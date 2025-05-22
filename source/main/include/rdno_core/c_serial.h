@@ -29,22 +29,21 @@ namespace ncore
             };
         }
 
-        // // Available gets the number of bytes (characters) available for reading from the serial port.
-        // // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/available/
-        s32 available();
+        // Available gets the number of bytes (characters) available for reading from the serial port.
+        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/available/
+        s32 Available();
 
-        // // Begin sets the data rate in bits per second (baud) for serial data transmission.
-        // // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
-        // func Begin(baud int) 
-        void begin(nbaud::Enum baud);
+        // Begin sets the data rate in bits per second (baud) for serial data transmission.
+        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
+        void Begin(nbaud::Enum baud);
 
-        // // Print prints data to the serial port as human-readable ASCII text.
-        // // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void print(const char* val);
+        // Print prints data to the serial port as human-readable ASCII text.
+        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
+        void Print(const char* val);
 
-        // // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
-        // // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void println(const char* val);
+        // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
+        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
+        void Println(const char* val);
 
     }  // namespace nserial
 }  // namespace ncore
