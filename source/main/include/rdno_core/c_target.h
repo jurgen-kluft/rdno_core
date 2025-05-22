@@ -1,12 +1,13 @@
-#ifndef __ACORE_TARGET_V2_H__
-#define __ACORE_TARGET_V2_H__
+#ifndef __RDNO_CORE_TARGET_V2_H__
+#define __RDNO_CORE_TARGET_V2_H__
 #include "rdno_core/config/c_compiler.h"
 #include "rdno_core/config/c_compiler_traits.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
 #endif
 
-// The platform is Arduino
+// Identify the platform and declare the CC_xxxx defines
+#include "rdno_core/config/c_platform.h"
 
 namespace ncore
 {
@@ -94,13 +95,49 @@ namespace ncore
     typedef unsigned int       u32;    // 32 bit unsigned integer. This works for both 32 bit and 64 bit platforms, as we assume the LP64 is followed.
     typedef s8                 sbyte;  // 8 bit signed integer
     typedef u8                 byte;   // 8 bit unsigned integer
-    typedef float              f32;
-    typedef double             f64;
+
+
+// According to the C98/99 standard, FLT_EVAL_METHOD defines control the
+// width used for floating point _t types.
+#if defined(_MSC_VER) && _MSC_VER >= 1800
+
+#elif defined(FLT_EVAL_METHOD)
+#    if (FLT_EVAL_METHOD == 0)
+    typedef float  f32;
+    typedef double f64;
+#    elif (FLT_EVAL_METHOD == 1)
+    typedef double f32;
+    typedef double f64;
+#    elif (FLT_EVAL_METHOD == 2)
+    typedef long double f32;
+    typedef long double f64;
+#    endif
+#endif
+
+#ifndef FLT_EVAL_METHOD
+#    define FLT_EVAL_METHOD 0
+    typedef float  f32;
+    typedef double f64;
+#endif
+
+#if defined(CC_COMPILER_MSVC)
+    typedef signed __int64   s64;
+    typedef unsigned __int64 u64;
+#else
+#    if defined(CC_PLATFORM_OSX)
+    typedef signed long   s64;
+    typedef unsigned long u64;
+    static_assert(sizeof(s64) == 8, "s64 must be 64 bits");
+    static_assert(sizeof(u64) == 8, "s64 must be 64 bits");
+#    else
     typedef signed long long   s64;
     typedef unsigned long long u64;
+    static_assert(sizeof(s64) == 8, "s64 must be 64 bits");
+    static_assert(sizeof(u64) == 8, "s64 must be 64 bits");
+#    endif
+#endif
 
-// 
-#define CC_PLATFORM_PTR_SIZE 4
+    typedef s64 i64;
 
 #if (CC_PLATFORM_PTR_SIZE == 4)
     typedef s32 ptr_t;

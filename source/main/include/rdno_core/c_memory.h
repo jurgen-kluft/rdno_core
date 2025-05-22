@@ -1,5 +1,5 @@
-#ifndef __ACORE_MEMORY_STD_H__
-#define __ACORE_MEMORY_STD_H__
+#ifndef __RDNO_CORE_MEMORY_STD_H__
+#define __RDNO_CORE_MEMORY_STD_H__
 #include "rdno_core/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once

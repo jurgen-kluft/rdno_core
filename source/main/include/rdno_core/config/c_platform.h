@@ -1,10 +1,11 @@
-#ifndef __ACORE_TARGET_PLATFORM_V2_H__
-#define __ACORE_TARGET_PLATFORM_V2_H__
+#ifndef __RDNO_CORE_TARGET_PLATFORM_V2_H__
+#define __RDNO_CORE_TARGET_PLATFORM_V2_H__
 #pragma once
 
 namespace ncore
 {
     // Platform define emanations from this file:
+    // #define CC_PLATFORM_ESP32
     // #define CC_PLATFORM_ANDROID
     // #define CC_PLATFORM_APPLE
     // #define CC_PLATFORM_IPHONE
@@ -282,6 +283,34 @@ namespace ncore
     #if defined(__GNUC__)
         #define CC_ASM_STYLE_ATT 1
     #endif
+
+#elif defined (CC_PLATFORM_XTENSA) || (defined(__xtensa__))
+
+    #undef CC_PLATFORM_XTENSA
+    #define CC_PLATFORM_XTENSA  1
+    #define CC_PLATFORM_DESKTOP 0
+    #define CC_PLATFORM_BSD     0
+    #define CC_PLATFORM_UNIX    0
+    #define CC_PLATFORM_POSIX   0  
+    #define CC_PLATFORM_NAME    "xtensa" // xtensa esp32 
+    #if __ORDER_LITTLE_ENDIAN__  == 1234
+        #define CC_SYSTEM_LITTLE_ENDIAN 1
+        #define CC_PLATFORM_DESCRIPTION "xtensa on esp32"
+        #define CC_PLATFORM_PTR_SIZE 4
+        #define CC_CACHE_LINE_SIZE __XCHAL_DCACHE_LINESIZE
+    #else
+        #error Unknown processor
+        #error Unknown endianness
+    #endif
+    #if __SIZE_WIDTH__ == 32
+        #define CC_PLATFORM_PTR_SIZE 4
+    #else 
+        #define CC_PLATFORM_PTR_SIZE 8
+    #endif
+    #if defined(__GNUC__)
+        #define CC_ASM_STYLE_ATT 1
+    #endif
+
 
 #elif defined(CC_PLATFORM_BSD) || (defined(__BSD__) || defined(__FreeBSD__))
     #undef CC_PLATFORM_BSD
