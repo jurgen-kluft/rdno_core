@@ -8,7 +8,7 @@ namespace ncore
 {
     namespace nadc
     {
-        s32 analogRead(u8 pin)
+        s32 AnalogRead(u8 pin)
         {
             return ::analogRead(pin);
         }
@@ -22,7 +22,7 @@ namespace ncore
 {
     namespace nadc
     {
-        s32 analogRead(u8 pin)
+        s32 AnalogRead(u8 pin)
         {
             return 42;
         }
