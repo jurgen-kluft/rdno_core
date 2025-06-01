@@ -8,7 +8,7 @@ namespace ncore
 {
     namespace nserial
     {
-        s32 available()
+        s32 Available()
         {
             return Serial.available();
         }
@@ -16,21 +16,21 @@ namespace ncore
         // // Begin sets the data rate in bits per second (baud) for serial data transmission.
         // // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
         // func Begin(baud int) 
-        void begin(nbaud::Enum baud)
+        void Begin(nbaud::Enum baud)
         {
             Serial.begin(baud);
         }
 
         // // Print prints data to the serial port as human-readable ASCII text.
         // // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void print(const char* val)
+        void Print(const char* val)
         {
             Serial.print(val);
         }
 
         // // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
         // // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void println(const char* val)
+        void Println(const char* val)
         {
             Serial.println(val);
         }
@@ -44,12 +44,12 @@ namespace ncore
 {
     namespace nserial
     {
-        s32 available(){ return 0; }
+        s32 Available(){ return 0; }
 
         // // Begin sets the data rate in bits per second (baud) for serial data transmission.
         // // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
         // func Begin(baud int) 
-        void begin(nbaud::Enum baud)
+        void Begin(nbaud::Enum baud)
         {
             // No operation in simulation
             (void)baud;
@@ -57,7 +57,7 @@ namespace ncore
 
         // // Print prints data to the serial port as human-readable ASCII text.
         // // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void print(const char* val)
+        void Print(const char* val)
         {
             // No operation in simulation
             (void)val;
@@ -65,7 +65,7 @@ namespace ncore
 
         // // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
         // // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void println(const char* val)
+        void Println(const char* val)
         {
             // No operation in simulation
             (void)val;

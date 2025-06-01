@@ -293,20 +293,37 @@ namespace ncore
     #define CC_PLATFORM_UNIX    0
     #define CC_PLATFORM_POSIX   0  
     #define CC_PLATFORM_NAME    "xtensa" // xtensa esp32 
-    #if __ORDER_LITTLE_ENDIAN__  == 1234
+    #define CC_PLATFORM_DESCRIPTION "xtensa on esp32"
+    #if __ORDER_LITTLE_ENDIAN__ == 1234
         #define CC_SYSTEM_LITTLE_ENDIAN 1
-        #define CC_PLATFORM_DESCRIPTION "xtensa on esp32"
-        #define CC_PLATFORM_PTR_SIZE 4
-        #define CC_CACHE_LINE_SIZE __XCHAL_DCACHE_LINESIZE
     #else
-        #error Unknown processor
-        #error Unknown endianness
+        #error xtensa unknown endianness
     #endif
+ 
+    #if __SIZEOF_INT__ == 4
+        #define CC_PLATFORM_WORD_SIZE 4
+    #elif __SIZEOF_INT__ == 8
+        #define CC_PLATFORM_WORD_SIZE 8
+    #else
+        #error xtensa unknown word size
+    #endif
+ 
     #if __SIZE_WIDTH__ == 32
         #define CC_PLATFORM_PTR_SIZE 4
     #else 
         #define CC_PLATFORM_PTR_SIZE 8
     #endif
+
+    #if __XCHAL_DCACHE_LINESIZE == 16
+        #define CC_CACHE_LINE_SIZE 16
+    #elif __XCHAL_DCACHE_LINESIZE == 32
+        #define CC_CACHE_LINE_SIZE 32
+    #elif __XCHAL_DCACHE_LINESIZE == 64
+        #define CC_CACHE_LINE_SIZE 64
+    #else
+        #error xtensa unknown cache line size
+    #endif
+
     #if defined(__GNUC__)
         #define CC_ASM_STYLE_ATT 1
     #endif

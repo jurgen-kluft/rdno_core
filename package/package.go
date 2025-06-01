@@ -17,24 +17,35 @@ import (
 // - UART
 // - WiFi
 
-// GetPackage returns the package object of 'rdno_core'
+const (
+	repo_path = "github.com\\jurgen-kluft"
+	repo_name = "rdno_core"
+)
+
 func GetPackage() *denv.Package {
-	// Dependencies
-	unittestpkg := cunittest.GetPackage()
+	name := repo_name
 
-	// The main (rdno_core) package
-	mainpkg := denv.NewPackage("rdno_core")
-	mainpkg.AddPackage(unittestpkg)
+	// dependencies
+	cunittestpkg := cunittest.GetPackage()
 
-	// 'rdno_core' library
-	mainlib := denv.SetupCppLibProject("rdno_core", "github.com\\jurgen-kluft\\rdno_core")
+	// main package
+	mainpkg := denv.NewPackage(repo_path, repo_name)
+	mainpkg.AddPackage(cunittestpkg)
 
-	// 'rdno_core' unittest project, only for Windows, Mac and Linux
-	maintest := denv.SetupCppTestProjectForDesktop("rdno_core"+"test", "github.com\\jurgen-kluft\\rdno_core")
-	maintest.AddDependencies(mainlib)
-	maintest.AddDependencies(unittestpkg.GetMainLib()...)
+	// main library
+	mainlib := denv.SetupCppLibProject(mainpkg, name)
+
+	// test library
+	testlib := denv.SetupCppTestLibProject(mainpkg, name)
+	testlib.AddDependencies(cunittestpkg.GetTestLib()...)
+
+	// unittest project
+	maintest := denv.SetupCppTestProject(mainpkg, name)
+	maintest.AddDependencies(cunittestpkg.GetMainLib()...)
+	maintest.AddDependency(testlib)
 
 	mainpkg.AddMainLib(mainlib)
+	mainpkg.AddTestLib(testlib)
 	mainpkg.AddUnittest(maintest)
 	return mainpkg
 }

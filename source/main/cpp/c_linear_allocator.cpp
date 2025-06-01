@@ -7,7 +7,7 @@ namespace ncore
 {
     linear_alloc_t::linear_alloc_t()
         : mBuffer(nullptr)
-        , mSize(0)
+        , mCapacity(0)
         , mUsed(0)
     {
     }
@@ -15,16 +15,16 @@ namespace ncore
     linear_alloc_t::~linear_alloc_t()
     {
         // No need to free the buffer, it is managed externally
-        mBuffer = nullptr;
-        mSize   = 0;
-        mUsed   = 0;
+        mBuffer   = nullptr;
+        mCapacity = 0;
+        mUsed     = 0;
     }
 
-    void linear_alloc_t::setup(void* pBuffer, uint_t size)
+    void linear_alloc_t::setup(void* pBuffer, uint_t capacity)
     {
-        mBuffer = pBuffer;
-        mSize   = size;
-        mUsed   = 0;
+        mBuffer   = pBuffer;
+        mCapacity = capacity;
+        mUsed     = 0;
     }
 
     void* linear_alloc_t::v_allocate(u32 size, u32 align)
@@ -33,7 +33,7 @@ namespace ncore
         size = (size + (align - 1)) & ~(align - 1);
 
         // Check if there is enough space
-        if (mUsed + size > mSize)
+        if (mUsed + size > mCapacity)
         {
             return nullptr;  // Not enough space
         }
@@ -50,4 +50,4 @@ namespace ncore
         (void)p;
     }
 
-}; // namespace ncore
+};  // namespace ncore

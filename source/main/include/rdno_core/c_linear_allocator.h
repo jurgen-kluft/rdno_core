@@ -19,9 +19,9 @@ namespace ncore
         linear_alloc_t();
         ~linear_alloc_t();
 
-        void setup(void* pBuffer, uint_t size);
+        void setup(void* pBuffer, uint_t capacity);
 
-        uint_t getSize() const { return mSize; }
+        uint_t getCapacity() const { return mCapacity; }
         uint_t getUsed() const { return mUsed; }
 
     private:
@@ -29,7 +29,7 @@ namespace ncore
         virtual void  v_deallocate(void* p);            // Deallocate/Free memory
 
         void*  mBuffer;
-        uint_t mSize;
+        uint_t mCapacity;
         uint_t mUsed;
     };
 
