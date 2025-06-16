@@ -94,6 +94,7 @@ namespace ncore
         {
             typedef byte Value;
             const Value  BedPresence = 0x01;
+            const Value  AirQuality = 0x02;
         }  // namespace DeviceLabel
 
         // Note: Little Endian byte order
