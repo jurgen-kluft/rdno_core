@@ -7,45 +7,60 @@
 
 namespace ncore
 {
+    namespace nbaud
+    {
+        enum Enum
+        {
+            Rate300    = 300,
+            Rate600    = 600,
+            Rate1200   = 1200,
+            Rate2400   = 2400,
+            Rate4800   = 4800,
+            Rate9600   = 9600,
+            Rate14400  = 14400,
+            Rate19200  = 19200,
+            Rate28800  = 28800,
+            Rate38400  = 38400,
+            Rate57600  = 57600,
+            Rate115200 = 115200,
+        };
+    }
+    namespace nconfig
+    {
+        enum Enum
+        {
+            MODE_8N1 = 0x800001c,
+        };
+    }
+
     namespace nserial
     {
-        // @see: https://docs.arduino.cc/language-reference/en/functions/communication/serial
-        namespace nbaud
-        {
-            enum Enum
-            {
-                Rate300    = 300,
-                Rate600    = 600,
-                Rate1200   = 1200,
-                Rate2400   = 2400,
-                Rate4800   = 4800,
-                Rate9600   = 9600,
-                Rate14400  = 14400,
-                Rate19200  = 19200,
-                Rate28800  = 28800,
-                Rate38400  = 38400,
-                Rate57600  = 57600,
-                Rate115200 = 115200,
-            };
-        }
-
-        // Available gets the number of bytes (characters) available for reading from the serial port.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/available/
-        s32 Available();
-
-        // Begin sets the data rate in bits per second (baud) for serial data transmission.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
-        void Begin(nbaud::Enum baud);
-
-        // Print prints data to the serial port as human-readable ASCII text.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
+        void Begin(nbaud::Enum baud = nbaud::Rate115200);
         void Print(const char* val);
-
-        // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
         void Println(const char* val);
-
+        void Write(const byte* data, s32 length);
     }  // namespace nserial
+
+    namespace nserial1
+    {
+        void Begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin);
+        s32  Available();
+        void Print(const char* val);
+        void Println(const char* val);
+        void Write(const byte* data, s32 length);
+        s32  ReadUntil(char terminator, char* outString, s32 outMaxLength);
+    }  // namespace nserial1
+
+    namespace nserial2
+    {
+        void Begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin);
+        s32  Available();
+        void Print(const char* val);
+        void Println(const char* val);
+        void Write(const byte* data, s32 length);
+        s32  ReadUntil(char terminator, char* outString, s32 outMaxLength);
+    }  // namespace nserial2
+
 }  // namespace ncore
 
 #endif  // __RDNO_CORE_SERIAL_H__

@@ -9,6 +9,71 @@ namespace ncore
 {
     namespace nsensor
     {
+        namespace DeviceLocation
+        {
+            typedef u16 Value;
+            const Value Unknown   = 0;
+            const Value Location1 = 0x01;
+            const Value Location2 = 0x02;
+            const Value Location3 = 0x03;
+            const Value Location4 = 0x04;
+            const Value Location5 = 0x05;
+            const Value Location6 = 0x06;
+            const Value Location7 = 0x07;
+            const Value Location8 = 0x08;
+            const Value Location9 = 0x09;
+            // Note: Max 15 rooms
+            const Value Location15 = 0x0F;
+
+            const Value Area1 = 0x10;
+            const Value Area2 = 0x20;
+            const Value Area3 = 0x30;
+            const Value Area4 = 0x40;
+            const Value Area5 = 0x50;
+            const Value Area6 = 0x60;
+            const Value Area7 = 0x70;
+            const Value Area8 = 0x80;
+            const Value Area9 = 0x90;
+            // Note: Max 15 areas
+            const Value Area15 = 0xF0;
+
+            const Value Bedroom    = 0x0100;
+            const Value Livingroom = 0x0200;
+            const Value Kitchen    = 0x0300;
+            const Value Bathroom   = 0x0400;
+            const Value Hallway    = 0x0500;
+            const Value Balcony    = 0x0600;
+            const Value Study      = 0x0700;
+            const Value Pantry     = 0x0800;
+        }  // namespace DeviceLocation
+
+        namespace SensorModel
+        {
+            typedef u8  Value;
+            const Value GPIO = 0x0;
+            const Value BH1750 = 0x10;
+            const Value BME280 = 0x11;
+            const Value SCD4X  = 0x12;
+            const Value HMMD  = 0x13;
+        };  // namespace SensorModel
+
+        namespace SensorType
+        {
+            typedef u8  Value;
+            const Value Temperature = 0x0;   // (float, °C)
+            const Value Humidity    = 0x1;   // (float, %)
+            const Value Pressure    = 0x2;   // (float, hPa)
+            const Value Light       = 0x3;   // (float, lux)
+            const Value CO2         = 0x4;   // (float, ppm)
+            const Value VOC         = 0x5;   // (float, ppm)
+            const Value PM1_0       = 0x6;   // (float, µg/m3)
+            const Value PM2_5       = 0x7;   // (float, µg/m3)
+            const Value PM10        = 0x8;   // (float, µg/m3)
+            const Value Noise       = 0x9;   // (float, dB)
+            const Value Presence    = 0x10;  // (float, 0.0-1.0)
+            const Value Target      = 0x20;  // (channel index indicates X, Y, Z axis)
+        };  // namespace SensorType
+
         namespace SensorState
         {
             typedef u8  Value;
@@ -16,19 +81,6 @@ namespace ncore
             const Value On    = 0x2;
             const Value Error = 0x3;
         };  // namespace SensorState
-
-        namespace SensorChannel
-        {
-            typedef u8  Value;
-            const Value Channel0 = 0x0;
-            const Value Channel1 = 0x1;
-            const Value Channel2 = 0x2;
-            const Value Channel3 = 0x3;
-            const Value Channel4 = 0x4;
-            const Value Channel5 = 0x5;
-            const Value Channel6 = 0x6;
-            const Value Channel7 = 0x7;
-        };  // namespace SensorChannel
 
         namespace FieldType
         {
@@ -42,58 +94,10 @@ namespace ncore
             const Value TypeF32 = 0x6;
         };  // namespace FieldType
 
-        namespace SensorType
-        {
-            typedef u8  Value;
-            const Value Temperature = 0x0;  //
-            const Value Humidity    = 0x1;  //
-            const Value Pressure    = 0x2;  //
-            const Value Light       = 0x3;  //
-            const Value CO2         = 0x4;  //
-            const Value Presence    = 0x5;  // (float, 0.0-1.0)
-            const Value Target      = 0x6;  // (channel index indicates X, Y, Z axis)
-        };  // namespace SensorType
-
-        namespace DeviceLocation
-        {
-            typedef byte Value;
-            const Value  Unknown     = 0;
-            const Value  Bedroom1    = 1;
-            const Value  Bedroom2    = 2;
-            const Value  Bedroom3    = 3;
-            const Value  Bedroom4    = 4;
-            const Value  Livingroom1 = 5;
-            const Value  Livingroom2 = 6;
-            const Value  Livingroom3 = 7;
-            const Value  Livingroom4 = 8;
-            const Value  Kitchen1    = 9;
-            const Value  Kitchen2    = 10;
-            const Value  Kitchen3    = 11;
-            const Value  Kitchen4    = 12;
-            const Value  Bathroom1   = 13;
-            const Value  Bathroom2   = 14;
-            const Value  Bathroom3   = 15;
-            const Value  Bathroom4   = 16;
-            const Value  Hallway     = 17;
-            const Value  ChildARoom  = 18;
-            const Value  ChildBRoom  = 19;
-            const Value  ChildCRoom  = 20;
-            const Value  ChildDRoom  = 21;
-            const Value  Guest1Room  = 22;
-            const Value  Guest2Room  = 23;
-            const Value  Study1Room  = 24;
-            const Value  Study2Room  = 25;
-            const Value  Balcony1    = 26;
-            const Value  Balcony2    = 27;
-            const Value  Balcony3    = 28;
-            const Value  Balcony4    = 29;
-
-        }  // namespace DeviceLocation
-
         namespace DeviceLabel
         {
             typedef byte Value;
-            const Value  BedPresence = 0x01;
+            const Value  Presence   = 0x01;
             const Value  AirQuality = 0x02;
         }  // namespace DeviceLabel
 
@@ -139,7 +143,7 @@ namespace ncore
             enum
             {
                 // Packet header
-                HeaderSize      = 2 + 2 + 1 + 1 + 1 + 1,  // length, sequence, version, location, label, count
+                HeaderSize        = 2 + 2 + 1 + 1 + 1 + 1,  // length, sequence, version, location, label, count
                 LengthOffset      = 0,
                 SensorCountOffset = 7,
             };
@@ -148,15 +152,15 @@ namespace ncore
 
             void write_info(DeviceLocation::Value location, DeviceLabel::Value label);
 
-            void write_sensor_value(SensorType::Value type, SensorChannel::Value channel, SensorState::Value state, s8 value);
-            void write_sensor_value(SensorType::Value type, SensorChannel::Value channel, SensorState::Value state, s16 value);
-            void write_sensor_value(SensorType::Value type, SensorChannel::Value channel, SensorState::Value state, s32 value);
+            void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, s8 value);
+            void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, s16 value);
+            void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, s32 value);
 
-            void write_sensor_value(SensorType::Value type, SensorChannel::Value channel, SensorState::Value state, u8 value);
-            void write_sensor_value(SensorType::Value type, SensorChannel::Value channel, SensorState::Value state, u16 value);
-            void write_sensor_value(SensorType::Value type, SensorChannel::Value channel, SensorState::Value state, u32 value);
+            void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u8 value);
+            void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u16 value);
+            void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u32 value);
 
-            void write_sensor_value(SensorType::Value type, SensorChannel::Value channel, SensorState::Value state, f32 value);
+            void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, f32 value);
 
             void finalize();
         };
