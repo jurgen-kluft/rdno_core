@@ -24,6 +24,48 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
         void Print(const char* val) { Serial.print(val); }
 
+        void PrintU8(const u8 val, bool hex)
+        {
+            if (hex)
+            {
+                if (val < 16)
+                {
+                    Serial.print("0");
+                }
+                Serial.print(val, HEX);
+            }
+            else
+            {
+                Serial.print((unsigned int)val);
+            }
+        }
+
+        void PrintIp(const IPAddress_t address)
+        {
+            Serial.print((unsigned int)address.m_address[0]);
+            Serial.print(".");
+            Serial.print((unsigned int)address.m_address[1]);
+            Serial.print(".");
+            Serial.print((unsigned int)address.m_address[2]);
+            Serial.print(".");
+            Serial.print((unsigned int)address.m_address[3]);
+        }
+
+        void PrintMac(const MACAddress_t address)
+        {
+            Serial.print((unsigned int)address.m_address[0]);
+            Serial.print(":");
+            Serial.print((unsigned int)address.m_address[1]);
+            Serial.print(":");
+            Serial.print((unsigned int)address.m_address[2]);
+            Serial.print(":");
+            Serial.print((unsigned int)address.m_address[3]);
+            Serial.print(":");
+            Serial.print((unsigned int)address.m_address[4]);
+            Serial.print(":");
+            Serial.print((unsigned int)address.m_address[5]);
+        }
+
         // Println prints data to the serial port as human-readable ASCII text followed by a
         // carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/

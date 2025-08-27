@@ -5,6 +5,8 @@
 #    pragma once
 #endif
 
+#include "rdno_core/c_network.h"
+
 namespace ncore
 {
     namespace nbaud
@@ -37,6 +39,9 @@ namespace ncore
     {
         void Begin(nbaud::Enum baud = nbaud::Rate115200);
         void Print(const char* val);
+        void PrintU8(const u8 val, bool hex = false);
+        void PrintIp(const IPAddress_t address);
+        void PrintMac(const MACAddress_t address);
         void Println(const char* val);
         void Write(const byte* data, s32 length);
     }  // namespace nserial
