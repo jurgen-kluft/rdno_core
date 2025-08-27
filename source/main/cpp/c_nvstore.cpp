@@ -2,7 +2,8 @@
 
 #ifdef TARGET_ESP32
 
-#    include "Arduino.h"
+#include "rdno_core/c_memory.h"
+
 #    include "nvs_flash.h"
 #    include "nvs.h"
 
@@ -68,7 +69,7 @@ namespace ncore
                 }
 
                 if (err != ESP_OK)
-                    memset(config, 0, sizeof(config_t));
+                    g_memset(config, 0, sizeof(config_t));
 
                 nvs_close(my_handle);
             }
