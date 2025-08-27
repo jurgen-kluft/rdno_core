@@ -74,8 +74,8 @@ namespace ncore
             }
         }
 
-    }  // namespace nvstore
-}  // namespace ncore
+    } // namespace nvstore
+} // namespace ncore
 
 #else
 
@@ -86,7 +86,145 @@ namespace ncore
         void Save(config_t* config) {}
         bool Load(config_t* config) { return true; }
 
-    }  // namespace nvstore
-}  // namespace ncore
+    } // namespace nvstore
+} // namespace ncore
 
 #endif
+
+namespace ncore
+{
+    namespace nvstore
+    {
+        static const char* SkipWhitespace(const char* str, const char* end)
+        {
+            while (str < end && (*str == ' ' || *str == '\t' || *str == '\r' || *str == '\n'))
+                str++;
+            return str;
+        }
+
+        static const char* FindChar(const char* str, const char* end, char ch)
+        {
+            while (str < end && *str != ch)
+                str++;
+            return str;
+        }
+
+        // Message example: "ssid=OBNOSIS8, password=MySecretPassword, remote_server=10.0.0.22, remote_port=1234"
+        bool ParseKeyValue(const char*& msg, const char* msgEnd, const char*& outKey, s32& outKeyLength, const char*& outValue, s32& outValueLength)
+        {
+            outKey = SkipWhitespace(msg, msgEnd);
+            if (outKey == msgEnd)
+                return false; // No more key-value pairs
+            const char* equalSign = FindChar(outKey, msgEnd, '=');
+            if (equalSign == msgEnd)
+                return false; // No '=' found
+            outKeyLength = static_cast<s32>(equalSign - outKey);
+
+            outValue = SkipWhitespace(equalSign + 1, msgEnd);
+            if (outValue == msgEnd)
+                return false; // No value found
+            const char* comma = FindChar(outValue, msgEnd, ',');
+            outValueLength    = static_cast<s32>((comma == msgEnd ? msgEnd : comma) - outValue);
+
+            msg = (comma == msgEnd) ? msgEnd : SkipWhitespace(comma + 1, msgEnd);
+            return msg < msgEnd;
+        }
+
+        void ParseValue(config_t* config, s16 id, const char* str, s32 len)
+        {
+            if (config == nullptr || (id < 0 || id >= 63))
+                return;
+            switch (config->m_params[id].m_type)
+            {
+                case nvstore::TYPE_NONE: break;
+                case nvstore::TYPE_STRING: nvstore::SetString(config, id, outValue, outValueLength); break;
+                case nvstore::TYPE_S32: nvstore::ParseS32(config, id, outValue, outValueLength); break;
+                case nvstore::TYPE_BOOL: nvstore::ParseBool(config, id, outValue, outValueLength); break;
+            }
+        }
+
+        void ParseS32(config_t* config, s16 id, const char* str, s32 len)
+        {
+            if (config == nullptr || (id < 0 || id >= 63))
+                return;
+            char buffer[16];
+            s32  copyLen = len < 15 ? len : 15;
+            strncpy(buffer, str, copyLen);
+            buffer[copyLen] = '\0';
+            s32 value       = static_cast<s32>(strtol(buffer, nullptr, 10));
+            SetS32(config, id, value);
+        }
+
+        void ParseBool(config_t* config, s16 id, const char* str, s32 len)
+        {
+            if (config == nullptr || (id < 0 || id >= 63))
+                return;
+            bool value = (len == 4 && strncmp(str, "true", 4) == 0) || (len == 1 && strncmp(str, "1", 1) == 0);
+            SetBool(config, id, value);
+        }
+
+        void SetString(config_t* config, s16 id, const char* str, s32 strLen)
+        {
+            if (config == nullptr || (id < 0 || id >= 63))
+                return;
+
+            s32 str_index;
+            if (config->m_params[id].m_type == TYPE_NONE)
+            {
+                if (config->m_string_count >= 32)
+                {
+                    return; // No more space for strings
+                }
+
+                str_index                    = config->m_string_count++;
+                config->m_params[id].m_type  = TYPE_STRING;
+                config->m_params[id].m_value = str_index;
+            }
+            else
+            {
+                str_index = config->m_params[id].m_value;
+            }
+            strncpy(&config->m_strings[str_index * 32], str, strLen < 31 ? strLen : 31);
+            config->m_strings[str_index * 32 + 31] = '\0'; // Ensure null termination
+        }
+
+        const char* GetString(const config_t* config, s16 id)
+        {
+            if (config == nullptr || (id < 0 || id >= 63))
+                return "";
+            if (config->m_params[id].m_type != TYPE_STRING)
+                return "";
+            s32 const str_index = config->m_params[id].m_value;
+            if (str_index < 0 || str_index >= config->m_string_count)
+                return "";
+            return &config->m_strings[str_index * 32];
+        }
+        void SetS32(config_t* config, s16 id, s32 value)
+        {
+            if (config == nullptr || (id < 0 || id >= 63))
+                return;
+            config->m_params[id].m_type  = TYPE_S32;
+            config->m_params[id].m_value = value;
+        }
+        s32 GetS32(const config_t* config, s16 id, s32 defaultValue)
+        {
+            if (config == nullptr || (id < 0 || id >= 63) || config->m_params[id].m_type != TYPE_S32)
+                return defaultValue;
+            return config->m_params[id].m_value;
+        }
+        void SetBool(config_t* config, s16 id, bool value)
+        {
+            if (config == nullptr || (id < 0 || id >= 63))
+                return;
+            config->m_params[id].m_type  = TYPE_BOOL;
+            config->m_params[id].m_value = value ? 1 : 0;
+        }
+        bool GetBool(const config_t* config, s16 id, bool defaultValue)
+        {
+            if (config == nullptr || (id < 0 || id >= 63) || config->m_params[id].m_type != TYPE_BOOL)
+                return defaultValue;
+            return config->m_params[id].m_value == 1;
+        }
+
+    } // namespace nvstore
+} // namespace ncore
