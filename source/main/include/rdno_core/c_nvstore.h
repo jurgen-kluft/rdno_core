@@ -51,13 +51,13 @@ namespace ncore
         // Message example: "ssid=OBNOSIS8, password=MySecretPassword, remote_server=10.0.0.22, remote_port=1234"
         bool ParseKeyValue(const char*& msg, const char* msgEnd, const char*& outKey, s32& outKeyLength, const char*& outValue, s32& outValueLength);
         void ParseValue(config_t* config, s16 id, const char* str, s32 len);
-        void ParseS32(config_t* config, s16 id, const char* str, s32 len);
+        void ParseInt(config_t* config, s16 id, const char* str, s32 len);
         void ParseBool(config_t* config, s16 id, const char* str, s32 len);
 
         void        SetString(config_t* config, s16 id, const char* str, s32 strLen);
         const char* GetString(const config_t* config, s16 id);
-        void        SetS32(config_t* config, s16 id, s32 value);
-        s32         GetS32(const config_t* config, s16 id, s32 defaultValue = 0);
+        void        SetInt(config_t* config, s16 id, s32 value);
+        s32         GetInt(const config_t* config, s16 id, s32 defaultValue = 0);
         void        SetBool(config_t* config, s16 id, bool value);
         bool        GetBool(const config_t* config, s16 id, bool defaultValue = false);
 

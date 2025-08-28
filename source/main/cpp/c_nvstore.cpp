@@ -6,6 +6,7 @@
 
 #    include "nvs_flash.h"
 #    include "nvs.h"
+#    include <string.h>
 
 namespace ncore
 {
@@ -138,13 +139,13 @@ namespace ncore
             switch (config->m_params[id].m_type)
             {
                 case nvstore::TYPE_NONE: break;
-                case nvstore::TYPE_STRING: nvstore::SetString(config, id, outValue, outValueLength); break;
-                case nvstore::TYPE_S32: nvstore::ParseS32(config, id, outValue, outValueLength); break;
-                case nvstore::TYPE_BOOL: nvstore::ParseBool(config, id, outValue, outValueLength); break;
+                case nvstore::TYPE_STRING: nvstore::SetString(config, id, str, len); break;
+                case nvstore::TYPE_S32: nvstore::ParseInt(config, id, str, len); break;
+                case nvstore::TYPE_BOOL: nvstore::ParseBool(config, id, str, len); break;
             }
         }
 
-        void ParseS32(config_t* config, s16 id, const char* str, s32 len)
+        void ParseInt(config_t* config, s16 id, const char* str, s32 len)
         {
             if (config == nullptr || (id < 0 || id >= 63))
                 return;
@@ -153,7 +154,7 @@ namespace ncore
             strncpy(buffer, str, copyLen);
             buffer[copyLen] = '\0';
             s32 value       = static_cast<s32>(strtol(buffer, nullptr, 10));
-            SetS32(config, id, value);
+            SetInt(config, id, value);
         }
 
         void ParseBool(config_t* config, s16 id, const char* str, s32 len)
@@ -200,14 +201,14 @@ namespace ncore
                 return "";
             return &config->m_strings[str_index * 32];
         }
-        void SetS32(config_t* config, s16 id, s32 value)
+        void SetInt(config_t* config, s16 id, s32 value)
         {
             if (config == nullptr || (id < 0 || id >= 63))
                 return;
             config->m_params[id].m_type  = TYPE_S32;
             config->m_params[id].m_value = value;
         }
-        s32 GetS32(const config_t* config, s16 id, s32 defaultValue)
+        s32 GetInt(const config_t* config, s16 id, s32 defaultValue)
         {
             if (config == nullptr || (id < 0 || id >= 63) || config->m_params[id].m_type != TYPE_S32)
                 return defaultValue;
