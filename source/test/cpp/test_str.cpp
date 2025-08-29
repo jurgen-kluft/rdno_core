@@ -91,8 +91,49 @@ UNITTEST_SUITE_BEGIN(str)
 			CHECK_FALSE(str_eq(str1, str3));
 			CHECK_TRUE(str_eq(str1, str3, false));
 			CHECK_FALSE(str_eq(str1, str4));
-			
 		}
+
+		UNITTEST_TEST(str_has_prefix)
+		{
+			str_t str1 = str_const("hello");
+			str_t str2 = str_const("he");
+			str_t str3 = str_const("He");
+			str_t str4 = str_const("hello world");
+
+			CHECK_TRUE(str_has_prefix(str1, str2));
+			CHECK_FALSE(str_has_prefix(str1, str3));
+			CHECK_TRUE(str_has_prefix(str1, str3, false));
+			CHECK_FALSE(str_has_prefix(str1, str4));
+		}
+
+		UNITTEST_TEST(str_has_suffix)
+		{
+			str_t str1 = str_const("hello");
+			str_t str2 = str_const("lo");
+			str_t str3 = str_const("Lo");
+			str_t str4 = str_const("world hello");
+
+			CHECK_TRUE(str_has_suffix(str1, str2));
+			CHECK_FALSE(str_has_suffix(str1, str3));
+			CHECK_TRUE(str_has_suffix(str1, str3, false));
+			CHECK_FALSE(str_has_suffix(str1, str4));
+		}
+
+//    bool        str_contains(str_t& s, str_t& substr, bool case_sensitive = true);    // test for substring
+
+		UNITTEST_TEST(str_contains)
+		{
+			str_t str1 = str_const("world");
+			str_t str2 = str_const("llo");
+			str_t str3 = str_const("WORLD");
+			str_t str4 = str_const("hello world");
+
+			CHECK_TRUE(str_contains(str4, str1));
+			CHECK_TRUE(str_contains(str4, str2));
+			CHECK_FALSE(str_contains(str4, str3));
+			CHECK_TRUE(str_contains(str4, str3, false));
+		}
+
 	}
 }
 UNITTEST_SUITE_END
