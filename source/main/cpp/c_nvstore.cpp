@@ -1,8 +1,9 @@
 #include "rdno_core/c_nvstore.h"
+#include "rdno_core/c_str.h"
 
 #ifdef TARGET_ESP32
 
-#include "rdno_core/c_memory.h"
+#    include "rdno_core/c_memory.h"
 
 #    include "nvs_flash.h"
 #    include "nvs.h"
@@ -76,8 +77,8 @@ namespace ncore
             }
         }
 
-    } // namespace nvstore
-} // namespace ncore
+    }  // namespace nvstore
+}  // namespace ncore
 
 #else
 
@@ -86,10 +87,10 @@ namespace ncore
     namespace nvstore
     {
         void Save(config_t* config) {}
-        bool Load(config_t* config) { return true; }
+        void Load(config_t* config) {}
 
-    } // namespace nvstore
-} // namespace ncore
+    }  // namespace nvstore
+}  // namespace ncore
 
 #endif
 
@@ -116,15 +117,15 @@ namespace ncore
         {
             outKey = SkipWhitespace(msg, msgEnd);
             if (outKey == msgEnd)
-                return false; // No more key-value pairs
+                return false;  // No more key-value pairs
             const char* equalSign = FindChar(outKey, msgEnd, '=');
             if (equalSign == msgEnd)
-                return false; // No '=' found
+                return false;  // No '=' found
             outKeyLength = static_cast<s32>(equalSign - outKey);
 
             outValue = SkipWhitespace(equalSign + 1, msgEnd);
             if (outValue == msgEnd)
-                return false; // No value found
+                return false;  // No value found
             const char* comma = FindChar(outValue, msgEnd, ',');
             outValueLength    = static_cast<s32>((comma == msgEnd ? msgEnd : comma) - outValue);
 
@@ -149,11 +150,11 @@ namespace ncore
         {
             if (config == nullptr || (id < 0 || id >= 63))
                 return;
-            char buffer[16];
-            s32  copyLen = len < 15 ? len : 15;
-            strncpy(buffer, str, copyLen);
-            buffer[copyLen] = '\0';
-            s32 value       = static_cast<s32>(strtol(buffer, nullptr, 10));
+            str_t s = str_const_n(str, 0, len, len);
+
+            s32 value = 0;
+            from_str(s, &value, 10);
+
             SetInt(config, id, value);
         }
 
@@ -161,8 +162,16 @@ namespace ncore
         {
             if (config == nullptr || (id < 0 || id >= 63))
                 return;
-            bool value = (len == 4 && strncmp(str, "true", 4) == 0) || (len == 1 && strncmp(str, "1", 1) == 0);
-            SetBool(config, id, value);
+
+            str_t s = str_const_n(str, 0, len, len);
+            if (str_eq(s, "true") || str_eq(s, "1"))
+            {
+                SetBool(config, id, true);
+            }
+            else
+            {
+                SetBool(config, id, false);
+            }
         }
 
         void SetString(config_t* config, s16 id, const char* str, s32 strLen)
@@ -175,7 +184,7 @@ namespace ncore
             {
                 if (config->m_string_count >= 32)
                 {
-                    return; // No more space for strings
+                    return;  // No more space for strings
                 }
 
                 str_index                    = config->m_string_count++;
@@ -186,8 +195,10 @@ namespace ncore
             {
                 str_index = config->m_params[id].m_value;
             }
-            strncpy(&config->m_strings[str_index * 32], str, strLen < 31 ? strLen : 31);
-            config->m_strings[str_index * 32 + 31] = '\0'; // Ensure null termination
+
+            str_t src = str_const_n(str, 0, strLen, strLen);
+            str_t dst = str_mutable(&config->m_strings[str_index * 32], 32);
+            str_append(dst, src);
         }
 
         const char* GetString(const config_t* config, s16 id)
@@ -228,5 +239,5 @@ namespace ncore
             return config->m_params[id].m_value == 1;
         }
 
-    } // namespace nvstore
-} // namespace ncore
+    }  // namespace nvstore
+}  // namespace ncore

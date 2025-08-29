@@ -1,7 +1,5 @@
 #include "rdno_core/c_network.h"
 
-#include "Arduino.h"
-
 namespace ncore
 {
     // examples of valid IP string addresses:
@@ -12,35 +10,36 @@ namespace ncore
     // "192.168.4"   (only 3 parts)
     // "10.001.1.1   (leading zero)
 
-    bool FromString(const char* str, IPAddress_t& outAddr)
+    bool FromString(const char* str, s32 strLen, IPAddress_t& outAddr)
     {
         if (str == nullptr)
             return false;
 
-        s32  parts[4]    = {0, 0, 0, 0};
-        s32  partIndex   = 0;
-        s32  partValue   = 0;
-        bool parsingPart = false;
+        byte parts[4]  = {0, 0, 0, 0};
+        s32  partIndex = 0;
+        s32  partValue = 0;
+        s32  partChars = 0;
 
-        while (*str != '\0')
+        const char* end = str + strLen;
+        while (str <= end)
         {
-            char ch = *str;
+            const char ch = str < end ? *str : '.';
             if (ch >= '0' && ch <= '9')
             {
-                if (!parsingPart && partValue == 0 && ch == '0')
-                    return false;  // Leading zero is not allowed
                 partValue = partValue * 10 + (ch - '0');
-                if (partValue > 255)
-                    return false;  // Each part must be in the range 0-255
-                parsingPart = true;
+                partChars++;
             }
             else if (ch == '.')
             {
-                if (!parsingPart || partIndex >= 3)
+                if (partChars == 0 || partIndex >= 4)
                     return false;  // Invalid format or too many parts
-                parts[partIndex++] = partValue;
+                if ((partValue <= 9 && partChars != 1) || (partValue > 9 && partValue <= 99 && partChars != 2))
+                    return false;  // Leading zero is not allowed
+                if (partValue > 255)
+                    return false;  // Each part must be in the range 0-255
+                parts[partIndex++] = (byte)partValue;
                 partValue          = 0;
-                parsingPart        = false;
+                partChars          = 0;
             }
             else
             {
@@ -49,89 +48,109 @@ namespace ncore
             str++;
         }
 
-        if (parsingPart && partIndex == 3)
+        if (partIndex == 4)
         {
-            parts[partIndex]     = partValue;  // Last part
-            outAddr.m_address[0] = static_cast<byte>(parts[0]);
-            outAddr.m_address[1] = static_cast<byte>(parts[1]);
-            outAddr.m_address[2] = static_cast<byte>(parts[2]);
-            outAddr.m_address[3] = static_cast<byte>(parts[3]);
+            outAddr.m_address[0] = parts[0];
+            outAddr.m_address[1] = parts[1];
+            outAddr.m_address[2] = parts[2];
+            outAddr.m_address[3] = parts[3];
             return true;
         }
 
         return false;  // Invalid format
     }
 
-    bool FromString(const char* str, MACAddress_t& outAddr)
+    bool FromString(const char* str, s32 strLen, MACAddress_t& outAddr)
     {
         if (str == nullptr)
             return false;
 
-        s32  parts[6]    = {0, 0, 0, 0, 0, 0};
-        s32  partIndex   = 0;
-        s32  partValue   = 0;
-        bool parsingPart = false;
+        byte parts[6]  = {0, 0, 0, 0, 0, 0};
+        s32  partIndex = 0;
+        s32  partValue = 0;
+        s32  partChars = 0;
 
-        while (*str != '\0')
+        const char* end = str + strLen;
+        while (str <= end)
         {
-            char ch = *str;
+            const char ch = str < end ? *str : ':';
             if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'))
             {
-                parsingPart = true;
-                partValue   = (partValue << 4) | (ch >= '0' && ch <= '9' ? (ch - '0') : (ch >= 'a' && ch <= 'f' ? (ch - 'a' + 10) : (ch - 'A' + 10)));
-                if (partValue > 255)
-                    return false;  // Each part must be in the range 0-255
+                partValue = (partValue << 4) | (ch >= '0' && ch <= '9' ? (ch - '0') : (ch >= 'a' && ch <= 'f' ? (ch - 'a' + 10) : (ch - 'A' + 10)));
+                partChars++;
             }
             else if (ch == ':')
             {
-                if (!parsingPart || partIndex >= 5)
+                if (partChars == 0 || partIndex >= 6)
                     return false;  // Invalid format or too many parts
+                if (partChars == 0 || partChars > 2)
+                    return false;  // Each part must have 1 or 2 hex digits
+                if (partValue > 0xFF)
+                    return false;  // Each part must be in the range 0x00-0
                 parts[partIndex++] = partValue;
                 partValue          = 0;
-                parsingPart        = false;
+                partChars          = 0;
             }
             else
             {
                 return false;  // Invalid character
             }
+
             str++;
         }
 
-        if (parsingPart && partIndex == 5)
+        if (partIndex == 6)
         {
-            parts[partIndex]     = partValue;  // Last part
-            outAddr.m_address[0] = static_cast<byte>(parts[0]);
-            outAddr.m_address[1] = static_cast<byte>(parts[1]);
-            outAddr.m_address[2] = static_cast<byte>(parts[2]);
-            outAddr.m_address[3] = static_cast<byte>(parts[3]);
-            outAddr.m_address[4] = static_cast<byte>(parts[4]);
-            outAddr.m_address[5] = static_cast<byte>(parts[5]);
+            outAddr.m_address[0] = parts[0];
+            outAddr.m_address[1] = parts[1];
+            outAddr.m_address[2] = parts[2];
+            outAddr.m_address[3] = parts[3];
+            outAddr.m_address[4] = parts[4];
+            outAddr.m_address[5] = parts[5];
             return true;
         }
 
         return false;  // Invalid format
     }
 
-    bool IsValidSSID(const char* ssid)
+    bool IsValidSSID(const char* ssid, s32 strLen)
     {
         if (ssid == nullptr)
             return false;
-        s32 length = strlen(ssid);
+        const char* iter = ssid;
+        const char* end  = ssid + strLen;
+        while (iter < end)
+        {
+            char ch = *iter;
+            if (ch < 32 || ch > 126)  // Printable ASCII range
+                return false;
+            iter++;
+        }
+        const s32 length = (s32)(iter - ssid);
         return length > 0 && length <= 32;
     }
 
-    bool IsValidPassword(const char* password)
+    bool IsValidPassword(const char* password, s32 strLen)
     {
         if (password == nullptr)
             return false;
-        s32 length = strlen(password);
+        const char* iter = password;
+        const char* end  = password + strLen;
+        while (iter < end)
+        {
+            char ch = *iter;
+            if (ch < 32 || ch > 126)  // Printable ASCII range
+                return false;
+            iter++;
+        }
+        const s32 length = (s32)(iter - password);
         return length >= 8 && length <= 64;
     }
 
-    bool IsValidIPAddress(const char* ipAddress)
+    bool IsValidIPAddress(const char* ipAddress, s32 strLen)
     {
         IPAddress_t addr;
-        return FromString(ipAddress, addr);
+        return FromString(ipAddress, strLen, addr);
     }
 
 }  // namespace ncore

@@ -50,11 +50,11 @@ namespace ncore
         namespace SensorModel
         {
             typedef u8  Value;
-            const Value GPIO = 0x0;
-            const Value BH1750 = 0x10;
-            const Value BME280 = 0x11;
-            const Value SCD4X  = 0x12;
-            const Value HMMD  = 0x13;
+            const Value GPIO   = 0x0;   // Generic GPIO sensor
+            const Value BH1750 = 0x10;  // Light sensor
+            const Value BME280 = 0x11;  // Temperature, Humidity, Pressure sensor
+            const Value SCD4X  = 0x12;  // CO2, Temperature, Humidity sensor
+            const Value HMMD   = 0x13;  // Presence (Doppler radar) sensor
         };  // namespace SensorModel
 
         namespace SensorType

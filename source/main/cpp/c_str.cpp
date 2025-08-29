@@ -1,8 +1,6 @@
 #include "rdno_core/c_str.h"
 #include "rdno_core/c_memory.h"
 
-#include "Arduino.h"
-
 namespace ncore
 {
     inline s16 str_len(const char* str)

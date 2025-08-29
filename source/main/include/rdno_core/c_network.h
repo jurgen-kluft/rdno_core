@@ -18,12 +18,12 @@ namespace ncore
         byte m_address[6];
     };
 
-    bool FromString(const char* str, IPAddress_t& outAddr);
-    bool FromString(const char* str, MACAddress_t& outAddr);
+    bool FromString(const char* str, s32 strLen, IPAddress_t& outAddr);
+    bool FromString(const char* str, s32 strLen, MACAddress_t& outAddr);
 
-    bool IsValidSSID(const char* ssid);
-    bool IsValidPassword(const char* password);
-    bool IsValidIPAddress(const char* ipAddress);
+    bool IsValidSSID(const char* ssid, s32 strLen);
+    bool IsValidPassword(const char* password, s32 strLen);
+    bool IsValidIPAddress(const char* ipAddress, s32 strLen);
 
 }  // namespace ncore
 

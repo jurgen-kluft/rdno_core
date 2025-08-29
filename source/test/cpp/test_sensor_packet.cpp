@@ -18,12 +18,12 @@ UNITTEST_SUITE_BEGIN(sensor_packet)
 		{
 			SensorPacket_t packet;
 			packet.begin(1, 1);
-			packet.write_info(DeviceLocation::Bedroom1, DeviceLabel::BedPresence);
+			packet.write_info(DeviceLocation::Bedroom | DeviceLocation::Location1, DeviceLabel::Presence);
 
 			// Write sensor values
-			packet.write_sensor_value(SensorType::Temperature, SensorChannel::Channel0, SensorState::On, (s8)25);
-			packet.write_sensor_value(SensorType::Humidity, SensorChannel::Channel1, SensorState::On, (s16)60);
-			packet.write_sensor_value(SensorType::Presence, SensorChannel::Channel2, SensorState::On, 0.75f);
+			packet.write_sensor_value(SensorType::Temperature, SensorModel::BME280, SensorState::On, (s8)25);
+			packet.write_sensor_value(SensorType::Humidity, SensorModel::BME280, SensorState::On, (s16)60);
+			packet.write_sensor_value(SensorType::Presence, SensorModel::HMMD, SensorState::On, 0.75f);
 
 			// Finalize the packet
 			packet.finalize();

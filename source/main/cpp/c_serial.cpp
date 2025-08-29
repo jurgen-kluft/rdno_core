@@ -254,7 +254,6 @@ namespace ncore
             // No operation in simulation
             (void)data;
             (void)length;
-            (void)port;
         }
 
         s32 ReadUntil(char terminator, char* outString, s32 outMaxLength)
@@ -263,114 +262,110 @@ namespace ncore
             (void)terminator;
             (void)outString;
             (void)outMaxLength;
-            (void)port;
             return 0;  // Return 0 bytes read
         }
+    }  // namespace nserial
+    
+    namespace nserial1
+    {
+        // Begin sets the data rate in bits per second (baud) for serial data transmission.
+        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
 
-        namespace nserial1
+        void Begin2(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
         {
-            // Begin sets the data rate in bits per second (baud) for serial data transmission.
-            // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
+            (void)baud;
+            (void)config;
+            (void)rxPin;
+            (void)txPin;
+        }
 
-            void Begin2(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
-            {
-                (void)baud;
-                (void)config;
-                (void)rxPin;
-                (void)txPin;
-            }
+        s32 Available() { return 0; }
 
-            s32 Available() { return 0; }
-
-            // Print prints data to the serial port as human-readable ASCII text.
-            // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-            void Print(const char* val)
-            {
-                // No operation in simulation
-                (void)val;
-            }
-
-            // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
-            // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-            void Println(const char* val)
-            {
-                // No operation in simulation
-                (void)val;
-            }
-
-            // Write writes data to the serial port.
-            // @see: https://www.arduino.cc/reference/en/language/functions/communication
-            void Write(const byte* data, s32 length)
-            {
-                // No operation in simulation
-                (void)data;
-                (void)length;
-                (void)port;
-            }
-
-            s32 ReadUntil(char terminator, char* outString, s32 outMaxLength)
-            {
-                // No operation in simulation
-                (void)terminator;
-                (void)outString;
-                (void)outMaxLength;
-                (void)port;
-                return 0;  // Return 0 bytes read
-            }
-        }  // namespace nserial1
-
-        namespace nserial2
+        // Print prints data to the serial port as human-readable ASCII text.
+        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
+        void Print(const char* val)
         {
-            // Begin sets the data rate in bits per second (baud) for serial data transmission.
-            // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
+            // No operation in simulation
+            (void)val;
+        }
 
-            void Begin2(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
-            {
-                (void)baud;
-                (void)config;
-                (void)rxPin;
-                (void)txPin;
-            }
+        // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
+        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
+        void Println(const char* val)
+        {
+            // No operation in simulation
+            (void)val;
+        }
 
-            s32 Available() { return 0; }
+        // Write writes data to the serial port.
+        // @see: https://www.arduino.cc/reference/en/language/functions/communication
+        void Write(const byte* data, s32 length)
+        {
+            // No operation in simulation
+            (void)data;
+            (void)length;
+        }
 
-            // Print prints data to the serial port as human-readable ASCII text.
-            // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-            void Print(const char* val)
-            {
-                // No operation in simulation
-                (void)val;
-            }
+        s32 ReadUntil(char terminator, char* outString, s32 outMaxLength)
+        {
+            // No operation in simulation
+            (void)terminator;
+            (void)outString;
+            (void)outMaxLength;
+            return 0;  // Return 0 bytes read
+        }
+    }  // namespace nserial1
 
-            // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
-            // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-            void Println(const char* val)
-            {
-                // No operation in simulation
-                (void)val;
-            }
+    namespace nserial2
+    {
+        // Begin sets the data rate in bits per second (baud) for serial data transmission.
+        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
 
-            // Write writes data to the serial port.
-            // @see: https://www.arduino.cc/reference/en/language/functions/communication
-            void Write(const byte* data, s32 length)
-            {
-                // No operation in simulation
-                (void)data;
-                (void)length;
-                (void)port;
-            }
+        void Begin2(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
+        {
+            (void)baud;
+            (void)config;
+            (void)rxPin;
+            (void)txPin;
+        }
 
-            s32 ReadUntil(char terminator, char* outString, s32 outMaxLength)
-            {
-                // No operation in simulation
-                (void)terminator;
-                (void)outString;
-                (void)outMaxLength;
-                (void)port;
-                return 0;  // Return 0 bytes read
-            }
-        }  // namespace nserial2
+        s32 Available() { return 0; }
 
-    }  // namespace ncore
+        // Print prints data to the serial port as human-readable ASCII text.
+        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
+        void Print(const char* val)
+        {
+            // No operation in simulation
+            (void)val;
+        }
+
+        // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
+        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
+        void Println(const char* val)
+        {
+            // No operation in simulation
+            (void)val;
+        }
+
+        // Write writes data to the serial port.
+        // @see: https://www.arduino.cc/reference/en/language/functions/communication
+        void Write(const byte* data, s32 length)
+        {
+            // No operation in simulation
+            (void)data;
+            (void)length;
+        }
+
+        s32 ReadUntil(char terminator, char* outString, s32 outMaxLength)
+        {
+            // No operation in simulation
+            (void)terminator;
+            (void)outString;
+            (void)outMaxLength;
+            return 0;  // Return 0 bytes read
+        }
+    }  // namespace nserial2
+
+}  // namespace ncore
 
 #endif
