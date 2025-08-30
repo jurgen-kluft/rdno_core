@@ -40,7 +40,12 @@ namespace ncore
     };
 
     // string properties ----------------------------------------------------------------------
-    inline s16         str_len(const str_t& s) { return s.m_end - s.m_str; }
+    inline s16  str_len(const str_t& s) { return s.m_end - s.m_str; }
+    inline char str_at(const str_t& s, s16 index)
+    {
+        index += s.m_str;
+        return index < s.m_end ? s.m_const[index] : '\0';
+    }
     inline char*       str_write_ptr(const str_t& s) { return s.m_ascii + s.m_str; }
     inline const char* str_const_ptr(const str_t& s) { return s.m_const + s.m_str; }
     inline const char* str_const_end(const str_t& s) { return s.m_const + s.m_end; }
@@ -74,6 +79,7 @@ namespace ncore
     str_t       str_find_last(str_t& s, const char* substr, bool case_sensitive = true);   // find last occurrence of substring
     str_t       str_find_one_of(str_t& s, const char* chars, bool case_sensitive = true);  // find first occurrence of any of the given characters
 
+    bool str_contains(str_t& s, char c, bool case_sensitive = true);       // test for character
     str_t str_find(str_t& s, char c, bool case_sensitive = true);       // find first occurrence of c
     str_t str_find_last(str_t& s, char c, bool case_sensitive = true);  // find last occurrence of c
 

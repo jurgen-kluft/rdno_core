@@ -3,6 +3,8 @@
 
 namespace ncore
 {
+    static const str_t s_empty = { "", nullptr, 0, 0, 0 };
+
     inline s16 str_len(const char* str)
     {
         if (str == nullptr)
@@ -39,7 +41,7 @@ namespace ncore
         ps.m_ascii = s;
         ps.m_str   = 0;
         ps.m_end   = 0;
-        ps.m_eos = (capacity > 0) ? capacity - 1 : 0; 
+        ps.m_eos   = (capacity > 0) ? capacity - 1 : 0;
         if (s != nullptr)
         {
             s[ps.m_end] = '\0';
@@ -145,13 +147,10 @@ namespace ncore
 
     str_t str_find(str_t& s, str_t& substr, bool case_sensitive)
     {
-        str_t empty     = str_const("");
         s16   lenS      = str_len(s);
         s16   lenSubstr = str_len(substr);
-        if (lenSubstr == 0)
-            return empty;  // empty substring
-        if (lenSubstr > lenS)
-            return empty;  // substring longer than string
+        if (lenSubstr == 0 || lenSubstr > lenS)
+            return s_empty;  // empty substring or substring longer than string
 
         for (s16 i = 0; i <= lenS - lenSubstr; i++)
         {
@@ -172,24 +171,21 @@ namespace ncore
                 str_t found;
                 found.m_ascii = s.m_ascii;
                 found.m_const = s.m_const;
-                found.m_str   = (s16)(s.m_str + i);
-                found.m_end   = s.m_end;
+                found.m_str   = s.m_str + i;
+                found.m_end   = s.m_str + i + lenSubstr;
                 found.m_eos   = s.m_eos;
                 return found;
             }
         }
-        return empty;  // not found
+        return s_empty;  // not found
     }
 
     str_t str_find_last(str_t& s, str_t& substr, bool case_sensitive)
     {
-        str_t empty     = str_const("");
         s16   lenS      = str_len(s);
         s16   lenSubstr = str_len(substr);
-        if (lenSubstr == 0)
-            return empty;  // empty substring
-        if (lenSubstr > lenS)
-            return empty;  // substring longer than string
+        if (lenSubstr == 0 || lenSubstr > lenS)
+            return s_empty;  // empty substring or substring longer than string
 
         for (s16 i = lenS - lenSubstr; i >= 0; i--)
         {
@@ -210,40 +206,37 @@ namespace ncore
                 str_t found;
                 found.m_ascii = s.m_ascii;
                 found.m_const = s.m_const;
-                found.m_str   = (s16)(s.m_str + i);
-                found.m_end   = s.m_end;
+                found.m_str   = s.m_str + i;
+                found.m_end   = s.m_str + i + lenSubstr;
                 found.m_eos   = s.m_eos;
                 return found;
             }
         }
-        return empty;  // not found
+        return s_empty;  // not found
     }
 
     str_t str_find_one_of(str_t& s, str_t& chars, bool case_sensitive)
     {
-        str_t empty    = str_const("");
         s16   lenS     = str_len(s);
         s16   lenChars = str_len(chars);
         if (lenChars == 0 || lenS == 0)
-            return empty;  // empty chars or string
+            return s_empty;  // empty chars or string
 
-        str_t iter = s;
         for (s16 i = 0; i < lenS; i++)
         {
-            char  c1    = s.m_const[s.m_str + i];
-            str_t found = str_find(chars, c1, case_sensitive);
-            if (!str_is_empty(found))
+            const char c1 = s.m_const[s.m_str + i];
+            if (str_contains(chars, c1, case_sensitive))
             {
                 str_t found;
                 found.m_ascii = s.m_ascii;
                 found.m_const = s.m_const;
-                found.m_str   = (s16)(s.m_str + i);
-                found.m_end   = s.m_end;
+                found.m_str   = s.m_str + i;
+                found.m_end   = s.m_str + i + 1;
                 found.m_eos   = s.m_eos;
                 return found;
             }
         }
-        return empty;  // not found
+        return s_empty;  // not found
     }
 
     s32 str_cmp(str_t& s1, const char* s2, bool case_sensitive)
@@ -288,7 +281,7 @@ namespace ncore
         return str_find_one_of(s, sc, case_sensitive);
     }
 
-    str_t str_find(str_t& s, char c, bool case_sensitive)
+    s32 str_find_index(str_t& s, char c, bool case_sensitive)
     {
         const char* ptr = s.m_const + s.m_str;
         const char* end = s.m_const + s.m_end;
@@ -299,17 +292,27 @@ namespace ncore
                 ch = to_lower(ch);
             if (ch == c)
             {
-                str_t found;
-                found.m_ascii = s.m_ascii;
-                found.m_const = s.m_const;
-                found.m_str   = (s16)(ptr - s.m_const);
-                found.m_end   = s.m_end;
-                found.m_eos   = s.m_eos;
-                return found;
+                return (s32)(ptr - s.m_const);
             }
+            ptr++;
         }
-        str_t empty = str_const("");
-        return empty;  // not found
+        return -1;
+    }
+
+    bool str_contains(str_t& s, char c, bool case_sensitive) { return str_find_index(s, c, case_sensitive) != -1; }
+
+    str_t str_find(str_t& s, char c, bool case_sensitive)
+    {
+        const s32 index = str_find_index(s, c, case_sensitive);
+        if (index == -1)
+            return s_empty;  // not found
+        str_t found;
+        found.m_ascii = s.m_ascii;
+        found.m_const = s.m_const;
+        found.m_str   = (s16)index;
+        found.m_end   = found.m_str + 1;
+        found.m_eos   = s.m_eos;
+        return found;
     }
 
     str_t str_find_last(str_t& s, char c, bool case_sensitive)
@@ -333,8 +336,7 @@ namespace ncore
             }
             ptr--;
         }
-        str_t empty = str_const("");
-        return empty;  // not found
+        return s_empty;  // not found
     }
 
     str_t str_trim_left(str_t& s)
