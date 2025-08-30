@@ -3,7 +3,7 @@
 
 namespace ncore
 {
-    static const str_t s_empty = { "", nullptr, 0, 0, 0 };
+    static const str_t s_empty = {"", nullptr, 0, 0, 0};
 
     inline s16 str_len(const char* str)
     {
@@ -147,8 +147,8 @@ namespace ncore
 
     str_t str_find(str_t& s, str_t& substr, bool case_sensitive)
     {
-        s16   lenS      = str_len(s);
-        s16   lenSubstr = str_len(substr);
+        s16 lenS      = str_len(s);
+        s16 lenSubstr = str_len(substr);
         if (lenSubstr == 0 || lenSubstr > lenS)
             return s_empty;  // empty substring or substring longer than string
 
@@ -182,8 +182,8 @@ namespace ncore
 
     str_t str_find_last(str_t& s, str_t& substr, bool case_sensitive)
     {
-        s16   lenS      = str_len(s);
-        s16   lenSubstr = str_len(substr);
+        s16 lenS      = str_len(s);
+        s16 lenSubstr = str_len(substr);
         if (lenSubstr == 0 || lenSubstr > lenS)
             return s_empty;  // empty substring or substring longer than string
 
@@ -217,8 +217,8 @@ namespace ncore
 
     str_t str_find_one_of(str_t& s, str_t& chars, bool case_sensitive)
     {
-        s16   lenS     = str_len(s);
-        s16   lenChars = str_len(chars);
+        s16 lenS     = str_len(s);
+        s16 lenChars = str_len(chars);
         if (lenChars == 0 || lenS == 0)
             return s_empty;  // empty chars or string
 
@@ -339,73 +339,6 @@ namespace ncore
         return s_empty;  // not found
     }
 
-    str_t str_trim_left(str_t& s)
-    {
-        str_t trimmed = s;
-        while (trimmed.m_str < trimmed.m_end)
-        {
-            char c = trimmed.m_const[trimmed.m_str];
-            if (c != ' ' && c != '\t' && c != '\r' && c != '\n')
-                break;
-            trimmed.m_str++;
-        }
-        return trimmed;
-    }
-
-    str_t str_trim_right(str_t& s)
-    {
-        str_t trimmed = s;
-        while (trimmed.m_end > trimmed.m_str)
-        {
-            char c = trimmed.m_const[trimmed.m_end - 1];
-            if (c != ' ' && c != '\t' && c != '\r' && c != '\n')
-                break;
-            trimmed.m_end--;
-        }
-        return trimmed;
-    }
-
-    str_t str_trim(str_t& s)
-    {
-        str_t trimmed = str_trim_left(s);
-        trimmed       = str_trim_right(trimmed);
-        return trimmed;
-    }
-
-    str_t str_trimQuotes(str_t& s)
-    {
-        str_t trimmed = s;
-        if (trimmed.m_end > trimmed.m_str + 1)
-        {
-            char firstChar = trimmed.m_const[trimmed.m_str];
-            char lastChar  = trimmed.m_const[trimmed.m_end - 1];
-            if ((firstChar == '"' && lastChar == '"') || (firstChar == '\'' && lastChar == '\''))
-            {
-                trimmed.m_str++;
-                trimmed.m_end--;
-            }
-        }
-        return trimmed;
-    }
-
-    str_t str_trimQuotes(str_t& s, char quoteChar) { return str_trimDelimiters(s, quoteChar, quoteChar); }
-
-    str_t str_trimDelimiters(str_t& s, char leftDelim, char rightDelim)
-    {
-        str_t trimmed = s;
-        if (trimmed.m_end > trimmed.m_str + 1)
-        {
-            char firstChar = trimmed.m_const[trimmed.m_str];
-            char lastChar  = trimmed.m_const[trimmed.m_end - 1];
-            if (firstChar == leftDelim && lastChar == rightDelim)
-            {
-                trimmed.m_str++;
-                trimmed.m_end--;
-            }
-        }
-        return trimmed;
-    }
-
     bool from_str(str_t& s, bool* outValue)
     {
         if (outValue == nullptr)
@@ -467,10 +400,10 @@ namespace ncore
                 ptr++;
             }
 
-            *outValue = value;
+            *outValue = isNegative ? -value : value;
             return true;
         }
-        return isNegative ? -value : value;
+        return false;
     }
 
     bool str_to_float(const char* str, const char* end, f32* outValue)
@@ -587,8 +520,14 @@ namespace ncore
 
         const char* str = value ? "true" : "false";
         const s16   len = (value ? 4 : 5);
-        str_t       src = str_const_n(str, len, len, len);
-        str_append(dest, src);
+
+        s16 cursor = dest.m_end;
+        for (s16 i = 0; i < len && cursor < dest.m_eos; i++)
+            dest.m_ascii[cursor++] = str[i];
+
+        dest.m_end               = cursor;
+        dest.m_ascii[dest.m_end] = '\0';
+        dest.m_const             = dest.m_ascii;
     }
 
     void to_str(str_t& dest, s32 value, s16 base)
@@ -596,48 +535,63 @@ namespace ncore
         if (dest.m_ascii == nullptr || base < 2 || base > 36)
             return;  // destination is not mutable or invalid base
 
-        char  buffer[34];  // enough for 32-bit integer in binary plus sign and null terminator
-        char* ptr = &buffer[sizeof(buffer) - 1];
-        *ptr      = '\0';
-
         bool isNegative = (value < 0);
         u32  uvalue     = isNegative ? (u32)(-value) : (u32)value;
 
         // Convert integer to string in reverse order
+        const s16 begin = dest.m_end;
         do
         {
-            u32 digit = uvalue % base;
-            *(--ptr)  = to_dec_char((u8)digit);
+            u32 digit                  = uvalue % base;
+            dest.m_ascii[dest.m_end++] = to_dec_char((u8)digit);
             uvalue /= base;
         } while (uvalue > 0);
 
         if (isNegative)
-            *(--ptr) = '-';
+            dest.m_ascii[dest.m_end++] = '-';
 
-        str_t src = str_const_n(ptr, (s16)(&buffer[sizeof(buffer) - 1] - ptr), (s16)(&buffer[sizeof(buffer) - 1] - ptr), (s16)(&buffer[sizeof(buffer) - 1] - ptr));
-        str_append(dest, src);
+        const s16 end = dest.m_end;
+
+        // Reverse the string portion we just wrote
+        s16 left  = begin;
+        s16 right = end - 1;
+        while (left < right)
+        {
+            char temp           = dest.m_ascii[left];
+            dest.m_ascii[left]  = dest.m_ascii[right];
+            dest.m_ascii[right] = temp;
+            left++;
+            right--;
+        }
     }
 
     void to_str(str_t& dest, u32 value, s16 base)
     {
-        if (dest.m_ascii == nullptr || base < 2 || base > 36)
+        if (dest.m_ascii == nullptr || dest.m_end == dest.m_eos || base < 2 || base > 36)
             return;  // destination is not mutable or invalid base
 
-        char  buffer[34];  // enough for 32-bit integer in binary plus null terminator
-        char* ptr = &buffer[sizeof(buffer) - 1];
-        *ptr      = '\0';
-
-        // Convert integer to string in reverse order
-        u32 uvalue = value;
+        // Convert integer to string inplace
+        const s16 begin  = dest.m_end;
+        u32       uvalue = value;
         do
         {
-            u32 digit = uvalue % base;
-            *(--ptr)  = to_dec_char((u8)digit);
+            u32 digit                  = uvalue % base;
+            dest.m_ascii[dest.m_end++] = to_dec_char((u8)digit);
             uvalue /= base;
-        } while (uvalue > 0);
+        } while (uvalue > 0 && dest.m_end < dest.m_eos);
+        const s16 end = dest.m_end;
 
-        str_t src = str_const_n(ptr, (s16)(&buffer[sizeof(buffer) - 1] - ptr), (s16)(&buffer[sizeof(buffer) - 1] - ptr), (s16)(&buffer[sizeof(buffer) - 1] - ptr));
-        str_append(dest, src);
+        // Reverse the string portion we just wrote
+        s16 left  = begin;
+        s16 right = end - 1;
+        while (left < right)
+        {
+            char temp           = dest.m_ascii[left];
+            dest.m_ascii[left]  = dest.m_ascii[right];
+            dest.m_ascii[right] = temp;
+            left++;
+            right--;
+        }
     }
 
     void to_str(str_t& dest, f32 value, s16 num_fractional_digits)
@@ -648,8 +602,8 @@ namespace ncore
         // Handle negative values
         if (value < 0.0f)
         {
-            to_str(dest, true);  // append '-'
-            value = -value;
+            dest.m_ascii[dest.m_end++] = '-';
+            value                      = -value;
         }
 
         // Separate integer and fractional parts
@@ -664,18 +618,18 @@ namespace ncore
             return;
 
         // Append decimal point
-        str_t decimalPoint = str_const(".");
-        str_append(dest, decimalPoint);
+        dest.m_ascii[dest.m_end++] = '.';
 
         // Convert fractional part
-        for (s16 i = 0; i < num_fractional_digits; i++)
+        for (s16 i = 1; i <= num_fractional_digits; i++)
         {
             fracPart *= 10.0f;
+            if (i == num_fractional_digits)
+                fracPart += 0.5f;  // round last digit
             s32 digit = (s32)fracPart;
             fracPart -= (f32)digit;
-            char  c        = to_dec_char((u8)digit);
-            str_t digitStr = str_const_n(&c, 1, 1, 1);
-            str_append(dest, digitStr);
+            char c                     = to_dec_char((u8)digit);
+            dest.m_ascii[dest.m_end++] = c;
         }
     }
 
@@ -689,18 +643,26 @@ namespace ncore
             len = (s16)(dest.m_eos - dest.m_end);  // truncate if necessary
 
         if (len > 0)
+        {
             nmem::memcpy(&dest.m_ascii[dest.m_end], src.m_const + src.m_str, len);
-
-        dest.m_ascii[dest.m_end + len] = '\0';
-        dest.m_const                   = dest.m_ascii;
-        dest.m_end                     = (s16)(dest.m_end + len);
+            dest.m_end               = dest.m_end + len;
+            dest.m_ascii[dest.m_end] = '\0';
+            dest.m_const             = dest.m_ascii;
+        }
         return len;
     }
 
     s16 str_append(str_t& dest, const char* src)
     {
-        str_t ps = str_const(src);
-        return str_append(dest, ps);
+        if (dest.m_ascii == nullptr)
+            return 0;  // destination is not mutable
+
+        const char* ptr = src;
+        while (*ptr != '\0' && dest.m_end < dest.m_eos)
+            dest.m_ascii[dest.m_end++] = *ptr++;
+        dest.m_ascii[dest.m_end] = '\0';
+        dest.m_const             = dest.m_ascii;
+        return (s16)(ptr - src);
     }
 
     s16 str_append(str_t& dest, const str_t* array, s16 count)
@@ -769,6 +731,64 @@ namespace ncore
             return totalLen;
         }
         return 0;
+    }
+
+    str_t str_trim_left(str_t& s)
+    {
+        str_t trimmed = s;
+        while (trimmed.m_str < trimmed.m_end)
+        {
+            char c = trimmed.m_const[trimmed.m_str];
+            if (c != ' ' && c != '\t' && c != '\r' && c != '\n')
+                break;
+            trimmed.m_str++;
+        }
+        return trimmed;
+    }
+
+    str_t str_trim_right(str_t& s)
+    {
+        str_t trimmed = s;
+        while (trimmed.m_end > trimmed.m_str)
+        {
+            char c = trimmed.m_const[trimmed.m_end - 1];
+            if (c != ' ' && c != '\t' && c != '\r' && c != '\n')
+                break;
+            trimmed.m_end--;
+        }
+        return trimmed;
+    }
+
+    str_t str_trim(str_t& s)
+    {
+        str_t trimmed = str_trim_left(s);
+        trimmed       = str_trim_right(trimmed);
+        return trimmed;
+    }
+
+    str_t str_trimQuotes(str_t& s)
+    {
+        str_t trimmed = str_trimDelimiters(s, '"', '"');
+        trimmed       = str_trimDelimiters(trimmed, '\'', '\'');
+        return trimmed;
+    }
+
+    str_t str_trimQuotes(str_t& s, char quoteChar) { return str_trimDelimiters(s, quoteChar, quoteChar); }
+
+    str_t str_trimDelimiters(str_t& s, char leftDelim, char rightDelim)
+    {
+        str_t trimmed = s;
+        if (trimmed.m_end > trimmed.m_str + 1)
+        {
+            char firstChar = trimmed.m_const[trimmed.m_str];
+            char lastChar  = trimmed.m_const[trimmed.m_end - 1];
+            if (firstChar == leftDelim && lastChar == rightDelim)
+            {
+                trimmed.m_str++;
+                trimmed.m_end--;
+            }
+        }
+        return trimmed;
     }
 
 }  // namespace ncore
