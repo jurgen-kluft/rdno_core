@@ -212,7 +212,10 @@ UNITTEST_SUITE_BEGIN(str)
             str_t found4 = str_find_one_of(str4, str6, false);
             CHECK_TRUE(str_is_empty(found4));
         }
+    }
 
+    UNITTEST_FIXTURE(from_and_to_str)
+    {
         UNITTEST_TEST(from_str_bool)
         {
             str_t str1 = str_const("true");
@@ -282,10 +285,6 @@ UNITTEST_SUITE_BEGIN(str)
             CHECK_CLOSE(floatValue, 2.71828f, 0.0001f);
             CHECK_FALSE(from_str(str13, &floatValue));
         }
-
-        // void to_str(str_t & dest, s32 value, s16 base = 10);
-        // void to_str(str_t & dest, u32 value, s16 base = 10);
-        // void to_str(str_t & dest, f32 value, s16 num_fractional_digits = 2);
 
         UNITTEST_TEST(to_str_bool)
         {
@@ -385,6 +384,113 @@ UNITTEST_SUITE_BEGIN(str)
             CHECK_EQUAL(str_at(str1, 6), '0');
             CHECK_EQUAL(str_at(str1, 7), '0');
         }
+    }
+
+    UNITTEST_FIXTURE(append)
+    {
+        UNITTEST_TEST(str_append_str)
+        {
+            char  buffer[30];
+            str_t str1 = str_mutable(buffer, sizeof(buffer));
+            str_t str2 = str_const("hello ");
+            str_t str3 = str_const("world");
+
+            s16 len1 = str_append(str1, str2);
+            CHECK_EQUAL(len1, str_len(str2));
+            CHECK_EQUAL(str_len(str1), str_len(str2));
+            CHECK_EQUAL(str_at(str1, 0), 'h');
+            CHECK_EQUAL(str_at(str1, 5), ' ');
+
+            s16 len2 = str_append(str1, str3);
+            CHECK_EQUAL(len2, str_len(str3));
+            CHECK_EQUAL(str_len(str1), str_len(str2) + str_len(str3));
+            CHECK_EQUAL(str_at(str1, 6), 'w');
+            CHECK_EQUAL(str_at(str1, 10), 'd');
+
+            s16 len3 = str_append(str1, "!!!");
+            CHECK_EQUAL(len3, 3);
+            CHECK_EQUAL(str_len(str1), 14);
+            CHECK_EQUAL(str_at(str1, 11), '!');
+            CHECK_EQUAL(str_at(str1, 13), '!');
+
+            str_clear(str1);
+            str_t array[3] = {str_const("one "), str_const("two "), str_const("three")};
+            s16   len4     = str_append(str1, array, 3);
+            CHECK_EQUAL(len4, 13);
+            CHECK_EQUAL(str_len(str1), 13);
+            CHECK_EQUAL(str_at(str1, 0), 'o');
+            CHECK_EQUAL(str_at(str1, 12), 'e');
+        }
+
+        UNITTEST_TEST(str_append_cstr)
+        {
+            char  buffer[30];
+            str_t str1 = str_mutable(buffer, sizeof(buffer));
+
+            s16 len1 = str_append(str1, "hello ");
+            CHECK_EQUAL(len1, 6);
+            CHECK_EQUAL(str_len(str1), 6);
+            CHECK_EQUAL(str_at(str1, 0), 'h');
+            CHECK_EQUAL(str_at(str1, 5), ' ');
+
+            s16 len2 = str_append(str1, "world");
+            CHECK_EQUAL(len2, 5);
+            CHECK_EQUAL(str_len(str1), 11);
+            CHECK_EQUAL(str_at(str1, 6), 'w');
+            CHECK_EQUAL(str_at(str1, 10), 'd');
+
+            s16 len3 = str_append(str1, "!!!");
+            CHECK_EQUAL(len3, 3);
+            CHECK_EQUAL(str_len(str1), 14);
+            CHECK_EQUAL(str_at(str1, 11), '!');
+            CHECK_EQUAL(str_at(str1, 13), '!');
+        }
+
+        // s16 str_append(str_t & dest, const str_t* array, s16 count);
+
+        UNITTEST_TEST(str_append_array)
+        {
+            char  buffer[30];
+            str_t str1     = str_mutable(buffer, sizeof(buffer));
+            str_t array[3] = {str_const("one "), str_const("two "), str_const("three")};
+
+            s16 len1 = str_append(str1, array, 3);
+            CHECK_EQUAL(len1, 13);
+            CHECK_EQUAL(str_len(str1), 13);
+            CHECK_EQUAL(str_at(str1, 0), 'o');
+            CHECK_EQUAL(str_at(str1, 1), 'n');
+            CHECK_EQUAL(str_at(str1, 2), 'e');
+            CHECK_EQUAL(str_at(str1, 4), 't');
+            CHECK_EQUAL(str_at(str1, 5), 'w');
+            CHECK_EQUAL(str_at(str1, 6), 'o');
+            CHECK_EQUAL(str_at(str1, 8), 't');
+            CHECK_EQUAL(str_at(str1, 9), 'h');
+            CHECK_EQUAL(str_at(str1, 12), 'e');
+        }
+    }
+
+    UNITTEST_FIXTURE(join)
+    {
+        // s16 str_join(str_t & dest, char sep, str_t& src1, str_t& src2);
+        // s16 str_join(str_t & dest, char sep, str_t& src1, str_t& src2, str_t& src3);
+        // s16 str_join(str_t & dest, char sep, const str_t* src_array, s16 array_count);
+        // s16 str_join(str_t & dest, str_t & sep, const str_t* src_array, s16 array_count);
+
+		UNITTEST_TEST(str_join_two)
+		{
+			char  buffer[30];
+			str_t str1 = str_mutable(buffer, sizeof(buffer));
+			str_t str2 = str_const("hello");
+			str_t str3 = str_const("world");
+
+			s16 len1 = str_join(str1, ' ', str2, str3);
+			CHECK_EQUAL(len1, str_len(str2) + str_len(str3) + 1);
+			CHECK_EQUAL(str_len(str1), str_len(str2) + str_len(str3) + 1);
+			CHECK_EQUAL(str_at(str1, 0), 'h');
+			CHECK_EQUAL(str_at(str1, 5), ' ');
+			CHECK_EQUAL(str_at(str1, 6), 'w');
+			CHECK_EQUAL(str_at(str1, 10), 'd');
+		}
     }
 }
 UNITTEST_SUITE_END

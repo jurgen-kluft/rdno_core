@@ -633,6 +633,17 @@ namespace ncore
         }
     }
 
+    s16 str_append(str_t& dest, char c)
+    {
+        if (dest.m_ascii == nullptr || dest.m_end >= dest.m_eos)
+            return 0;  // destination is not mutable or no space left
+
+        dest.m_ascii[dest.m_end++] = c;
+        dest.m_ascii[dest.m_end]   = '\0';
+        return 1;
+    }
+
+
     s16 str_append(str_t& dest, const str_t& src)
     {
         if (dest.m_ascii == nullptr)
@@ -681,12 +692,9 @@ namespace ncore
         if (dest.m_ascii == nullptr)
             return -1;  // destination is not mutable
 
-        char  c[2]   = {sep, '\0'};
-        str_t sepStr = str_const_n(c, 1, 1, 1);
-
         s16 totalLen = 0;
         totalLen += str_append(dest, src1);
-        totalLen += str_append(dest, sepStr);
+        totalLen += str_append(dest, sep);
         totalLen += str_append(dest, src2);
         return totalLen;
     }
@@ -696,14 +704,11 @@ namespace ncore
         if (dest.m_ascii == nullptr)
             return -1;  // destination is not mutable
 
-        char  c[2]   = {sep, '\0'};
-        str_t sepStr = str_const_n(c, 1, 1, 1);
-
         s16 totalLen = 0;
         totalLen += str_append(dest, src1);
-        totalLen += str_append(dest, sepStr);
+        totalLen += str_append(dest, sep);
         totalLen += str_append(dest, src2);
-        totalLen += str_append(dest, sepStr);
+        totalLen += str_append(dest, sep);
         totalLen += str_append(dest, src3);
         return totalLen;
     }

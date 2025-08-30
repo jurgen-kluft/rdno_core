@@ -103,6 +103,7 @@ namespace ncore
     void to_str(str_t& dest, f32 value, s16 num_fractional_digits = 2);
 
     // string composition ------------------------------------------------------------------
+    s16 str_append(str_t& dest, char c);  // append single character to 'dest' (note: dest must be mutable)
     s16 str_append(str_t& dest, const str_t& s);  // append 's' to 'dest' (note: dest must be mutable)
     s16 str_append(str_t& dest, const char* src);
     s16 str_append(str_t& dest, const str_t* array, s16 count);
