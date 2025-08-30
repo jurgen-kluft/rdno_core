@@ -1,4 +1,5 @@
 #include "rdno_core/c_nvstore.h"
+#include "rdno_core/c_memory.h"
 #include "rdno_core/c_str.h"
 
 #ifdef TARGET_ESP32
@@ -7,7 +8,6 @@
 
 #    include "nvs_flash.h"
 #    include "nvs.h"
-#    include <string.h>
 
 namespace ncore
 {
@@ -33,6 +33,8 @@ namespace ncore
             }
             return s_valid;
         }
+
+        void Reset(config_t* config) { g_memset(config, 0, sizeof(config_t)); }
 
         void Save(config_t* config)
         {
@@ -86,6 +88,7 @@ namespace ncore
 {
     namespace nvstore
     {
+        void Reset(config_t* config) { g_memset(config, 0, sizeof(config_t)); }
         void Save(config_t* config) {}
         void Load(config_t* config) {}
 
@@ -98,73 +101,65 @@ namespace ncore
 {
     namespace nvstore
     {
-        static const char* SkipWhitespace(const char* str, const char* end)
-        {
-            while (str < end && (*str == ' ' || *str == '\t' || *str == '\r' || *str == '\n'))
-                str++;
-            return str;
-        }
-
-        static const char* FindChar(const char* str, const char* end, char ch)
-        {
-            while (str < end && *str != ch)
-                str++;
-            return str;
-        }
-
         // Message example: "ssid=OBNOSIS8, password=MySecretPassword, remote_server=10.0.0.22, remote_port=1234"
-        bool ParseKeyValue(const char*& msg, const char* msgEnd, const char*& outKey, s32& outKeyLength, const char*& outValue, s32& outValueLength)
+        bool ParseKeyValue(str_t& msg, str_t& outKey, str_t& outValue)
         {
-            outKey = SkipWhitespace(msg, msgEnd);
-            if (outKey == msgEnd)
+            if (str_is_empty(msg))
+                return false;
+
+            str_t key = str_trim_left(msg);
+            if (str_is_empty(key))
                 return false;  // No more key-value pairs
-            const char* equalSign = FindChar(outKey, msgEnd, '=');
-            if (equalSign == msgEnd)
+            str_t equalSign = str_find(key, '=');
+            if (str_is_empty(equalSign))
                 return false;  // No '=' found
-            outKeyLength = static_cast<s32>(equalSign - outKey);
+            key    = str_select_before(key, equalSign);
+            outKey = str_trim_right(key);
 
-            outValue = SkipWhitespace(equalSign + 1, msgEnd);
-            if (outValue == msgEnd)
+            outValue = str_select_after(msg, equalSign);
+            outValue = str_trim_left(outValue);
+            if (str_is_empty(outValue))
                 return false;  // No value found
-            const char* comma = FindChar(outValue, msgEnd, ',');
-            outValueLength    = static_cast<s32>((comma == msgEnd ? msgEnd : comma) - outValue);
+            str_t comma = str_find(outValue, ',');
+            outValue    = str_select_until(outValue, comma);
+            outValue    = str_trim_right(outValue);
 
-            msg = (comma == msgEnd) ? msgEnd : SkipWhitespace(comma + 1, msgEnd);
-            return msg < msgEnd;
+            msg = str_select_after(msg, comma);
+            msg = str_trim_left(msg);
+            return true;
         }
 
-        void ParseValue(config_t* config, s16 id, const char* str, s32 len)
+        void ParseValue(config_t* config, s16 id, str_t const& str)
         {
             if (config == nullptr || (id < 0 || id >= 63))
                 return;
             switch (config->m_params[id].m_type)
             {
                 case nvstore::TYPE_NONE: break;
-                case nvstore::TYPE_STRING: nvstore::SetString(config, id, str, len); break;
-                case nvstore::TYPE_S32: nvstore::ParseInt(config, id, str, len); break;
-                case nvstore::TYPE_BOOL: nvstore::ParseBool(config, id, str, len); break;
+                case nvstore::TYPE_STRING: nvstore::SetString(config, id, str); break;
+                case nvstore::TYPE_S32: nvstore::ParseInt(config, id, str); break;
+                case nvstore::TYPE_BOOL: nvstore::ParseBool(config, id, str); break;
             }
         }
 
-        void ParseInt(config_t* config, s16 id, const char* str, s32 len)
+        void ParseInt(config_t* config, s16 id, const str_t& str)
         {
             if (config == nullptr || (id < 0 || id >= 63))
                 return;
-            str_t s = str_const_n(str, 0, len, len);
 
             s32 value = 0;
-            from_str(s, &value, 10);
-
-            SetInt(config, id, value);
+            if (from_str(str, &value, 10))
+            {
+                SetInt(config, id, value);
+            }
         }
 
-        void ParseBool(config_t* config, s16 id, const char* str, s32 len)
+        void ParseBool(config_t* config, s16 id, const str_t& str)
         {
             if (config == nullptr || (id < 0 || id >= 63))
                 return;
 
-            str_t s = str_const_n(str, 0, len, len);
-            if (str_eq(s, "true") || str_eq(s, "1"))
+            if (str_eq(str, "true") || str_eq(str, "1"))
             {
                 SetBool(config, id, true);
             }
@@ -174,44 +169,48 @@ namespace ncore
             }
         }
 
-        void SetString(config_t* config, s16 id, const char* str, s32 strLen)
+        bool SetString(config_t* config, s16 id, const str_t& str)
         {
-            if (config == nullptr || (id < 0 || id >= 63))
-                return;
+            if (config == nullptr || (id < 0 || id >= 63) || str_len(str) >= 32)
+                return false;
 
             s32 str_index;
             if (config->m_params[id].m_type == TYPE_NONE)
             {
                 if (config->m_string_count >= 32)
-                {
-                    return;  // No more space for strings
-                }
+                    return false;  // No more space for strings
 
                 str_index                    = config->m_string_count++;
                 config->m_params[id].m_type  = TYPE_STRING;
-                config->m_params[id].m_value = str_index;
+                config->m_params[id].m_value = (str_index * 32) + str_len(str);
             }
             else
             {
-                str_index = config->m_params[id].m_value;
+                str_index                    = config->m_params[id].m_value >> 5;
+                config->m_params[id].m_value = (str_index * 32) + str_len(str);
             }
 
-            str_t src = str_const_n(str, 0, strLen, strLen);
             str_t dst = str_mutable(&config->m_strings[str_index * 32], 32);
-            str_append(dst, src);
+            str_append(dst, str);
+            return true;
         }
 
-        const char* GetString(const config_t* config, s16 id)
+        bool GetString(const config_t* config, s16 id, str_t& outStr)
         {
+            outStr = str_empty();
             if (config == nullptr || (id < 0 || id >= 63))
-                return "";
+                return false;
             if (config->m_params[id].m_type != TYPE_STRING)
-                return "";
-            s32 const str_index = config->m_params[id].m_value;
+                return false;
+            s32 const str_value  = config->m_params[id].m_value;
+            s32 const str_index  = str_value >> 5;
+            s32 const str_length = str_value & 0x1F;
             if (str_index < 0 || str_index >= config->m_string_count)
-                return "";
-            return &config->m_strings[str_index * 32];
+                return false;
+            outStr = str_const_n(&config->m_strings[str_index * 32], 0, str_length, str_length);
+            return true;
         }
+
         void SetInt(config_t* config, s16 id, s32 value)
         {
             if (config == nullptr || (id < 0 || id >= 63))
@@ -219,12 +218,14 @@ namespace ncore
             config->m_params[id].m_type  = TYPE_S32;
             config->m_params[id].m_value = value;
         }
+
         s32 GetInt(const config_t* config, s16 id, s32 defaultValue)
         {
             if (config == nullptr || (id < 0 || id >= 63) || config->m_params[id].m_type != TYPE_S32)
                 return defaultValue;
             return config->m_params[id].m_value;
         }
+
         void SetBool(config_t* config, s16 id, bool value)
         {
             if (config == nullptr || (id < 0 || id >= 63))
@@ -232,6 +233,7 @@ namespace ncore
             config->m_params[id].m_type  = TYPE_BOOL;
             config->m_params[id].m_value = value ? 1 : 0;
         }
+
         bool GetBool(const config_t* config, s16 id, bool defaultValue)
         {
             if (config == nullptr || (id < 0 || id >= 63) || config->m_params[id].m_type != TYPE_BOOL)

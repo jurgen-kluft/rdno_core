@@ -15,6 +15,8 @@ namespace ncore
         return len;
     }
 
+    str_t str_empty() { return s_empty; }
+
     void str_clear(str_t& ps)
     {
         if (ps.m_ascii != nullptr)
@@ -67,6 +69,39 @@ namespace ncore
         return ps;
     }
 
+    str_t str_select_after(const str_t& str, const str_t& sel)
+    {
+        str_t ps;
+        ps.m_ascii = str.m_ascii;
+        ps.m_const = str.m_const;
+        ps.m_str   = sel.m_end;
+        ps.m_end   = str.m_end;
+        ps.m_eos   = str.m_eos;
+        return ps;
+    }
+
+    str_t str_select_before(const str_t& str, const str_t& sel)
+    {
+        str_t ps;
+        ps.m_ascii = str.m_ascii;
+        ps.m_const = str.m_const;
+        ps.m_str   = str.m_str;
+        ps.m_end   = sel.m_str;
+        ps.m_eos   = str.m_eos;
+        return ps;
+    }
+
+    str_t str_select_until(const str_t& str, const str_t& sel)
+    {
+        str_t ps;
+        ps.m_ascii = str.m_ascii;
+        ps.m_const = str.m_const;
+        ps.m_str = str.m_str;
+        ps.m_end = sel.m_str;
+        ps.m_eos = str.m_eos;
+        return ps;
+    }
+
     void str_swap(str_t& s1, str_t& s2)
     {
         str_t temp = s1;
@@ -74,7 +109,7 @@ namespace ncore
         s2         = temp;
     }
 
-    s32 str_cmp(str_t& s1, str_t& s2, bool case_sensitive)
+    s32 str_cmp(const str_t& s1, const str_t& s2, bool case_sensitive)
     {
         s16 len1 = str_len(s1);
         s16 len2 = str_len(s2);
@@ -97,7 +132,7 @@ namespace ncore
         return (len1 < len2) ? -1 : 1;
     }
 
-    bool str_has_prefix(str_t& s, str_t& prefix, bool case_sensitive)
+    bool str_has_prefix(const str_t& s, const str_t& prefix, bool case_sensitive)
     {
         s16 lenS      = str_len(s);
         s16 lenPrefix = str_len(prefix);
@@ -118,7 +153,7 @@ namespace ncore
         return true;
     }
 
-    bool str_has_suffix(str_t& s, str_t& suffix, bool case_sensitive)
+    bool str_has_suffix(const str_t& s, const str_t& suffix, bool case_sensitive)
     {
         s16 lenS      = str_len(s);
         s16 lenSuffix = str_len(suffix);
@@ -139,13 +174,13 @@ namespace ncore
         return true;
     }
 
-    bool str_contains(str_t& s, str_t& substr, bool case_sensitive)
+    bool str_contains(const str_t& s, const str_t& substr, bool case_sensitive)
     {
         str_t found = str_find(s, substr, case_sensitive);
         return !str_is_empty(found);
     }
 
-    str_t str_find(str_t& s, str_t& substr, bool case_sensitive)
+    str_t str_find(const str_t& s, const str_t& substr, bool case_sensitive)
     {
         s16 lenS      = str_len(s);
         s16 lenSubstr = str_len(substr);
@@ -180,7 +215,7 @@ namespace ncore
         return s_empty;  // not found
     }
 
-    str_t str_find_last(str_t& s, str_t& substr, bool case_sensitive)
+    str_t str_find_last(const str_t& s, const str_t& substr, bool case_sensitive)
     {
         s16 lenS      = str_len(s);
         s16 lenSubstr = str_len(substr);
@@ -215,7 +250,7 @@ namespace ncore
         return s_empty;  // not found
     }
 
-    str_t str_find_one_of(str_t& s, str_t& chars, bool case_sensitive)
+    str_t str_find_one_of(const str_t& s, const str_t& chars, bool case_sensitive)
     {
         s16 lenS     = str_len(s);
         s16 lenChars = str_len(chars);
@@ -239,83 +274,93 @@ namespace ncore
         return s_empty;  // not found
     }
 
-    s32 str_cmp(str_t& s1, const char* s2, bool case_sensitive)
+    s32 str_cmp(const str_t& s1, const char* s2, bool case_sensitive)
     {
         str_t ps2 = str_const(s2);
         return str_cmp(s1, ps2, case_sensitive);
     }
 
-    bool str_has_prefix(str_t& s1, const char* prefix, bool case_sensitive)
+    s32 str_cmp_n(const str_t& s1, const char* s2, s32 s2Len, bool case_sensitive)
+    {
+        str_t ps2 = str_const_n(s2, 0, (s16)s2Len, (s16)s2Len);
+        return str_cmp(s1, ps2, case_sensitive);
+    }
+
+    bool str_has_prefix(const str_t& s1, const char* prefix, bool case_sensitive)
     {
         str_t sp = str_const(prefix);
         return str_has_prefix(s1, sp, case_sensitive);
     }
 
-    bool str_has_suffix(str_t& s, const char* suffix, bool case_sensitive)
+    bool str_has_suffix(const str_t& s, const char* suffix, bool case_sensitive)
     {
         str_t ss = str_const(suffix);
         return str_has_suffix(s, ss, case_sensitive);
     }
 
-    bool str_contains(str_t& s, const char* substr, bool case_sensitive)
+    bool str_contains(const str_t& s, const char* substr, bool case_sensitive)
     {
         str_t ss = str_const(substr);
         return str_contains(s, ss, case_sensitive);
     }
 
-    str_t str_find(str_t& s, const char* substr, bool case_sensitive)
+    str_t str_find(const str_t& s, const char* substr, bool case_sensitive)
     {
         str_t ss = str_const(substr);
         return str_find(s, ss, case_sensitive);
     }
 
-    str_t str_find_last(str_t& s, const char* substr, bool case_sensitive)
+    str_t str_find_last(const str_t& s, const char* substr, bool case_sensitive)
     {
         str_t ss = str_const(substr);
         return str_find_last(s, ss, case_sensitive);
     }
 
-    str_t str_find_one_of(str_t& s, const char* chars, bool case_sensitive)
+    str_t str_find_one_of(const str_t& s, const char* chars, bool case_sensitive)
     {
         str_t sc = str_const(chars);
         return str_find_one_of(s, sc, case_sensitive);
     }
 
-    s32 str_find_index(str_t& s, char c, bool case_sensitive)
+    s16 str_find_index(const str_t& s, char c, bool case_sensitive)
     {
-        const char* ptr = s.m_const + s.m_str;
-        const char* end = s.m_const + s.m_end;
-        while (ptr < end)
+        s16 index = s.m_str;
+        while (index < s.m_end)
         {
-            char ch = *ptr;
+            char ch = s.m_const[index];
             if (!case_sensitive)
                 ch = to_lower(ch);
             if (ch == c)
-            {
-                return (s32)(ptr - s.m_const);
-            }
-            ptr++;
+                return index;
+            index++;
         }
         return -1;
     }
 
-    bool str_contains(str_t& s, char c, bool case_sensitive) { return str_find_index(s, c, case_sensitive) != -1; }
+    bool str_contains(const str_t& s, char c, bool case_sensitive) { return str_find_index(s, c, case_sensitive) != -1; }
 
-    str_t str_find(str_t& s, char c, bool case_sensitive)
+    str_t str_find(const str_t& s, char c, bool case_sensitive)
     {
-        const s32 index = str_find_index(s, c, case_sensitive);
-        if (index == -1)
-            return s_empty;  // not found
+        const s16 index = str_find_index(s, c, case_sensitive);
+
         str_t found;
         found.m_ascii = s.m_ascii;
         found.m_const = s.m_const;
-        found.m_str   = (s16)index;
-        found.m_end   = found.m_str + 1;
         found.m_eos   = s.m_eos;
+
+        if (index == -1)
+        {
+            found.m_str = s.m_end;
+            found.m_end = s.m_end;
+            return found;  // not found
+        }
+
+        found.m_str = index;
+        found.m_end = index + 1;
         return found;
     }
 
-    str_t str_find_last(str_t& s, char c, bool case_sensitive)
+    str_t str_find_last(const str_t& s, char c, bool case_sensitive)
     {
         const char* ptr   = s.m_const + s.m_end - 1;
         const char* start = s.m_const + s.m_str;
@@ -339,7 +384,7 @@ namespace ncore
         return s_empty;  // not found
     }
 
-    bool from_str(str_t& s, bool* outValue)
+    bool from_str(const str_t& s, bool* outValue)
     {
         if (outValue == nullptr)
             return false;
@@ -470,7 +515,7 @@ namespace ncore
         return false;
     }
 
-    bool from_str(str_t& s, s32* outValue, s16 base)
+    bool from_str(const str_t& s, s32* outValue, s16 base)
     {
         if (outValue == nullptr)
             return false;
@@ -484,7 +529,7 @@ namespace ncore
         return str_to_integer(start, end, base, outValue);
     }
 
-    bool from_str(str_t& s, u32* outValue, s16 base)
+    bool from_str(const str_t& s, u32* outValue, s16 base)
     {
         if (outValue == nullptr)
             return false;
@@ -499,7 +544,7 @@ namespace ncore
         return false;
     }
 
-    bool from_str(str_t& s, f32* outValue)
+    bool from_str(const str_t& s, f32* outValue)
     {
         if (outValue == nullptr)
             return false;
@@ -643,7 +688,6 @@ namespace ncore
         return 1;
     }
 
-
     s16 str_append(str_t& dest, const str_t& src)
     {
         if (dest.m_ascii == nullptr)
@@ -687,7 +731,7 @@ namespace ncore
         return totalLen;
     }
 
-    s16 str_join(str_t& dest, char sep, str_t& src1, str_t& src2)
+    s16 str_join(str_t& dest, char sep, const str_t& src1, const str_t& src2)
     {
         if (dest.m_ascii == nullptr)
             return -1;  // destination is not mutable
@@ -699,7 +743,7 @@ namespace ncore
         return totalLen;
     }
 
-    s16 str_join(str_t& dest, char sep, str_t& src1, str_t& src2, str_t& src3)
+    s16 str_join(str_t& dest, char sep, const str_t& src1, const str_t& src2, const str_t& src3)
     {
         if (dest.m_ascii == nullptr)
             return -1;  // destination is not mutable
@@ -720,7 +764,7 @@ namespace ncore
         return str_join(dest, sepStr, src_array, array_count);
     }
 
-    s16 str_join(str_t& dest, str_t& sep, const str_t* src_array, s16 array_count)
+    s16 str_join(str_t& dest, const str_t& sep, const str_t* src_array, s16 array_count)
     {
         if (dest.m_ascii == nullptr || src_array == nullptr || array_count <= 0)
             return 0;  // destination is not mutable or invalid source array
@@ -738,7 +782,7 @@ namespace ncore
         return 0;
     }
 
-    str_t str_trim_left(str_t& s)
+    str_t str_trim_left(const str_t& s)
     {
         str_t trimmed = s;
         while (trimmed.m_str < trimmed.m_end)
@@ -751,7 +795,7 @@ namespace ncore
         return trimmed;
     }
 
-    str_t str_trim_right(str_t& s)
+    str_t str_trim_right(const str_t& s)
     {
         str_t trimmed = s;
         while (trimmed.m_end > trimmed.m_str)
@@ -764,23 +808,23 @@ namespace ncore
         return trimmed;
     }
 
-    str_t str_trim(str_t& s)
+    str_t str_trim(const str_t& s)
     {
         str_t trimmed = str_trim_left(s);
         trimmed       = str_trim_right(trimmed);
         return trimmed;
     }
 
-    str_t str_trimQuotes(str_t& s)
+    str_t str_trimQuotes(const str_t& s)
     {
         str_t trimmed = str_trimDelimiters(s, '"', '"');
         trimmed       = str_trimDelimiters(trimmed, '\'', '\'');
         return trimmed;
     }
 
-    str_t str_trimQuotes(str_t& s, char quoteChar) { return str_trimDelimiters(s, quoteChar, quoteChar); }
+    str_t str_trimQuotes(const str_t& s, char quoteChar) { return str_trimDelimiters(s, quoteChar, quoteChar); }
 
-    str_t str_trimDelimiters(str_t& s, char leftDelim, char rightDelim)
+    str_t str_trimDelimiters(const str_t& s, char leftDelim, char rightDelim)
     {
         str_t trimmed = s;
         if (trimmed.m_end > trimmed.m_str + 1)

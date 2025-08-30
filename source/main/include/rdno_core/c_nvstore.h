@@ -7,6 +7,8 @@
 
 namespace ncore
 {
+    struct str_t;
+
     namespace nvstore
     {
         enum param_type_t
@@ -30,13 +32,13 @@ namespace ncore
             PARAM_REMOTE_PORT   = 5,
             PARAM_HOSTNAME      = 6,
 
-            PARAM_SENSOR_READ_INTERVAL = 10, // Interval in milli-seconds to read sensors
-            PARAM_SENSOR_SEND_INTERVAL = 11, // Interval in milli-seconds to send sensor data to server
+            PARAM_SENSOR_READ_INTERVAL = 10,  // Interval in milli-seconds to read sensors
+            PARAM_SENSOR_SEND_INTERVAL = 11,  // Interval in milli-seconds to send sensor data to server
         };
 
         struct param_t
         {
-            s32 m_type; 
+            s32 m_type;
             s32 m_value;
         };
 
@@ -45,26 +47,28 @@ namespace ncore
         {
             param_t m_params[63];
             u32     m_string_count;
-            char    m_strings[32 * 32]; // Maximum of 32 strings of max 32 characters each
+            char    m_strings[32 * 32];  // Maximum of 32 strings of max 32 characters each
         };
 
+
         // Message example: "ssid=OBNOSIS8, password=MySecretPassword, remote_server=10.0.0.22, remote_port=1234"
-        bool ParseKeyValue(const char*& msg, const char* msgEnd, const char*& outKey, s32& outKeyLength, const char*& outValue, s32& outValueLength);
-        void ParseValue(config_t* config, s16 id, const char* str, s32 len);
-        void ParseInt(config_t* config, s16 id, const char* str, s32 len);
-        void ParseBool(config_t* config, s16 id, const char* str, s32 len);
+        bool ParseKeyValue(str_t& msg, str_t& outKey, str_t& outValue);
+        void ParseValue(config_t* config, s16 id, str_t const& str);
+        void ParseInt(config_t* config, s16 id, str_t const& str);
+        void ParseBool(config_t* config, s16 id, str_t const& str);
 
-        void        SetString(config_t* config, s16 id, const char* str, s32 strLen);
-        const char* GetString(const config_t* config, s16 id);
-        void        SetInt(config_t* config, s16 id, s32 value);
-        s32         GetInt(const config_t* config, s16 id, s32 defaultValue = 0);
-        void        SetBool(config_t* config, s16 id, bool value);
-        bool        GetBool(const config_t* config, s16 id, bool defaultValue = false);
+        bool SetString(config_t* config, s16 id, str_t const& str);
+        bool GetString(const config_t* config, s16 id, str_t& outStr);
+        void SetInt(config_t* config, s16 id, s32 value);
+        s32  GetInt(const config_t* config, s16 id, s32 defaultValue = 0);
+        void SetBool(config_t* config, s16 id, bool value);
+        bool GetBool(const config_t* config, s16 id, bool defaultValue = false);
 
+        void Reset(config_t* config);
         void Save(config_t* config);
         void Load(config_t* config);
 
-    } // namespace nvstore
-} // namespace ncore
+    }  // namespace nvstore
+}  // namespace ncore
 
-#endif // __RDNO_CORE_PREFERENCES_H__
+#endif  // __RDNO_CORE_PREFERENCES_H__

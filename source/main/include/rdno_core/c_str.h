@@ -52,50 +52,57 @@ namespace ncore
     inline bool        str_is_empty(const str_t& s) { return s.m_str == s.m_end; }
 
     // constructors ----------------------------------------------------------------------------
+    str_t str_empty();                                              // create an empty str
     void  str_clear(str_t& ps);                                     // clear the string to empty
     str_t str_mutable(char* s, s16 capacity);                       // create a str to the given buffer
     str_t str_const(const char* s);                                 // create a str to the given null-terminated string
     str_t str_const_n(const char* s, s16 begin, s16 end, s16 eos);  // create a reference to the given range of chars
 
+    // selections -----------------------------------------------------------------------------
+    str_t str_select_after(const str_t& str, const str_t& sel);   // select the part after the incoming string
+    str_t str_select_before(const str_t& str, const str_t& sel);  // select the part before the incoming string
+    str_t str_select_until(const str_t& str, const str_t& sel);   // widen 'str' until the beginning of 'part'
+
     // string movements -----------------------------------------------------------------------
     void str_swap(str_t& s1, str_t& s2);  // swap two string objects
 
     // string comparisons and search -----------------------------------------------------------
-    s32         str_cmp(str_t& s1, str_t& s2, bool case_sensitive = true);  // compare two strings lexicographically
-    inline bool str_eq(str_t& s1, str_t& s2, bool case_sensitive = true) { return str_cmp(s1, s2, case_sensitive) == 0; }
-    bool        str_has_prefix(str_t& s, str_t& prefix, bool case_sensitive = true);  // test for prefix
-    bool        str_has_suffix(str_t& s, str_t& suffix, bool case_sensitive = true);  // test for suffix
-    bool        str_contains(str_t& s, str_t& substr, bool case_sensitive = true);    // test for substring
-    str_t       str_find(str_t& s, str_t& substr, bool case_sensitive = true);        // find first occurrence of substring
-    str_t       str_find_last(str_t& s, str_t& substr, bool case_sensitive = true);   // find last occurrence of substring
-    str_t       str_find_one_of(str_t& s, str_t& chars, bool case_sensitive = true);  // find first occurrence of any of the given characters
+    s32         str_cmp(const str_t& s1, const str_t& s2, bool case_sensitive = true);  // compare two strings lexicographically
+    inline bool str_eq(const str_t& s1, const str_t& s2, bool case_sensitive = true) { return str_cmp(s1, s2, case_sensitive) == 0; }
+    bool        str_has_prefix(const str_t& s, const str_t& prefix, bool case_sensitive = true);  // test for prefix
+    bool        str_has_suffix(const str_t& s, const str_t& suffix, bool case_sensitive = true);  // test for suffix
+    bool        str_contains(const str_t& s, const str_t& substr, bool case_sensitive = true);    // test for substring
+    str_t       str_find(const str_t& s, const str_t& substr, bool case_sensitive = true);        // find first occurrence of substring
+    str_t       str_find_last(const str_t& s, const str_t& substr, bool case_sensitive = true);   // find last occurrence of substring
+    str_t       str_find_one_of(const str_t& s, const str_t& chars, bool case_sensitive = true);  // find first occurrence of any of the given characters
 
-    s32         str_cmp(str_t& s1, const char* s2, bool case_sensitive = true);  // compare two strings lexicographically
-    inline bool str_eq(str_t& s1, const char* s2, bool case_sensitive = true) { return str_cmp(s1, s2, case_sensitive) == 0; }
-    bool        str_has_prefix(str_t& s, const char* prefix, bool case_sensitive = true);  // test for prefix
-    bool        str_has_suffix(str_t& s, const char* suffix, bool case_sensitive = true);  // test for suffix
-    bool        str_contains(str_t& s, const char* substr, bool case_sensitive = true);    // test for substring
-    str_t       str_find(str_t& s, const char* substr, bool case_sensitive = true);        // find first occurrence of substring
-    str_t       str_find_last(str_t& s, const char* substr, bool case_sensitive = true);   // find last occurrence of substring
-    str_t       str_find_one_of(str_t& s, const char* chars, bool case_sensitive = true);  // find first occurrence of any of the given characters
+    s32         str_cmp(const str_t& s1, const char* s2, bool case_sensitive = true);               // compare two strings lexicographically
+    s32         str_cmp_n(const str_t& s1, const char* s2, s32 s2Len, bool case_sensitive = true);  // compare two strings lexicographically
+    inline bool str_eq(const str_t& s1, const char* s2, bool case_sensitive = true) { return str_cmp(s1, s2, case_sensitive) == 0; }
+    bool        str_has_prefix(const str_t& s, const char* prefix, bool case_sensitive = true);  // test for prefix
+    bool        str_has_suffix(const str_t& s, const char* suffix, bool case_sensitive = true);  // test for suffix
+    bool        str_contains(const str_t& s, const char* substr, bool case_sensitive = true);    // test for substring
+    str_t       str_find(const str_t& s, const char* substr, bool case_sensitive = true);        // find first occurrence of substring
+    str_t       str_find_last(const str_t& s, const char* substr, bool case_sensitive = true);   // find last occurrence of substring
+    str_t       str_find_one_of(const str_t& s, const char* chars, bool case_sensitive = true);  // find first occurrence of any of the given characters
 
-    bool str_contains(str_t& s, char c, bool case_sensitive = true);       // test for character
-    str_t str_find(str_t& s, char c, bool case_sensitive = true);       // find first occurrence of c
-    str_t str_find_last(str_t& s, char c, bool case_sensitive = true);  // find last occurrence of c
+    bool  str_contains(const str_t& s, char c, bool case_sensitive = true);   // test for character
+    str_t str_find(const str_t& s, char c, bool case_sensitive = true);       // find first occurrence of c
+    str_t str_find_last(const str_t& s, char c, bool case_sensitive = true);  // find last occurrence of c
 
     // string trimming ----------------------------------------------------------------------
-    str_t str_trim_left(str_t& s);                                        // trim whitespace from the left
-    str_t str_trim_right(str_t& s);                                       // trim whitespace from the right
-    str_t str_trim(str_t& s);                                             // trim whitespace from both ends
-    str_t str_trimQuotes(str_t& s);                                       // trim quotes from both ends if present
-    str_t str_trimQuotes(str_t& s, char quoteChar);                       // trim specified quote char from both ends if present
-    str_t str_trimDelimiters(str_t& s, char leftDelim, char rightDelim);  // trim specified delimiters from both ends if present
+    str_t str_trim_left(const str_t& s);                                        // trim whitespace from the left
+    str_t str_trim_right(const str_t& s);                                       // trim whitespace from the right
+    str_t str_trim(const str_t& s);                                             // trim whitespace from both ends
+    str_t str_trimQuotes(const str_t& s);                                       // trim quotes from both ends if present
+    str_t str_trimQuotes(const str_t& s, char quoteChar);                       // trim specified quote char from both ends if present
+    str_t str_trimDelimiters(const str_t& s, char leftDelim, char rightDelim);  // trim specified delimiters from both ends if present
 
     // from and to conversions ----------------------------------------------------------------
-    bool from_str(str_t& s, bool* outValue);
-    bool from_str(str_t& s, s32* outValue, s16 base = 10);
-    bool from_str(str_t& s, u32* outValue, s16 base = 10);
-    bool from_str(str_t& s, f32* outValue);
+    bool from_str(const str_t& s, bool* outValue);
+    bool from_str(const str_t& s, s32* outValue, s16 base = 10);
+    bool from_str(const str_t& s, u32* outValue, s16 base = 10);
+    bool from_str(const str_t& s, f32* outValue);
 
     void to_str(str_t& dest, bool value);
     void to_str(str_t& dest, s32 value, s16 base = 10);
@@ -103,16 +110,16 @@ namespace ncore
     void to_str(str_t& dest, f32 value, s16 num_fractional_digits = 2);
 
     // string composition ------------------------------------------------------------------
-    s16 str_append(str_t& dest, char c);  // append single character to 'dest' (note: dest must be mutable)
+    s16 str_append(str_t& dest, char c);          // append single character to 'dest' (note: dest must be mutable)
     s16 str_append(str_t& dest, const str_t& s);  // append 's' to 'dest' (note: dest must be mutable)
     s16 str_append(str_t& dest, const char* src);
     s16 str_append(str_t& dest, const str_t* array, s16 count);
 
     // implementation helpers
-    s16 str_join(str_t& dest, char sep, str_t& src1, str_t& src2);
-    s16 str_join(str_t& dest, char sep, str_t& src1, str_t& src2, str_t& src3);
+    s16 str_join(str_t& dest, char sep, const str_t& src1, const str_t& src2);
+    s16 str_join(str_t& dest, char sep, const str_t& src1, const str_t& src2, const str_t& src3);
     s16 str_join(str_t& dest, char sep, const str_t* src_array, s16 array_count);
-    s16 str_join(str_t& dest, str_t& sep, const str_t* src_array, s16 array_count);
+    s16 str_join(str_t& dest, const str_t& sep, const str_t* src_array, s16 array_count);
 
 }  // namespace ncore
 

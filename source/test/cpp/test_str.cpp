@@ -471,11 +471,6 @@ UNITTEST_SUITE_BEGIN(str)
 
     UNITTEST_FIXTURE(join)
     {
-        // s16 str_join(str_t & dest, char sep, str_t& src1, str_t& src2);
-        // s16 str_join(str_t & dest, char sep, str_t& src1, str_t& src2, str_t& src3);
-        // s16 str_join(str_t & dest, char sep, const str_t* src_array, s16 array_count);
-        // s16 str_join(str_t & dest, str_t & sep, const str_t* src_array, s16 array_count);
-
 		UNITTEST_TEST(str_join_two)
 		{
 			char  buffer[30];
@@ -491,6 +486,10 @@ UNITTEST_SUITE_BEGIN(str)
 			CHECK_EQUAL(str_at(str1, 6), 'w');
 			CHECK_EQUAL(str_at(str1, 10), 'd');
 		}
+
+        // s16 str_join(str_t & dest, char sep, str_t& src1, str_t& src2, str_t& src3);
+        // s16 str_join(str_t & dest, char sep, const str_t* src_array, s16 array_count);
+        // s16 str_join(str_t & dest, str_t & sep, const str_t* src_array, s16 array_count);
     }
 }
 UNITTEST_SUITE_END
