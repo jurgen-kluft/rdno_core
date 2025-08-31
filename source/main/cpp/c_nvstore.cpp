@@ -131,20 +131,20 @@ namespace ncore
 
         void ParseValue(config_t* config, s16 id, str_t const& str)
         {
-            if (config == nullptr || (id < 0 || id >= 63))
+            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
                 return;
-            switch (config->m_params[id].m_type)
+            switch (config->m_param_types[id])
             {
-                case nvstore::TYPE_NONE: break;
-                case nvstore::TYPE_STRING: nvstore::SetString(config, id, str); break;
-                case nvstore::TYPE_S32: nvstore::ParseInt(config, id, str); break;
-                case nvstore::TYPE_BOOL: nvstore::ParseBool(config, id, str); break;
+                case nvstore::PARAM_TYPE_NONE: break;
+                case nvstore::PARAM_TYPE_STRING: nvstore::SetString(config, id, str); break;
+                case nvstore::PARAM_TYPE_S32: nvstore::ParseInt(config, id, str); break;
+                case nvstore::PARAM_TYPE_BOOL: nvstore::ParseBool(config, id, str); break;
             }
         }
 
         void ParseInt(config_t* config, s16 id, const str_t& str)
         {
-            if (config == nullptr || (id < 0 || id >= 63))
+            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
                 return;
 
             s32 value = 0;
@@ -156,7 +156,7 @@ namespace ncore
 
         void ParseBool(config_t* config, s16 id, const str_t& str)
         {
-            if (config == nullptr || (id < 0 || id >= 63))
+            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
                 return;
 
             if (str_eq(str, "true") || str_eq(str, "1"))
@@ -171,26 +171,26 @@ namespace ncore
 
         bool SetString(config_t* config, s16 id, const str_t& str)
         {
-            if (config == nullptr || (id < 0 || id >= 63) || str_len(str) >= 32)
+            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT) || str_len(str) >= PARAM_ID_STRING_MAX_LENGTH)
                 return false;
 
             s32 str_index;
-            if (config->m_params[id].m_type == TYPE_NONE)
+            if (config->m_param_types[id] == PARAM_TYPE_NONE)
             {
-                if (config->m_string_count >= 32)
+                if (config->m_string_count >= PARAM_ID_STRING_MAX_COUNT)
                     return false;  // No more space for strings
 
-                str_index                    = config->m_string_count++;
-                config->m_params[id].m_type  = TYPE_STRING;
-                config->m_params[id].m_value = (str_index * 32) + str_len(str);
+                str_index                  = config->m_string_count++;
+                config->m_param_types[id]  = PARAM_TYPE_STRING;
+                config->m_param_values[id] = (str_index * PARAM_ID_STRING_MAX_LENGTH) + str_len(str);
             }
             else
             {
-                str_index                    = config->m_params[id].m_value >> 5;
-                config->m_params[id].m_value = (str_index * 32) + str_len(str);
+                str_index                  = config->m_param_values[id] >> 5;
+                config->m_param_values[id] = (str_index * PARAM_ID_STRING_MAX_LENGTH) + str_len(str);
             }
 
-            str_t dst = str_mutable(&config->m_strings[str_index * 32], 32);
+            str_t dst = str_mutable(&config->m_strings[str_index * PARAM_ID_STRING_MAX_LENGTH], PARAM_ID_STRING_MAX_LENGTH);
             str_append(dst, str);
             return true;
         }
@@ -198,47 +198,47 @@ namespace ncore
         bool GetString(const config_t* config, s16 id, str_t& outStr)
         {
             outStr = str_empty();
-            if (config == nullptr || (id < 0 || id >= 63))
+            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
                 return false;
-            if (config->m_params[id].m_type != TYPE_STRING)
+            if (config->m_param_types[id] != PARAM_TYPE_STRING)
                 return false;
-            s32 const str_value  = config->m_params[id].m_value;
-            s32 const str_index  = str_value >> 5;
-            s32 const str_length = str_value & 0x1F;
+            s32 const str_value  = config->m_param_values[id];
+            s32 const str_index  = str_value / PARAM_ID_STRING_MAX_LENGTH;
+            s32 const str_length = str_value & (PARAM_ID_STRING_MAX_LENGTH - 1);
             if (str_index < 0 || str_index >= config->m_string_count)
                 return false;
-            outStr = str_const_n(&config->m_strings[str_index * 32], 0, str_length, str_length);
+            outStr = str_const_n(&config->m_strings[str_index * PARAM_ID_STRING_MAX_LENGTH], 0, str_length, str_length);
             return true;
         }
 
         void SetInt(config_t* config, s16 id, s32 value)
         {
-            if (config == nullptr || (id < 0 || id >= 63))
+            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
                 return;
-            config->m_params[id].m_type  = TYPE_S32;
-            config->m_params[id].m_value = value;
+            config->m_param_types[id]  = PARAM_TYPE_S32;
+            config->m_param_values[id] = value;
         }
 
         s32 GetInt(const config_t* config, s16 id, s32 defaultValue)
         {
-            if (config == nullptr || (id < 0 || id >= 63) || config->m_params[id].m_type != TYPE_S32)
+            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_S32)
                 return defaultValue;
-            return config->m_params[id].m_value;
+            return config->m_param_values[id];
         }
 
         void SetBool(config_t* config, s16 id, bool value)
         {
-            if (config == nullptr || (id < 0 || id >= 63))
+            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
                 return;
-            config->m_params[id].m_type  = TYPE_BOOL;
-            config->m_params[id].m_value = value ? 1 : 0;
+            config->m_param_types[id]  = PARAM_TYPE_BOOL;
+            config->m_param_values[id] = value ? 1 : 0;
         }
 
         bool GetBool(const config_t* config, s16 id, bool defaultValue)
         {
-            if (config == nullptr || (id < 0 || id >= 63) || config->m_params[id].m_type != TYPE_BOOL)
+            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_BOOL)
                 return defaultValue;
-            return config->m_params[id].m_value == 1;
+            return config->m_param_values[id] == 1;
         }
 
     }  // namespace nvstore

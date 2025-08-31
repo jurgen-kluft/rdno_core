@@ -31,7 +31,7 @@ UNITTEST_SUITE_BEGIN(nvstore)
                 return 5;
 
             s32 value = 0;
-            if (from_str(str, &value, 10) && value >= 0 && value < 256)
+            if (from_str(str, &value, 10) && value >= 0 && value < nvstore::PARAM_ID_MAX_COUNT)
             {
                 return static_cast<s16>(value);
             }
@@ -74,7 +74,7 @@ UNITTEST_SUITE_BEGIN(nvstore)
             CHECK_TRUE(nvstore::GetString(&config, 4, remote_server));
             CHECK_TRUE(str_eq(remote_server, "10.0.0.62", false));
 
-            CHECK_TRUE(config.m_params[5].m_type == nvstore::TYPE_S32);
+            CHECK_TRUE(config.m_param_types[5] == nvstore::PARAM_TYPE_S32);
 
             s32 remote_port = nvstore::GetInt(&config, 5, 123);
             CHECK_EQUAL(1234, remote_port);

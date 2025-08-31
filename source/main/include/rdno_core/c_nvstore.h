@@ -13,10 +13,10 @@ namespace ncore
     {
         enum param_type_t
         {
-            TYPE_NONE   = 0,
-            TYPE_S32    = 15,
-            TYPE_BOOL   = 17,
-            TYPE_STRING = 18,
+            PARAM_TYPE_NONE   = 0,
+            PARAM_TYPE_S32    = 15,
+            PARAM_TYPE_BOOL   = 17,
+            PARAM_TYPE_STRING = 18,
         };
 
         typedef s16 (*ParamNameToId)(const char* str, s32 len);
@@ -24,32 +24,30 @@ namespace ncore
         enum params_t
         {
             // WiFi parameters
-            PARAM_SSID          = 0,
-            PARAM_PASSWORD      = 1,
-            PARAM_AP_SSID       = 2,
-            PARAM_AP_PASSWORD   = 3,
-            PARAM_REMOTE_SERVER = 4,
-            PARAM_REMOTE_PORT   = 5,
-            PARAM_HOSTNAME      = 6,
+            PARAM_ID_SSID          = 0,
+            PARAM_ID_PASSWORD      = 1,
+            PARAM_ID_AP_SSID       = 2,
+            PARAM_ID_AP_PASSWORD   = 3,
+            PARAM_ID_REMOTE_SERVER = 4,
+            PARAM_ID_REMOTE_PORT   = 5,
+            PARAM_ID_HOSTNAME      = 6,
 
-            PARAM_SENSOR_READ_INTERVAL = 10,  // Interval in milli-seconds to read sensors
-            PARAM_SENSOR_SEND_INTERVAL = 11,  // Interval in milli-seconds to send sensor data to server
+            PARAM_ID_SENSOR_READ_INTERVAL = 10,  // Interval in milli-seconds to read sensors
+            PARAM_ID_SENSOR_SEND_INTERVAL = 11,  // Interval in milli-seconds to send sensor data to server
+
+            PARAM_ID_MAX_COUNT         = 64,
+            PARAM_ID_STRING_MAX_COUNT  = 32,
+            PARAM_ID_STRING_MAX_LENGTH = 32,
         };
 
-        struct param_t
-        {
-            s32 m_type;
-            s32 m_value;
-        };
-
-        // 1.5 KB fixed size configuration structure
+        // 1.3 KB fixed size configuration structure
         struct config_t
         {
-            param_t m_params[63];
-            u32     m_string_count;
-            char    m_strings[32 * 32];  // Maximum of 32 strings of max 32 characters each
+            s8   m_param_types[PARAM_ID_MAX_COUNT];
+            s32  m_param_values[PARAM_ID_MAX_COUNT];  // For strings: (index * 32) + length
+            u32  m_string_count;
+            char m_strings[PARAM_ID_STRING_MAX_COUNT * PARAM_ID_STRING_MAX_LENGTH];  // Maximum of 32 strings of max 32 characters each
         };
-
 
         // Message example: "ssid=OBNOSIS8, password=MySecretPassword, remote_server=10.0.0.22, remote_port=1234"
         bool ParseKeyValue(str_t& msg, str_t& outKey, str_t& outValue);
