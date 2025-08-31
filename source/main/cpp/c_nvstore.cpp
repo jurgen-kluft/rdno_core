@@ -177,12 +177,13 @@ namespace ncore
             s32 str_index;
             if (config->m_param_types[id] == PARAM_TYPE_NONE)
             {
-                if (config->m_string_count >= PARAM_ID_STRING_MAX_COUNT)
+                if (config->m_param_values[PARAM_ID_STRING_COUNT] >= PARAM_ID_STRING_MAX_COUNT)
                     return false;  // No more space for strings
 
-                str_index                  = config->m_string_count++;
+                str_index                  = config->m_param_values[PARAM_ID_STRING_COUNT];
                 config->m_param_types[id]  = PARAM_TYPE_STRING;
                 config->m_param_values[id] = (str_index * PARAM_ID_STRING_MAX_LENGTH) + str_len(str);
+                config->m_param_values[PARAM_ID_STRING_COUNT] += 1;
             }
             else
             {
@@ -205,7 +206,7 @@ namespace ncore
             s32 const str_value  = config->m_param_values[id];
             s32 const str_index  = str_value / PARAM_ID_STRING_MAX_LENGTH;
             s32 const str_length = str_value & (PARAM_ID_STRING_MAX_LENGTH - 1);
-            if (str_index < 0 || str_index >= config->m_string_count)
+            if (str_index < 0 || str_index >= config->m_param_values[PARAM_ID_STRING_COUNT])
                 return false;
             outStr = str_const_n(&config->m_strings[str_index * PARAM_ID_STRING_MAX_LENGTH], 0, str_length, str_length);
             return true;

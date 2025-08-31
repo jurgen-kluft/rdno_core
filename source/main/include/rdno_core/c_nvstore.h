@@ -24,13 +24,14 @@ namespace ncore
         enum params_t
         {
             // WiFi parameters
-            PARAM_ID_SSID          = 0,
-            PARAM_ID_PASSWORD      = 1,
-            PARAM_ID_AP_SSID       = 2,
-            PARAM_ID_AP_PASSWORD   = 3,
-            PARAM_ID_REMOTE_SERVER = 4,
-            PARAM_ID_REMOTE_PORT   = 5,
-            PARAM_ID_HOSTNAME      = 6,
+            PARAM_ID_STRING_COUNT  = 0,
+            PARAM_ID_SSID          = 1,
+            PARAM_ID_PASSWORD      = 2,
+            PARAM_ID_AP_SSID       = 3,
+            PARAM_ID_AP_PASSWORD   = 4,
+            PARAM_ID_REMOTE_SERVER = 5,
+            PARAM_ID_REMOTE_PORT   = 6,
+            PARAM_ID_HOSTNAME      = 7,
 
             PARAM_ID_SENSOR_READ_INTERVAL = 10,  // Interval in milli-seconds to read sensors
             PARAM_ID_SENSOR_SEND_INTERVAL = 11,  // Interval in milli-seconds to send sensor data to server
@@ -45,7 +46,6 @@ namespace ncore
         {
             s8   m_param_types[PARAM_ID_MAX_COUNT];
             s32  m_param_values[PARAM_ID_MAX_COUNT];  // For strings: (index * 32) + length
-            u32  m_string_count;
             char m_strings[PARAM_ID_STRING_MAX_COUNT * PARAM_ID_STRING_MAX_LENGTH];  // Maximum of 32 strings of max 32 characters each
         };
 

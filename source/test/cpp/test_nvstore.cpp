@@ -44,13 +44,13 @@ UNITTEST_SUITE_BEGIN(nvstore)
 
             nvstore::config_t config;
             nvstore::Reset(&config);
-            nvstore::SetString(&config, 0, str_const(""));  // ssid
-            nvstore::SetString(&config, 1, str_const(""));  // password
-            nvstore::SetString(&config, 2, str_const(""));  // ap_ssid
-            nvstore::SetString(&config, 3, str_const(""));  // ap_password
-            nvstore::SetString(&config, 4, str_const(""));  // remote_server
-            nvstore::SetInt(&config, 5, 12);                 // remote_port
-            CHECK_EQUAL(5, config.m_string_count);          // 5 strings used so far
+            nvstore::SetString(&config, 0, str_const(""));                          // ssid
+            nvstore::SetString(&config, 1, str_const(""));                          // password
+            nvstore::SetString(&config, 2, str_const(""));                          // ap_ssid
+            nvstore::SetString(&config, 3, str_const(""));                          // ap_password
+            nvstore::SetString(&config, 4, str_const(""));                          // remote_server
+            nvstore::SetInt(&config, 5, 12);                                        // remote_port
+            CHECK_EQUAL(5, config.m_param_values[nvstore::PARAM_ID_STRING_COUNT]);  // 5 strings used so far
 
             str_t msg      = str_const(message);
             str_t outKey   = str_empty();
