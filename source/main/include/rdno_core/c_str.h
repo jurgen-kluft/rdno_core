@@ -21,15 +21,21 @@ namespace ncore
     inline bool is_hexa(char c) { return (((c >= 'A') && (c <= 'F')) || ((c >= 'a') && (c <= 'f')) || ((c >= '0') && (c <= '9'))); }
     inline char to_upper(char c) { return ((c >= 'a') && (c <= 'z')) ? c + (char)('A' - 'a') : c; }
     inline char to_lower(char c) { return ((c >= 'A') && (c <= 'Z')) ? c + (char)('a' - 'A') : c; }
-    inline s32  to_digit(char c) { return ((c >= '0') && (c <= '9')) ? (c - '0') : c; }
-    inline s32  hex_to_number(char c) { return is_digit(c) ? (c - '0') : ((c >= 'A') && (c <= 'F')) ? (c - 'A' + 10) : ((c >= 'a') && (c <= 'f')) ? (c - 'a' + 10) : -1; }
     inline char to_dec_char(u8 val) { return "0123456789??????"[val & 0xf]; }
     inline char to_hex_char(u8 val, bool lowercase) { return (lowercase) ? "0123456789abcdef"[val & 0xf] : "0123456789ABCDEF"[val & 0xf]; }
+    inline byte from_char(char c)
+    {
+        return is_digit(c) ? (c - '0') : ((c >= 'A') && (c <= 'F')) ? (c - 'A' + 10) : ((c >= 'a') && (c <= 'f')) ? (c - 'a' + 10) : 255;
+    }
 
     // string type ----------------------------------------------------------------------------
-    // A str_t is a string object that can either be a reference to an existing string
-    // or own its own string memory.
-    // The maximum length of a string is 65535 characters (not including the null terminator).
+    // The string is defined by the range [m_str, m_end) within the buffer [0, m_eos).
+    // The buffer must always be null-terminated at m_eos, but the string itself
+    // does not need to be null-terminated.
+    // The string can be empty (m_str == m_end) but must always satisfy:
+    //   0 <= m_str <= m_end <= m_eos <= 32767
+    // The buffer can be mutable (m_ascii != nullptr) or read-only (m_ascii == nullptr).
+    // If the buffer is mutable, then the string can be modified in-place.
     struct str_t
     {
         const char* m_const;  // pointer to a read-only ascii string
@@ -99,7 +105,7 @@ namespace ncore
     str_t str_trimDelimiters(const str_t& s, char leftDelim, char rightDelim);  // trim specified delimiters from both ends if present
 
     // from and to conversions ----------------------------------------------------------------
-    bool from_str(const str_t& s, bool* outValue);
+    bool from_str(const str_t& s);
     bool from_str(const str_t& s, s32* outValue, s16 base = 10);
     bool from_str(const str_t& s, u32* outValue, s16 base = 10);
     bool from_str(const str_t& s, f32* outValue);

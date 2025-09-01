@@ -384,19 +384,12 @@ namespace ncore
         return s_empty;  // not found
     }
 
-    bool from_str(const str_t& s, bool* outValue)
+    bool from_str(const str_t& s)
     {
         if (outValue == nullptr)
             return false;
-
         if (str_has_prefix(s, "true", false))
         {
-            *outValue = true;
-            return true;
-        }
-        if (str_has_prefix(s, "false", false))
-        {
-            *outValue = false;
             return true;
         }
         return false;
@@ -436,9 +429,7 @@ namespace ncore
             while (ptr < end)
             {
                 const char c     = *ptr;
-                const s32  digit = hex_to_number(c);
-                if (digit == -1)
-                    return false;  // invalid digit for any base
+                const s32  digit = from_char(c);
                 if (digit >= base)
                     return false;
                 value = value * base + digit;

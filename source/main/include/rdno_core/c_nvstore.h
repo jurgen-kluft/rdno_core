@@ -1,5 +1,5 @@
-#ifndef __RDNO_CORE_PREFERENCES_H__
-#define __RDNO_CORE_PREFERENCES_H__
+#ifndef __RDNO_CORE_NVSTORE_H__
+#define __RDNO_CORE_NVSTORE_H__
 #include "rdno_core/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
@@ -69,4 +69,4 @@ namespace ncore
     }  // namespace nvstore
 }  // namespace ncore
 
-#endif  // __RDNO_CORE_PREFERENCES_H__
+#endif  // __RDNO_CORE_NVSTORE_H__

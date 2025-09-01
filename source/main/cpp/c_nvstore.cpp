@@ -158,15 +158,7 @@ namespace ncore
         {
             if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
                 return;
-
-            if (str_eq(str, "true") || str_eq(str, "1"))
-            {
-                SetBool(config, id, true);
-            }
-            else
-            {
-                SetBool(config, id, false);
-            }
+            SetBool(config, id, from_str(str));
         }
 
         bool SetString(config_t* config, s16 id, const str_t& str)

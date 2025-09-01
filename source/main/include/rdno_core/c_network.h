@@ -7,23 +7,25 @@
 
 namespace ncore
 {
+    struct str_t;
+
     struct IPAddress_t
     {
         byte m_address[4];
     };
-
 
     struct MACAddress_t
     {
         byte m_address[6];
     };
 
-    bool FromString(const char* str, s32 strLen, IPAddress_t& outAddr);
-    bool FromString(const char* str, s32 strLen, MACAddress_t& outAddr);
+    bool FromString(str_t const& str, IPAddress_t& outAddr);
+    bool FromString(str_t const& str, MACAddress_t& outAddr);
 
-    bool IsValidSSID(const char* ssid, s32 strLen);
-    bool IsValidPassword(const char* password, s32 strLen);
-    bool IsValidIPAddress(const char* ipAddress, s32 strLen);
+    bool IsValidSSID(str_t const&);
+    bool IsValidPassword(str_t const&);
+    bool IsValidIPAddress(str_t const&);
+    bool IsValidPort(s32 port);
 
 }  // namespace ncore
 
