@@ -64,7 +64,7 @@ namespace ncore
 
         void reset(config_t* config);
         void save(config_t* config);
-        void load(config_t* config);
+        bool load(config_t* config);
 
     }  // namespace nvstore
 }  // namespace ncore

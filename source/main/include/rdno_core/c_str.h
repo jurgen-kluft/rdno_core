@@ -23,10 +23,7 @@ namespace ncore
     inline char to_lower(char c) { return ((c >= 'A') && (c <= 'Z')) ? c + (char)('a' - 'A') : c; }
     inline char to_dec_char(u8 val) { return "0123456789??????"[val & 0xf]; }
     inline char to_hex_char(u8 val, bool lowercase) { return (lowercase) ? "0123456789abcdef"[val & 0xf] : "0123456789ABCDEF"[val & 0xf]; }
-    inline byte from_char(char c)
-    {
-        return is_digit(c) ? (c - '0') : ((c >= 'A') && (c <= 'F')) ? (c - 'A' + 10) : ((c >= 'a') && (c <= 'f')) ? (c - 'a' + 10) : 255;
-    }
+    inline byte from_char(char c) { return is_digit(c) ? (c - '0') : ((c >= 'A') && (c <= 'F')) ? (c - 'A' + 10) : ((c >= 'a') && (c <= 'f')) ? (c - 'a' + 10) : 255; }
 
     // string type ----------------------------------------------------------------------------
     // The string is defined by the range [m_str, m_end) within the buffer [0, m_eos).
@@ -58,11 +55,11 @@ namespace ncore
     inline bool        str_is_empty(const str_t& s) { return s.m_str == s.m_end; }
 
     // constructors ----------------------------------------------------------------------------
-    str_t str_empty();                                              // create an empty str
-    void  str_clear(str_t& ps);                                     // clear the string to empty
-    str_t str_mutable(char* s, s16 capacity);                       // create a str to the given buffer
-    str_t str_const(const char* s);                                 // create a str to the given null-terminated string
-    str_t str_const_n(const char* s, s16 len);                      // create a str to the given null-terminated string
+    str_t str_empty();                                                 // create an empty str
+    void  str_clear(str_t& ps);                                        // clear the string to empty
+    str_t str_mutable(char* s, s16 capacity);                          // create a str to the given buffer
+    str_t str_const(const char* s);                                    // create a str to the given null-terminated string
+    str_t str_const_n(const char* s, s16 len);                         // create a str to the given null-terminated string
     str_t str_const_full(const char* s, s16 begin, s16 end, s16 eos);  // create a reference to the given range of chars
 
     // selections -----------------------------------------------------------------------------
@@ -86,6 +83,7 @@ namespace ncore
     s32         str_cmp(const str_t& s1, const char* s2, bool case_sensitive = true);               // compare two strings lexicographically
     s32         str_cmp_n(const str_t& s1, const char* s2, s32 s2Len, bool case_sensitive = true);  // compare two strings lexicographically
     inline bool str_eq(const str_t& s1, const char* s2, bool case_sensitive = true) { return str_cmp(s1, s2, case_sensitive) == 0; }
+    inline bool str_eq_n(const str_t& s1, const char* s2, s32 s2Len, bool case_sensitive = true) { return str_cmp_n(s1, s2, s2Len, case_sensitive) == 0; }
     bool        str_has_prefix(const str_t& s, const char* prefix, bool case_sensitive = true);  // test for prefix
     bool        str_has_suffix(const str_t& s, const char* suffix, bool case_sensitive = true);  // test for suffix
     bool        str_contains(const str_t& s, const char* substr, bool case_sensitive = true);    // test for substring

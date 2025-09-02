@@ -63,19 +63,19 @@ namespace ncore
         };
 
         // Is this pin valid ?
-        inline bool IsValid(s8 pin) { return pin <= PinsMax && pin > 0; }
+        inline bool is_valid(s8 pin) { return pin <= PinsMax && pin > 0; }
 
         // PinMode configures the specified pin to behave either as an input or an output.
         // @see: https://docs.arduino.cc/language-reference/en/functions/digital-io/pinMode
-        void SetPinMode(s8 pin, s8 mode);
+        void set_pinmode(s8 pin, s8 mode);
 
         // Read reads the value from a specified digital pin, either HIGH or LOW.
         // @see: https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalread/
-        s8 ReadPin(s8 pin);
+        s8 read_pin(s8 pin);
 
         // Write sets a HIGH or a LOW value to a digital pin.
         // @see: https://docs.arduino.cc/reference/en/language/functions/digital-io/digitalwrite/
-        void WritePin(s8 pin, s8 value);
+        void write_pin(s8 pin, s8 value);
     }  // namespace npin
 }  // namespace ncore
 

@@ -37,33 +37,33 @@ namespace ncore
 
     namespace nserial
     {
-        void Begin(nbaud::Enum baud = nbaud::Rate115200);
-        void Print(const char* val);
-        void PrintU8(const u8 val, bool hex = false);
-        void PrintIp(const IPAddress_t address);
-        void PrintMac(const MACAddress_t address);
-        void Println(const char* val);
-        void Write(const byte* data, s32 length);
+        void begin(nbaud::Enum baud = nbaud::Rate115200);
+        void print(const char* val);
+        void print_U8(const u8 val, bool hex = false);
+        void print_IP(const IPAddress_t address);
+        void print_Mac(const MACAddress_t address);
+        void println(const char* val);
+        void write(const byte* data, s32 length);
     }  // namespace nserial
 
     namespace nserial1
     {
-        void Begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin);
-        s32  Available();
-        void Print(const char* val);
-        void Println(const char* val);
-        void Write(const byte* data, s32 length);
-        s32  ReadUntil(char terminator, char* outString, s32 outMaxLength);
+        void begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin);
+        s32  available();
+        void print(const char* val);
+        void println(const char* val);
+        void write(const byte* data, s32 length);
+        s32  read_until(char terminator, char* outString, s32 outMaxLength);
     }  // namespace nserial1
 
     namespace nserial2
     {
-        void Begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin);
-        s32  Available();
-        void Print(const char* val);
-        void Println(const char* val);
-        void Write(const byte* data, s32 length);
-        s32  ReadUntil(char terminator, char* outString, s32 outMaxLength);
+        void begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin);
+        s32  available();
+        void print(const char* val);
+        void println(const char* val);
+        void write(const byte* data, s32 length);
+        s32  read_until(char terminator, char* outString, s32 outMaxLength);
     }  // namespace nserial2
 
 }  // namespace ncore

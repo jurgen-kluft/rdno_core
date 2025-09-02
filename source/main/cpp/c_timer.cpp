@@ -8,7 +8,7 @@ namespace ncore
 {
     namespace ntimer
     {
-        void Delay(u32 ms)
+        void delay(u32 ms)
         {
             ::delay(ms);
         }
@@ -24,7 +24,7 @@ namespace ncore
 {
     namespace ntimer
     {
-        void Delay(u32 ms)
+        void delay(u32 ms)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(ms));
         }

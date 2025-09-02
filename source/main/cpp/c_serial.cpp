@@ -11,20 +11,20 @@ namespace ncore
     {
         // Begin sets the data rate in bits per second (baud) for serial data transmission.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
-        void Begin(nbaud::Enum baud)
+        void begin(nbaud::Enum baud)
         {
             Serial.begin(baud);
             while (!Serial)
             {
-                ntimer::Delay(10);  // Wait for 10 milliseconds before retrying
+                ntimer::delay(10);  // Wait for 10 milliseconds before retrying
             }
         }
 
         // Print prints data to the serial port as human-readable ASCII text.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void Print(const char* val) { Serial.print(val); }
+        void print(const char* val) { Serial.print(val); }
 
-        void PrintU8(const u8 val, bool hex)
+        void print_U8(const u8 val, bool hex)
         {
             if (hex)
             {
@@ -40,7 +40,7 @@ namespace ncore
             }
         }
 
-        void PrintIp(const IPAddress_t address)
+        void print_IP(const IPAddress_t address)
         {
             Serial.print((unsigned int)address.m_address[0]);
             Serial.print(".");
@@ -51,7 +51,7 @@ namespace ncore
             Serial.print((unsigned int)address.m_address[3]);
         }
 
-        void PrintMac(const MACAddress_t address)
+        void print_Mac(const MACAddress_t address)
         {
             Serial.print((unsigned int)address.m_address[0]);
             Serial.print(":");
@@ -69,11 +69,11 @@ namespace ncore
         // Println prints data to the serial port as human-readable ASCII text followed by a
         // carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void Println(const char* val) { Serial.println(val); }
+        void println(const char* val) { Serial.println(val); }
 
         // Write writes data to the serial port.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication
-        void Write(const byte* data, s32 length)
+        void write(const byte* data, s32 length)
         {
             // Write the specified data to the given serial port
             Serial.write(data, length);
@@ -85,7 +85,7 @@ namespace ncore
     {
         // Begin sets the data rate in bits per second (baud) for serial data transmission.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
-        void Begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
+        void begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
         {
 #    if SOC_UART_NUM > 1
             uint32_t configValue = SERIAL_8N1;
@@ -100,7 +100,7 @@ namespace ncore
 #    endif
         }
 
-        s32 Available()
+        s32 available()
         {
 #    if SOC_UART_NUM > 1
             return Serial1.available();
@@ -110,7 +110,7 @@ namespace ncore
 
         // Print prints data to the serial port as human-readable ASCII text.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void Print(const char* val)
+        void print(const char* val)
         {
 #    if SOC_UART_NUM > 1
             Serial1.print(val);
@@ -120,7 +120,7 @@ namespace ncore
         // Println prints data to the serial port as human-readable ASCII text followed by a
         // carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void Println(const char* val)
+        void println(const char* val)
         {
 #    if SOC_UART_NUM > 1
             Serial1.println(val);
@@ -129,14 +129,14 @@ namespace ncore
 
         // Write writes data to the serial port.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication
-        void Write(const byte* data, s32 length)
+        void write(const byte* data, s32 length)
         {
 #    if SOC_UART_NUM > 1
             Serial1.write(data, length);
 #    endif
         }
 
-        s32 ReadUntil(char terminator, char* outString, s32 outMaxLength)
+        s32 read_until(char terminator, char* outString, s32 outMaxLength)
         {
             // Read data from the specified serial port until the terminator character is found or the maximum length is reached
             s32 n = 0;
@@ -151,7 +151,7 @@ namespace ncore
     {
         // Begin sets the data rate in bits per second (baud) for serial data transmission.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
-        void Begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
+        void begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
         {
 #    if SOC_UART_NUM > 2
             uint32_t configValue = SERIAL_8N1;
@@ -166,7 +166,7 @@ namespace ncore
 #    endif
         }
 
-        s32 Available()
+        s32 available()
         {
 #    if SOC_UART_NUM > 2
             return Serial2.available();
@@ -177,7 +177,7 @@ namespace ncore
 
         // Print prints data to the serial port as human-readable ASCII text.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void Print(const char* val)
+        void print(const char* val)
         {
 #    if SOC_UART_NUM > 2
             Serial2.print(val);
@@ -187,7 +187,7 @@ namespace ncore
         // Println prints data to the serial port as human-readable ASCII text followed by a
         // carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void Println(const char* val)
+        void println(const char* val)
         {
 #    if SOC_UART_NUM > 2
             Serial2.println(val);
@@ -196,14 +196,14 @@ namespace ncore
 
         // Write writes data to the serial port.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication
-        void Write(const byte* data, s32 length)
+        void write(const byte* data, s32 length)
         {
 #    if SOC_UART_NUM > 2
             Serial2.write(data, length);
 #    endif
         }
 
-        s32 ReadUntil(char terminator, char* outString, s32 outMaxLength)
+        s32 read_until(char terminator, char* outString, s32 outMaxLength)
         {
             // Read data from the specified serial port until the terminator character is found or the maximum length is reached
 #    if SOC_UART_NUM > 2
@@ -225,7 +225,7 @@ namespace ncore
         // Begin sets the data rate in bits per second (baud) for serial data transmission.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
         // func Begin(baud int)
-        void Begin(nbaud::Enum baud)
+        void begin(nbaud::Enum baud)
         {
             // No operation in simulation
             (void)baud;
@@ -233,7 +233,7 @@ namespace ncore
 
         // Print prints data to the serial port as human-readable ASCII text.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void Print(const char* val)
+        void print(const char* val)
         {
             // No operation in simulation
             (void)val;
@@ -241,7 +241,7 @@ namespace ncore
 
         // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void Println(const char* val)
+        void println(const char* val)
         {
             // No operation in simulation
             (void)val;
@@ -249,14 +249,14 @@ namespace ncore
 
         // Write writes data to the serial port.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication
-        void Write(const byte* data, s32 length)
+        void write(const byte* data, s32 length)
         {
             // No operation in simulation
             (void)data;
             (void)length;
         }
 
-        s32 ReadUntil(char terminator, char* outString, s32 outMaxLength)
+        s32 read_until(char terminator, char* outString, s32 outMaxLength)
         {
             // No operation in simulation
             (void)terminator;
@@ -271,7 +271,7 @@ namespace ncore
         // Begin sets the data rate in bits per second (baud) for serial data transmission.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
 
-        void Begin2(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
+        void begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
         {
             (void)baud;
             (void)config;
@@ -279,11 +279,11 @@ namespace ncore
             (void)txPin;
         }
 
-        s32 Available() { return 0; }
+        s32 available() { return 0; }
 
         // Print prints data to the serial port as human-readable ASCII text.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void Print(const char* val)
+        void print(const char* val)
         {
             // No operation in simulation
             (void)val;
@@ -291,7 +291,7 @@ namespace ncore
 
         // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void Println(const char* val)
+        void println(const char* val)
         {
             // No operation in simulation
             (void)val;
@@ -299,14 +299,14 @@ namespace ncore
 
         // Write writes data to the serial port.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication
-        void Write(const byte* data, s32 length)
+        void write(const byte* data, s32 length)
         {
             // No operation in simulation
             (void)data;
             (void)length;
         }
 
-        s32 ReadUntil(char terminator, char* outString, s32 outMaxLength)
+        s32 read_until(char terminator, char* outString, s32 outMaxLength)
         {
             // No operation in simulation
             (void)terminator;
@@ -321,7 +321,7 @@ namespace ncore
         // Begin sets the data rate in bits per second (baud) for serial data transmission.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
 
-        void Begin2(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
+        void begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
         {
             (void)baud;
             (void)config;
@@ -329,11 +329,11 @@ namespace ncore
             (void)txPin;
         }
 
-        s32 Available() { return 0; }
+        s32 available() { return 0; }
 
         // Print prints data to the serial port as human-readable ASCII text.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void Print(const char* val)
+        void print(const char* val)
         {
             // No operation in simulation
             (void)val;
@@ -341,7 +341,7 @@ namespace ncore
 
         // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void Println(const char* val)
+        void println(const char* val)
         {
             // No operation in simulation
             (void)val;
@@ -349,14 +349,14 @@ namespace ncore
 
         // Write writes data to the serial port.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication
-        void Write(const byte* data, s32 length)
+        void write(const byte* data, s32 length)
         {
             // No operation in simulation
             (void)data;
             (void)length;
         }
 
-        s32 ReadUntil(char terminator, char* outString, s32 outMaxLength)
+        s32 read_until(char terminator, char* outString, s32 outMaxLength)
         {
             // No operation in simulation
             (void)terminator;

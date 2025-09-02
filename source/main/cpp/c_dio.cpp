@@ -8,17 +8,17 @@ namespace ncore
 {
     namespace npin
     {
-        void SetPinMode(s8 pin, s8 mode)
+        void set_pinmode(s8 pin, s8 mode)
         {
             ::pinMode(pin, mode);
         }
 
-        s8 ReadPin(s8 pin)
+        s8 read_pin(s8 pin)
         {
             return ::digitalRead(pin);
         }
 
-        void WritePin(s8 pin, s8 value)
+        void write_pin(s8 pin, s8 value)
         {
             ::digitalWrite(pin, value);
         }
@@ -35,26 +35,26 @@ namespace ncore
         static u8 GPIOModes[PinsMax]  = {0};
         static u8 GPIOValues[PinsMax] = {0};
 
-        void SetPinMode(s8 pin, s8 mode)
+        void set_pinmode(s8 pin, s8 mode)
         {
-            if (IsValid(pin))
+            if (is_valid(pin))
             {
                 GPIOModes[pin] = mode;
             }
         }
 
-        s8 ReadPin(s8 pin)
+        s8 read_pin(s8 pin)
         {
-            if (IsValid(pin))
+            if (is_valid(pin))
             {
                 return GPIOValues[pin];
             }
             return 0;
         }
 
-        void WritePin(s8 pin, s8 value)
+        void write_pin(s8 pin, s8 value)
         {
-            if (IsValid(pin))
+            if (is_valid(pin))
             {
                 GPIOValues[pin] = value;
             }

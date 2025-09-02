@@ -19,13 +19,13 @@ namespace ncore
         byte m_address[6];
     };
 
-    bool FromString(str_t const& str, IPAddress_t& outAddr);
-    bool FromString(str_t const& str, MACAddress_t& outAddr);
+    bool from_string(str_t const& str, IPAddress_t& outAddr);
+    bool from_string(str_t const& str, MACAddress_t& outAddr);
 
-    bool IsValidSSID(str_t const&);
-    bool IsValidPassword(str_t const&);
-    bool IsValidIPAddress(str_t const&);
-    bool IsValidPort(s32 port);
+    bool is_valid_SSID(str_t const&);
+    bool is_valid_password(str_t const&);
+    bool is_valid_IPAddress(str_t const&);
+    bool is_valid_port(s32 port);
 
 }  // namespace ncore
 

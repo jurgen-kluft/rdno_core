@@ -52,10 +52,10 @@ namespace ncore
             }
         }
 
-        void load(config_t* config)
+        bool load(config_t* config)
         {
             if (!initialize())
-                return;
+                return false;
 
             nvs_handle my_handle;
             esp_err_t  err = nvs_open("storage", NVS_READWRITE, &my_handle);
@@ -73,10 +73,12 @@ namespace ncore
                 }
 
                 if (err != ESP_OK)
-                    g_memset(config, 0, sizeof(config_t));
+                    return false;
 
                 nvs_close(my_handle);
+                return true;
             }
+            return false;
         }
 
     }  // namespace nvstore
@@ -90,7 +92,7 @@ namespace ncore
     {
         void reset(config_t* config) { g_memset(config, 0, sizeof(config_t)); }
         void save(config_t* config) {}
-        void load(config_t* config) {}
+        bool load(config_t* config) { return true; }
 
     }  // namespace nvstore
 }  // namespace ncore

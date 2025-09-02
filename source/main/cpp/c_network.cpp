@@ -11,7 +11,7 @@ namespace ncore
     // "192.168.4"   (only 3 parts)
     // "10.001.1.1   (leading zero)
 
-    bool FromString(str_t const& str, IPAddress_t& outAddr)
+    bool from_string(str_t const& str, IPAddress_t& outAddr)
     {
         s32 partIndex = 0;
         s32 partValue = 0;
@@ -45,7 +45,7 @@ namespace ncore
         return (partIndex == 4);
     }
 
-    bool FromString(str_t const& str, MACAddress_t& outAddr)
+    bool from_string(str_t const& str, MACAddress_t& outAddr)
     {
         s32 partIndex = 0;
         s32 partValue = 0;
@@ -79,7 +79,7 @@ namespace ncore
         return (partIndex == 6);
     }
 
-    bool IsValidSSID(str_t const& str)
+    bool is_valid_SSID(str_t const& str)
     {
         str_t iter = str;
         while (iter.m_str < iter.m_end)
@@ -93,7 +93,7 @@ namespace ncore
         return length > 0 && length <= 32;
     }
 
-    bool IsValidPassword(str_t const& str)
+    bool is_valid_password(str_t const& str)
     {
         str_t iter = str;
         while (iter.m_str < iter.m_end)
@@ -107,13 +107,13 @@ namespace ncore
         return length >= 8 && length <= 64;
     }
 
-    bool IsValidIPAddress(str_t const& str)
+    bool is_valid_IPAddress(str_t const& str)
     {
         IPAddress_t addr;
-        return FromString(str, addr);
+        return from_string(str, addr);
     }
 
-    bool IsValidPort(s32 port)
+    bool is_valid_port(s32 port)
     {
         return port > 0 && port <= 65535;
     }
