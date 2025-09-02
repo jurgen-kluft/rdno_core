@@ -38,9 +38,9 @@ UNITTEST_SUITE_BEGIN(str)
             CHECK_NOT_NULL(str1.m_const);
         }
 
-        UNITTEST_TEST(str_const_n)
+        UNITTEST_TEST(str_const_full)
         {
-            str_t str1 = str_const_n("hello world", 6, 11, 11);
+            str_t str1 = str_const_full("hello world", 6, 11, 11);
 
             CHECK_EQUAL(str1.m_str, 6);
             CHECK_EQUAL(str1.m_eos, 11);
@@ -53,7 +53,7 @@ UNITTEST_SUITE_BEGIN(str)
         UNITTEST_TEST(str_len)
         {
             str_t str1 = str_const("hello");
-            str_t str2 = str_const_n("hello world", 6, 11, 11);
+            str_t str2 = str_const_full("hello world", 6, 11, 11);
 
             CHECK_EQUAL(str_len(str1), 5);
             CHECK_EQUAL(str_len(str2), 5);

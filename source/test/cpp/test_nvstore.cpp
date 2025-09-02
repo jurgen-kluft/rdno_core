@@ -43,40 +43,40 @@ UNITTEST_SUITE_BEGIN(nvstore)
             const char* message = "ssid=OBNOSIS8, password=MySecretPassword, remote_server=10.0.0.62, remote_port=1234";
 
             nvstore::config_t config;
-            nvstore::Reset(&config);
-            nvstore::SetString(&config, 0, str_const(""));                          // ssid
-            nvstore::SetString(&config, 1, str_const(""));                          // password
-            nvstore::SetString(&config, 2, str_const(""));                          // ap_ssid
-            nvstore::SetString(&config, 3, str_const(""));                          // ap_password
-            nvstore::SetString(&config, 4, str_const(""));                          // remote_server
-            nvstore::SetInt(&config, 5, 12);                                        // remote_port
+            nvstore::reset(&config);
+            nvstore::set_string(&config, 0, str_const(""));                          // ssid
+            nvstore::set_string(&config, 1, str_const(""));                          // password
+            nvstore::set_string(&config, 2, str_const(""));                          // ap_ssid
+            nvstore::set_string(&config, 3, str_const(""));                          // ap_password
+            nvstore::set_string(&config, 4, str_const(""));                          // remote_server
+            nvstore::set_int(&config, 5, 12);                                        // remote_port
             CHECK_EQUAL(5, config.m_param_values[nvstore::PARAM_ID_STRING_COUNT]);  // 5 strings used so far
 
             str_t msg      = str_const(message);
             str_t outKey   = str_empty();
             str_t outValue = str_empty();
-            while (nvstore::ParseKeyValue(msg, outKey, outValue))
+            while (nvstore::parse_keyvalue(msg, outKey, outValue))
             {
                 s16 id = KeyToIndex(outKey);
                 CHECK_TRUE(id >= 0);
-                nvstore::ParseValue(&config, id, outValue);
+                nvstore::parse_value(&config, id, outValue);
             }
 
             str_t ssid;
-            CHECK_TRUE(nvstore::GetString(&config, 0, ssid));
+            CHECK_TRUE(nvstore::get_string(&config, 0, ssid));
             CHECK_TRUE(str_eq(ssid, "OBNOSIS8", false));
 
             str_t password;
-            CHECK_TRUE(nvstore::GetString(&config, 1, password));
+            CHECK_TRUE(nvstore::get_string(&config, 1, password));
             CHECK_TRUE(str_eq(password, "MySecretPassword", false));
 
             str_t remote_server;
-            CHECK_TRUE(nvstore::GetString(&config, 4, remote_server));
+            CHECK_TRUE(nvstore::get_string(&config, 4, remote_server));
             CHECK_TRUE(str_eq(remote_server, "10.0.0.62", false));
 
             CHECK_TRUE(config.m_param_types[5] == nvstore::PARAM_TYPE_S32);
 
-            s32 remote_port = nvstore::GetInt(&config, 5, 123);
+            s32 remote_port = nvstore::get_int(&config, 5, 123);
             CHECK_EQUAL(1234, remote_port);
         }
     }

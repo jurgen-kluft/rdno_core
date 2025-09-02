@@ -16,7 +16,7 @@ namespace ncore
         bool s_initialized = false;
         bool s_valid       = false;
 
-        bool Initialize()
+        static bool initialize()
         {
             if (!s_initialized)
             {
@@ -34,11 +34,11 @@ namespace ncore
             return s_valid;
         }
 
-        void Reset(config_t* config) { g_memset(config, 0, sizeof(config_t)); }
+        void reset(config_t* config) { g_memset(config, 0, sizeof(config_t)); }
 
-        void Save(config_t* config)
+        void save(config_t* config)
         {
-            if (!Initialize())
+            if (!initialize())
                 return;
 
             // write to non-volatile storage
@@ -52,9 +52,9 @@ namespace ncore
             }
         }
 
-        void Load(config_t* config)
+        void load(config_t* config)
         {
-            if (!Initialize())
+            if (!initialize())
                 return;
 
             nvs_handle my_handle;
@@ -88,9 +88,9 @@ namespace ncore
 {
     namespace nvstore
     {
-        void Reset(config_t* config) { g_memset(config, 0, sizeof(config_t)); }
-        void Save(config_t* config) {}
-        void Load(config_t* config) {}
+        void reset(config_t* config) { g_memset(config, 0, sizeof(config_t)); }
+        void save(config_t* config) {}
+        void load(config_t* config) {}
 
     }  // namespace nvstore
 }  // namespace ncore
@@ -102,7 +102,7 @@ namespace ncore
     namespace nvstore
     {
         // Message example: "ssid=OBNOSIS8, password=MySecretPassword, remote_server=10.0.0.22, remote_port=1234"
-        bool ParseKeyValue(str_t& msg, str_t& outKey, str_t& outValue)
+        bool parse_keyvalue(str_t& msg, str_t& outKey, str_t& outValue)
         {
             if (str_is_empty(msg))
                 return false;
@@ -129,20 +129,20 @@ namespace ncore
             return true;
         }
 
-        void ParseValue(config_t* config, s16 id, str_t const& str)
+        void parse_value(config_t* config, s16 id, str_t const& str)
         {
             if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
                 return;
             switch (config->m_param_types[id])
             {
                 case nvstore::PARAM_TYPE_NONE: break;
-                case nvstore::PARAM_TYPE_STRING: nvstore::SetString(config, id, str); break;
-                case nvstore::PARAM_TYPE_S32: nvstore::ParseInt(config, id, str); break;
-                case nvstore::PARAM_TYPE_BOOL: nvstore::ParseBool(config, id, str); break;
+                case nvstore::PARAM_TYPE_STRING: nvstore::set_string(config, id, str); break;
+                case nvstore::PARAM_TYPE_S32: nvstore::parse_int(config, id, str); break;
+                case nvstore::PARAM_TYPE_BOOL: nvstore::parse_bool(config, id, str); break;
             }
         }
 
-        void ParseInt(config_t* config, s16 id, const str_t& str)
+        void parse_int(config_t* config, s16 id, const str_t& str)
         {
             if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
                 return;
@@ -150,18 +150,20 @@ namespace ncore
             s32 value = 0;
             if (from_str(str, &value, 10))
             {
-                SetInt(config, id, value);
+                set_int(config, id, value);
             }
         }
 
-        void ParseBool(config_t* config, s16 id, const str_t& str)
+        void parse_bool(config_t* config, s16 id, const str_t& str)
         {
             if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
                 return;
-            SetBool(config, id, from_str(str));
+            bool boolean = false;
+            if (from_str(str, &boolean))
+                set_bool(config, id, boolean);
         }
 
-        bool SetString(config_t* config, s16 id, const str_t& str)
+        bool set_string(config_t* config, s16 id, const str_t& str)
         {
             if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT) || str_len(str) >= PARAM_ID_STRING_MAX_LENGTH)
                 return false;
@@ -188,7 +190,7 @@ namespace ncore
             return true;
         }
 
-        bool GetString(const config_t* config, s16 id, str_t& outStr)
+        bool get_string(const config_t* config, s16 id, str_t& outStr)
         {
             outStr = str_empty();
             if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
@@ -200,11 +202,11 @@ namespace ncore
             s32 const str_length = str_value & (PARAM_ID_STRING_MAX_LENGTH - 1);
             if (str_index < 0 || str_index >= config->m_param_values[PARAM_ID_STRING_COUNT])
                 return false;
-            outStr = str_const_n(&config->m_strings[str_index * PARAM_ID_STRING_MAX_LENGTH], 0, str_length, str_length);
+            outStr = str_const_n(&config->m_strings[str_index * PARAM_ID_STRING_MAX_LENGTH], str_length);
             return true;
         }
 
-        void SetInt(config_t* config, s16 id, s32 value)
+        void set_int(config_t* config, s16 id, s32 value)
         {
             if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
                 return;
@@ -212,14 +214,14 @@ namespace ncore
             config->m_param_values[id] = value;
         }
 
-        s32 GetInt(const config_t* config, s16 id, s32 defaultValue)
+        s32 get_int(const config_t* config, s16 id, s32 defaultValue)
         {
             if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_S32)
                 return defaultValue;
             return config->m_param_values[id];
         }
 
-        void SetBool(config_t* config, s16 id, bool value)
+        void set_bool(config_t* config, s16 id, bool value)
         {
             if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
                 return;
@@ -227,7 +229,7 @@ namespace ncore
             config->m_param_values[id] = value ? 1 : 0;
         }
 
-        bool GetBool(const config_t* config, s16 id, bool defaultValue)
+        bool get_bool(const config_t* config, s16 id, bool defaultValue)
         {
             if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_BOOL)
                 return defaultValue;

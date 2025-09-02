@@ -55,10 +55,21 @@ namespace ncore
     str_t str_const(const char* s)
     {
         const s16 len = str_len(s);
-        return str_const_n(s, 0, len, len);
+        return str_const_n(s, len);
     }
 
-    str_t str_const_n(const char* s, s16 begin, s16 end, s16 eos)
+    str_t str_const_n(const char* s, s16 len)
+    {
+        str_t ps;
+        ps.m_const = (s != nullptr) ? s : "";
+        ps.m_ascii = nullptr;
+        ps.m_str   = 0;
+        ps.m_end   = len;
+        ps.m_eos   = len;
+        return ps;
+    }
+
+    str_t str_const_full(const char* s, s16 begin, s16 end, s16 eos)
     {
         str_t ps;
         ps.m_const = (s != nullptr) ? s : "";
@@ -282,7 +293,7 @@ namespace ncore
 
     s32 str_cmp_n(const str_t& s1, const char* s2, s32 s2Len, bool case_sensitive)
     {
-        str_t ps2 = str_const_n(s2, 0, (s16)s2Len, (s16)s2Len);
+        str_t ps2 = str_const_n(s2, (s16)s2Len);
         return str_cmp(s1, ps2, case_sensitive);
     }
 
@@ -384,12 +395,16 @@ namespace ncore
         return s_empty;  // not found
     }
 
-    bool from_str(const str_t& s)
+    bool from_str(const str_t& s, bool* outValue)
     {
-        if (outValue == nullptr)
-            return false;
         if (str_has_prefix(s, "true", false))
         {
+            *outValue = true;
+            return true;
+        }
+        else if (str_has_prefix(s, "false", false))
+        {
+            *outValue = false;
             return true;
         }
         return false;
@@ -483,7 +498,8 @@ namespace ncore
                     ptr++;
                     continue;
                 }
-                const s32 digit = to_digit(c);
+
+                const s32 digit = from_char(c);
                 if (digit < 0 || digit > 9)
                     return false;  // invalid digit
                 if (inFraction)
@@ -751,7 +767,7 @@ namespace ncore
     s16 str_join(str_t& dest, char sep, const str_t* src_array, s16 array_count)
     {
         char  c[2]   = {sep, '\0'};
-        str_t sepStr = str_const_n(c, 1, 1, 1);
+        str_t sepStr = str_const_n(c, 1);
         return str_join(dest, sepStr, src_array, array_count);
     }
 

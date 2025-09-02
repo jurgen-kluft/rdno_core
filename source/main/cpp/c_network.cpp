@@ -81,35 +81,29 @@ namespace ncore
 
     bool IsValidSSID(str_t const& str)
     {
-        if (str_is_empty(str))
-            return false;
-
         str_t iter = str;
-        while (iter.m_str <= iter.m_end)
+        while (iter.m_str < iter.m_end)
         {
-            const char ch = iter.m_str < iter.m_end ? iter.m_const[iter.m_str] : ':';
+            const char ch = iter.m_const[iter.m_str];
             if (ch < 32 || ch > 126) // Printable ASCII range
                 return false;
             iter.m_str++;
         }
-        const s32 length = (s32)(iter.m_str - str.m_str);
+        const s16 length = (s16)(iter.m_str - str.m_str);
         return length > 0 && length <= 32;
     }
 
     bool IsValidPassword(str_t const& str)
     {
-        if (str_is_empty(str))
-            return false;
-
         str_t iter = str;
-        while (iter.m_str <= iter.m_end)
+        while (iter.m_str < iter.m_end)
         {
-            const char ch = iter.m_str < iter.m_end ? iter.m_const[iter.m_str] : ':';
+            const char ch = iter.m_const[iter.m_str];
             if (ch < 32 || ch > 126) // Printable ASCII range
                 return false;
             iter.m_str++;
         }
-        const s32 length = (s32)(iter.m_str - str.m_str);
+        const s16 length = (s16)(iter.m_str - str.m_str);
         return length >= 8 && length <= 64;
     }
 

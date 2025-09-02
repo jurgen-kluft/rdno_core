@@ -1,6 +1,7 @@
 #include "rdno_core/c_target.h"
 #include "rdno_core/c_allocator.h"
 #include "rdno_core/c_network.h"
+#include "rdno_core/c_str.h"
 
 #include "cunittest/cunittest.h"
 
@@ -15,17 +16,24 @@ UNITTEST_SUITE_BEGIN(network)
 
         UNITTEST_TEST(valid)
         {
-            CHECK_TRUE(IsValidSSID("MyWiFi", 6));
-            CHECK_TRUE(IsValidSSID("Network_123", 11));
-            CHECK_TRUE(IsValidSSID("A", 1));
-            CHECK_TRUE(IsValidSSID("ThisIsA32CharacterLongSSID!!!!!!", 32));
+            str_t str = str_const_n("MyWiFi", 6);
+            CHECK_TRUE(IsValidSSID(str));
+            str = str_const_n("Network_123", 11);
+            CHECK_TRUE(IsValidSSID(str));
+            str = str_const_n("A", 1);
+            CHECK_TRUE(IsValidSSID(str));
+            str = str_const_n("ThisIsA32CharacterLongSSID!!!!!!", 32);
+            CHECK_TRUE(IsValidSSID(str));
         }
 
         UNITTEST_TEST(invalid)
         {
-            CHECK_FALSE(IsValidSSID("", 0));          
-            CHECK_FALSE(IsValidSSID("ThisSSIDIsWayTooLongToBeValid123", 40)); 
-            CHECK_FALSE(IsValidSSID("Invalid\x01SSID", 12)); 
+            str_t str = str_const_n("", 0);
+            CHECK_FALSE(IsValidSSID(str));
+            str = str_const_n("ThisSSIDIsWayTooLongToBeValid123", 40);
+            CHECK_FALSE(IsValidSSID(str));
+            str = str_const_n("Invalid\x01SSID", 12);
+            CHECK_FALSE(IsValidSSID(str));
         }
     }
 
@@ -36,14 +44,15 @@ UNITTEST_SUITE_BEGIN(network)
 
         UNITTEST_TEST(valid)
         {
-            CHECK_TRUE(IsValidPassword("password", 8));
-            CHECK_TRUE(IsValidPassword("P@ssw0rd123!", 12));
-            CHECK_TRUE(IsValidPassword("ThisIsA64CharacterLongPassword!@ThisIsA64CharacterLongPassword!@", 64));
+            str_t str = str_const_n("password", 8);
+            CHECK_TRUE(IsValidPassword(str));
+            str = str_const_n("P@ssw0rd123!", 12);
+            CHECK_TRUE(IsValidPassword(str));
+            str = str_const_n("ThisIsA64CharacterLongPassword!@ThisIsA64CharacterLongPassword!@", 64);
+            CHECK_TRUE(IsValidPassword(str));
         }
 
-        UNITTEST_TEST(invalid)
-        {
-        }
+        UNITTEST_TEST(invalid) {}
     }
 
     UNITTEST_FIXTURE(ipaddress)
@@ -53,17 +62,21 @@ UNITTEST_SUITE_BEGIN(network)
 
         UNITTEST_TEST(valid)
         {
-            CHECK_TRUE(IsValidIPAddress("10.0.0.8", 8));
-            CHECK_TRUE(IsValidIPAddress("192.168.8.88", 12));
+            str_t str = str_const_n("10.0.0.8", 8);
+            CHECK_TRUE(IsValidIPAddress(str));
+            str = str_const_n("192.168.8.88", 12);
+            CHECK_TRUE(IsValidIPAddress(str));
         }
 
         UNITTEST_TEST(invalid)
         {
-            CHECK_FALSE(IsValidIPAddress("256.0.0.1", 9));  // 256 is out of range
-            CHECK_FALSE(IsValidIPAddress("192.168.4", 9));  // only 3 parts
-            CHECK_FALSE(IsValidIPAddress("010.0.0.8", 9));  // leading zero
+            str_t str = str_const_n("256.0.0.1", 9);  // 256 is out of range
+            CHECK_FALSE(IsValidIPAddress(str));
+            str = str_const_n("192.168.4", 9);  // only 3 parts
+            CHECK_FALSE(IsValidIPAddress(str));
+            str = str_const_n("010.0.0.8", 9);  // leading zero
+            CHECK_FALSE(IsValidIPAddress(str));
         }
     }
-
 }
 UNITTEST_SUITE_END

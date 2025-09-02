@@ -62,7 +62,8 @@ namespace ncore
     void  str_clear(str_t& ps);                                     // clear the string to empty
     str_t str_mutable(char* s, s16 capacity);                       // create a str to the given buffer
     str_t str_const(const char* s);                                 // create a str to the given null-terminated string
-    str_t str_const_n(const char* s, s16 begin, s16 end, s16 eos);  // create a reference to the given range of chars
+    str_t str_const_n(const char* s, s16 len);                      // create a str to the given null-terminated string
+    str_t str_const_full(const char* s, s16 begin, s16 end, s16 eos);  // create a reference to the given range of chars
 
     // selections -----------------------------------------------------------------------------
     str_t str_select_after(const str_t& str, const str_t& sel);   // select the part after the incoming string
@@ -105,7 +106,7 @@ namespace ncore
     str_t str_trimDelimiters(const str_t& s, char leftDelim, char rightDelim);  // trim specified delimiters from both ends if present
 
     // from and to conversions ----------------------------------------------------------------
-    bool from_str(const str_t& s);
+    bool from_str(const str_t& s, bool* outValue);
     bool from_str(const str_t& s, s32* outValue, s16 base = 10);
     bool from_str(const str_t& s, u32* outValue, s16 base = 10);
     bool from_str(const str_t& s, f32* outValue);

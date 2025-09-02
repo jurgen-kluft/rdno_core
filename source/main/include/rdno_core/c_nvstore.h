@@ -50,21 +50,21 @@ namespace ncore
         };
 
         // Message example: "ssid=OBNOSIS8, password=MySecretPassword, remote_server=10.0.0.22, remote_port=1234"
-        bool ParseKeyValue(str_t& msg, str_t& outKey, str_t& outValue);
-        void ParseValue(config_t* config, s16 id, str_t const& str);
-        void ParseInt(config_t* config, s16 id, str_t const& str);
-        void ParseBool(config_t* config, s16 id, str_t const& str);
+        bool parse_keyvalue(str_t& msg, str_t& outKey, str_t& outValue);
+        void parse_value(config_t* config, s16 id, str_t const& str);
+        void parse_int(config_t* config, s16 id, str_t const& str);
+        void parse_bool(config_t* config, s16 id, str_t const& str);
 
-        bool SetString(config_t* config, s16 id, str_t const& str);
-        bool GetString(const config_t* config, s16 id, str_t& outStr);
-        void SetInt(config_t* config, s16 id, s32 value);
-        s32  GetInt(const config_t* config, s16 id, s32 defaultValue = 0);
-        void SetBool(config_t* config, s16 id, bool value);
-        bool GetBool(const config_t* config, s16 id, bool defaultValue = false);
+        bool set_string(config_t* config, s16 id, str_t const& str);
+        bool get_string(const config_t* config, s16 id, str_t& outStr);
+        void set_int(config_t* config, s16 id, s32 value);
+        s32  get_int(const config_t* config, s16 id, s32 defaultValue = 0);
+        void set_bool(config_t* config, s16 id, bool value);
+        bool get_bool(const config_t* config, s16 id, bool defaultValue = false);
 
-        void Reset(config_t* config);
-        void Save(config_t* config);
-        void Load(config_t* config);
+        void reset(config_t* config);
+        void save(config_t* config);
+        void load(config_t* config);
 
     }  // namespace nvstore
 }  // namespace ncore
