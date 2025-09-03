@@ -7,10 +7,11 @@
 
 namespace ncore
 {
-    // System malloc
-    byte* gMalloc(u32 size);
-    void  gFree(byte* ptr);
-
+    namespace nsystem
+    {
+        byte* malloc(u32 size);
+        void  free(byte* ptr);
+    }  // namespace nsystem
 }  // namespace ncore
 
 #endif  // __RDNO_CORE_ALLOCATOR_H__

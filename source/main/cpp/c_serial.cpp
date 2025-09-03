@@ -24,7 +24,7 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
         void print(const char* val) { Serial.print(val); }
 
-        void print_U8(const u8 val, bool hex)
+        void print(const u8 val, bool hex)
         {
             if (hex)
             {
@@ -40,7 +40,7 @@ namespace ncore
             }
         }
 
-        void print_IP(const IPAddress_t address)
+        void print(const IPAddress_t& address)
         {
             Serial.print((unsigned int)address.m_address[0]);
             Serial.print(".");
@@ -51,7 +51,7 @@ namespace ncore
             Serial.print((unsigned int)address.m_address[3]);
         }
 
-        void print_Mac(const MACAddress_t address)
+        void print(const MACAddress_t& address)
         {
             Serial.print((unsigned int)address.m_address[0]);
             Serial.print(":");

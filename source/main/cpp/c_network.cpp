@@ -115,7 +115,7 @@ namespace ncore
 
     bool is_valid_port(s32 port)
     {
-        return port > 0 && port <= 65535;
+        return port > 1023 && port <= 65535;
     }
 
 } // namespace ncore

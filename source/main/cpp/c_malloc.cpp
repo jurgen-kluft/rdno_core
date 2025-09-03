@@ -6,20 +6,22 @@
 
 namespace ncore
 {
-    byte* gMalloc(uint_t size)
+    namespace nsystem
     {
-        byte* mem = (byte*)::malloc(size);
-        return mem;
-    }
-
-    void gFree(byte* ptr)
-    {
-        if (ptr != nullptr)
+        byte* malloc(uint_t size)
         {
-            ::free(ptr);
+            byte* mem = (byte*)::malloc(size);
+            return mem;
         }
-    }
 
+        void free(byte* ptr)
+        {
+            if (ptr != nullptr)
+            {
+                ::free(ptr);
+            }
+        }
+    }  // namespace nsystem
 };  // namespace ncore
 
 #else
@@ -28,21 +30,22 @@ namespace ncore
 
 namespace ncore
 {
-
-    byte* gMalloc(u32 size)
+    namespace nsystem
     {
-        byte* mem = (byte*)::malloc(size);
-        return mem;
-    }
-
-    void gFree(byte* ptr)
-    {
-        if (ptr != nullptr)
+        byte* malloc(u32 size)
         {
-            ::free(ptr);
+            byte* mem = (byte*)::malloc(size);
+            return mem;
         }
-    }
 
+        void free(byte* ptr)
+        {
+            if (ptr != nullptr)
+            {
+                ::free(ptr);
+            }
+        }
+    }  // namespace nsystem
 };  // namespace ncore
 
 #endif

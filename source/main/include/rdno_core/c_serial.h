@@ -39,9 +39,9 @@ namespace ncore
     {
         void begin(nbaud::Enum baud = nbaud::Rate115200);
         void print(const char* val);
-        void print_U8(const u8 val, bool hex = false);
-        void print_IP(const IPAddress_t address);
-        void print_Mac(const MACAddress_t address);
+        void print(const u8 val, bool hex = false);
+        void print(const IPAddress_t& address);
+        void print(const MACAddress_t& address);
         void println(const char* val);
         void write(const byte* data, s32 length);
     }  // namespace nserial
