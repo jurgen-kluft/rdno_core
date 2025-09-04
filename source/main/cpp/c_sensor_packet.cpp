@@ -26,13 +26,24 @@ namespace ncore
 {
     namespace nsensor
     {
-        void SensorPacket_t::begin(u16 sequence, u8 version)
+        void SensorPacket_t::begin(u8 sequence, u8 version)
         {
-            Capacity     = sizeof(Data);            // Maximum size of the packet
-            Size         = 2;                       // Skip length, will be set during finalize
-            Data[Size++] = sequence & 0xFF;         // Sequence number (1st byte)
-            Data[Size++] = (sequence >> 8) & 0xFF;  // Sequence number (2nd byte)
-            Data[Size++] = version;                 // Version number
+            Capacity     = sizeof(Data);  // Maximum size of the packet
+            Size         = 1;             // Skip length, will be set during finalize
+            Data[Size++] = sequence;      // Sequence number
+            Data[Size++] = version;       // Version number
+        }
+
+        void SensorPacket_t::finalize()
+        {
+            // Align size to 4 bytes
+            while ((Size & 0x03) != 0)
+            {
+                Data[Size++] = 0xFE;
+            }
+
+            // Set the length (number of words) of the packet 
+            Data[0] = (Size >> 2) & 0xFF;
         }
 
         void SensorPacket_t::write_info(DeviceLocation::Value location, DeviceLabel::Value label)
@@ -129,36 +140,6 @@ namespace ncore
             Data[Size++] = value & 0xFF;
             value        = value >> 8;
             Data[Size++] = value & 0xFF;
-        }
-
-        void SensorPacket_t::write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, f32 value)
-        {
-            Data[SensorCountOffset]++;  // Increment the count of sensor values
-
-            // Write the sensor value to the packet
-            FieldType::Value field_type = FieldType::TypeF32;
-            Data[Size++]                = (type << 4) | (model);
-            Data[Size++]                = (state << 4) | (field_type);
-
-            u32 value_as_u32 = *reinterpret_cast<u32*>(&value);
-            Data[Size++]     = value_as_u32 & 0xFF;
-            value_as_u32     = value_as_u32 >> 8;
-            Data[Size++]     = value_as_u32 & 0xFF;
-            value_as_u32     = value_as_u32 >> 8;
-            Data[Size++]     = value_as_u32 & 0xFF;
-            value_as_u32     = value_as_u32 >> 8;
-            Data[Size++]     = value_as_u32 & 0xFF;
-        }
-
-        void SensorPacket_t::finalize()
-        {
-            // End a packet with a terminator
-            Data[Size++] = 0xCA;  // Terminator (1st byte)
-            Data[Size++] = 0xFE;  // Terminator (2nd byte)
-
-            // Set the length of the packet
-            Data[0] = Size & 0xFF;
-            Data[1] = (Size >> 8) & 0xFF;
         }
 
     }  // namespace nsensor

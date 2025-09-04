@@ -11,7 +11,7 @@ namespace ncore
     {
         namespace DeviceLocation
         {
-            typedef u16 Value;
+            typedef u8 Value;
             const Value Unknown   = 0;
             const Value Location1 = 0x01;
             const Value Location2 = 0x02;
@@ -22,29 +22,18 @@ namespace ncore
             const Value Location7 = 0x07;
             const Value Location8 = 0x08;
             const Value Location9 = 0x09;
-            // Note: Max 15 rooms
+            // Note: Max 15 locations
             const Value Location15 = 0x0F;
 
-            const Value Area1 = 0x10;
-            const Value Area2 = 0x20;
-            const Value Area3 = 0x30;
-            const Value Area4 = 0x40;
-            const Value Area5 = 0x50;
-            const Value Area6 = 0x60;
-            const Value Area7 = 0x70;
-            const Value Area8 = 0x80;
-            const Value Area9 = 0x90;
-            // Note: Max 15 areas
-            const Value Area15 = 0xF0;
-
-            const Value Bedroom    = 0x0100;
-            const Value Livingroom = 0x0200;
-            const Value Kitchen    = 0x0300;
-            const Value Bathroom   = 0x0400;
-            const Value Hallway    = 0x0500;
-            const Value Balcony    = 0x0600;
-            const Value Study      = 0x0700;
-            const Value Pantry     = 0x0800;
+            const Value Bedroom    = 0x10;
+            const Value Livingroom = 0x20;
+            const Value Kitchen    = 0x30;
+            const Value Bathroom   = 0x40;
+            const Value Hallway    = 0x50;
+            const Value Balcony    = 0x60;
+            const Value Study      = 0x70;
+            const Value Pantry     = 0x80;
+            // Note: Max 15 rooms
         }  // namespace DeviceLocation
 
         namespace SensorModel
@@ -91,7 +80,6 @@ namespace ncore
             const Value TypeU8  = 0x3;
             const Value TypeU16 = 0x4;
             const Value TypeU32 = 0x5;
-            const Value TypeF32 = 0x6;
         };  // namespace FieldType
 
         namespace DeviceLabel
@@ -102,53 +90,51 @@ namespace ncore
         }  // namespace DeviceLabel
 
         // Note: Little Endian byte order
-
         // Packet structure
         // {
-        //     u16                   length; // Number of bytes in the packet
-        //     u16                   sequence; // Sequence number of the packet
-        //     u8                    version; // Version of the packet structure
+        //     u8                    length;   // Number of u32 in the packet
+        //     u8                    sequence; // Sequence number of the packet
+        //     u8                    version;  // Version of the packet structure
         //     DeviceLocation::Value location;
         //     DeviceLabel::Value    label;
-        //     u8                    count;  // Number of sensor values in the packet (max 16)
+        //     u8                    count;    // Number of sensor values in the packet (max 16)
 
         //     // sensor value 1
         //     u8 type_and_channel;
         //     u8 state_and_field_type;
-        //     union
-        //     {
-        //         s8  s8_value;
-        //         s16 s16_value;
-        //         s32 s32_value;
-        //         u8  u8_value;
-        //         u16 u16_value;
-        //         u32 u32_value;
-        //         f32 f32_value;
-        //     } value;
+        //     One of the following:
+        //         - s8  s8_value;
+        //         - s16 s16_value;
+        //         - s32 s32_value;
+        //         - u8  u8_value;
+        //         - u16 u16_value;
+        //         - u32 u32_value;
+        //         - f32 f32_value;
 
         //     // sensor value 2
 
         //     // ... (up to max 16 sensor values)
 
-        //     // terminator, 2 bytes
-        //     u16 terminator; // 0xFFFF
+        //     Padding to align to 4 bytes
+
         // };
 
         struct SensorPacket_t
         {
-            byte Data[128];
+            byte Data[256];
             s32  Size;
             s32  Capacity;
 
             enum
             {
                 // Packet header
-                HeaderSize        = 2 + 2 + 1 + 1 + 1 + 1,  // length, sequence, version, location, label, count
+                HeaderSize        = 1 + 1 + 1 + 1 + 1 + 1,  // length, sequence, version, location, label, count
                 LengthOffset      = 0,
-                SensorCountOffset = 7,
+                SensorCountOffset = 5,
             };
 
-            void begin(u16 sequence, u8 version);
+            void begin(u8 sequence, u8 version);
+            void finalize();
 
             void write_info(DeviceLocation::Value location, DeviceLabel::Value label);
 
@@ -159,10 +145,6 @@ namespace ncore
             void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u8 value);
             void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u16 value);
             void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u32 value);
-
-            void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, f32 value);
-
-            void finalize();
         };
 
     }  // namespace nsensor
