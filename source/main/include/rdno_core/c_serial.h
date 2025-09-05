@@ -43,7 +43,6 @@ namespace ncore
         void print(const IPAddress_t& address);
         void print(const MACAddress_t& address);
         void println(const char* val);
-        void write(const byte* data, s32 length);
     }  // namespace nserial
 
     namespace nserial1
@@ -64,6 +63,7 @@ namespace ncore
         void println(const char* val);
         void write(const byte* data, s32 length);
         s32  read_until(char terminator, char* outString, s32 outMaxLength);
+        s32  read_bytes(byte* outData, s32 outMaxLength);
     }  // namespace nserial2
 
 }  // namespace ncore

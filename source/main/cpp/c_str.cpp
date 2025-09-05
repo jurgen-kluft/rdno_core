@@ -107,9 +107,9 @@ namespace ncore
         str_t ps;
         ps.m_ascii = str.m_ascii;
         ps.m_const = str.m_const;
-        ps.m_str = str.m_str;
-        ps.m_end = sel.m_str;
-        ps.m_eos = str.m_eos;
+        ps.m_str   = str.m_str;
+        ps.m_end   = sel.m_str;
+        ps.m_eos   = str.m_eos;
         return ps;
     }
 
@@ -597,16 +597,14 @@ namespace ncore
             u32 digit                  = uvalue % base;
             dest.m_ascii[dest.m_end++] = to_dec_char((u8)digit);
             uvalue /= base;
-        } while (uvalue > 0);
+        } while (uvalue > 0 && dest.m_end < dest.m_eos);
 
-        if (isNegative)
+        if (isNegative && dest.m_end < dest.m_eos)
             dest.m_ascii[dest.m_end++] = '-';
-
-        const s16 end = dest.m_end;
 
         // Reverse the string portion we just wrote
         s16 left  = begin;
-        s16 right = end - 1;
+        s16 right = dest.m_end - 1;
         while (left < right)
         {
             char temp           = dest.m_ascii[left];
@@ -615,6 +613,7 @@ namespace ncore
             left++;
             right--;
         }
+        dest.m_ascii[dest.m_end] = '\0';
     }
 
     void to_str(str_t& dest, u32 value, s16 base)
@@ -631,11 +630,10 @@ namespace ncore
             dest.m_ascii[dest.m_end++] = to_dec_char((u8)digit);
             uvalue /= base;
         } while (uvalue > 0 && dest.m_end < dest.m_eos);
-        const s16 end = dest.m_end;
 
         // Reverse the string portion we just wrote
         s16 left  = begin;
-        s16 right = end - 1;
+        s16 right = dest.m_end - 1;
         while (left < right)
         {
             char temp           = dest.m_ascii[left];
@@ -644,6 +642,7 @@ namespace ncore
             left++;
             right--;
         }
+        dest.m_ascii[dest.m_end] = '\0';
     }
 
     void to_str(str_t& dest, f32 value, s16 num_fractional_digits)
@@ -683,6 +682,7 @@ namespace ncore
             char c                     = to_dec_char((u8)digit);
             dest.m_ascii[dest.m_end++] = c;
         }
+        dest.m_ascii[dest.m_end] = '\0';
     }
 
     s16 str_append(str_t& dest, char c)

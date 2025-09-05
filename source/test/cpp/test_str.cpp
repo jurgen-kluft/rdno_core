@@ -320,6 +320,7 @@ UNITTEST_SUITE_BEGIN(str)
             CHECK_EQUAL(str_at(str1, 2), '3');
             CHECK_EQUAL(str_at(str1, 3), '4');
             CHECK_EQUAL(str_at(str1, 4), '5');
+            CHECK_EQUAL(str_at(str1, 5), '\0');
 
             str_clear(str1);
             to_str(str1, -6789);
@@ -329,6 +330,7 @@ UNITTEST_SUITE_BEGIN(str)
             CHECK_EQUAL(str_at(str1, 2), '7');
             CHECK_EQUAL(str_at(str1, 3), '8');
             CHECK_EQUAL(str_at(str1, 4), '9');
+            CHECK_EQUAL(str_at(str1, 5), '\0');
         }
 
         UNITTEST_TEST(to_str_uint)
@@ -343,6 +345,7 @@ UNITTEST_SUITE_BEGIN(str)
             CHECK_EQUAL(str_at(str1, 2), '3');
             CHECK_EQUAL(str_at(str1, 3), '4');
             CHECK_EQUAL(str_at(str1, 4), '5');
+            CHECK_EQUAL(str_at(str1, 5), '\0');
         }
 
         UNITTEST_TEST(to_str_float)
@@ -357,6 +360,7 @@ UNITTEST_SUITE_BEGIN(str)
             CHECK_EQUAL(str_at(str1, 2), '1');
             CHECK_EQUAL(str_at(str1, 3), '4');
             CHECK_EQUAL(str_at(str1, 4), '2');  // rounded
+            CHECK_EQUAL(str_at(str1, 5), '\0');
 
             str_clear(str1);
             to_str(str1, -0.005f, 2);
@@ -366,11 +370,13 @@ UNITTEST_SUITE_BEGIN(str)
             CHECK_EQUAL(str_at(str1, 2), '.');
             CHECK_EQUAL(str_at(str1, 3), '0');  // rounded
             CHECK_EQUAL(str_at(str1, 4), '1');  // rounded
+            CHECK_EQUAL(str_at(str1, 5), '\0');
 
             str_clear(str1);
             to_str(str1, 2.0f, 0);
             CHECK_EQUAL(str_len(str1), 1);
             CHECK_EQUAL(str_at(str1, 0), '2');
+            CHECK_EQUAL(str_at(str1, 1), '\0');
 
             str_clear(str1);
             to_str(str1, 2.0f, 6);
@@ -383,6 +389,7 @@ UNITTEST_SUITE_BEGIN(str)
             CHECK_EQUAL(str_at(str1, 5), '0');
             CHECK_EQUAL(str_at(str1, 6), '0');
             CHECK_EQUAL(str_at(str1, 7), '0');
+            CHECK_EQUAL(str_at(str1, 8), '\0');
         }
     }
 
@@ -471,21 +478,21 @@ UNITTEST_SUITE_BEGIN(str)
 
     UNITTEST_FIXTURE(join)
     {
-		UNITTEST_TEST(str_join_two)
-		{
-			char  buffer[30];
-			str_t str1 = str_mutable(buffer, sizeof(buffer));
-			str_t str2 = str_const("hello");
-			str_t str3 = str_const("world");
+        UNITTEST_TEST(str_join_two)
+        {
+            char  buffer[30];
+            str_t str1 = str_mutable(buffer, sizeof(buffer));
+            str_t str2 = str_const("hello");
+            str_t str3 = str_const("world");
 
-			s16 len1 = str_join(str1, ' ', str2, str3);
-			CHECK_EQUAL(len1, str_len(str2) + str_len(str3) + 1);
-			CHECK_EQUAL(str_len(str1), str_len(str2) + str_len(str3) + 1);
-			CHECK_EQUAL(str_at(str1, 0), 'h');
-			CHECK_EQUAL(str_at(str1, 5), ' ');
-			CHECK_EQUAL(str_at(str1, 6), 'w');
-			CHECK_EQUAL(str_at(str1, 10), 'd');
-		}
+            s16 len1 = str_join(str1, ' ', str2, str3);
+            CHECK_EQUAL(len1, str_len(str2) + str_len(str3) + 1);
+            CHECK_EQUAL(str_len(str1), str_len(str2) + str_len(str3) + 1);
+            CHECK_EQUAL(str_at(str1, 0), 'h');
+            CHECK_EQUAL(str_at(str1, 5), ' ');
+            CHECK_EQUAL(str_at(str1, 6), 'w');
+            CHECK_EQUAL(str_at(str1, 10), 'd');
+        }
 
         // s16 str_join(str_t & dest, char sep, str_t& src1, str_t& src2, str_t& src3);
         // s16 str_join(str_t & dest, char sep, const str_t* src_array, s16 array_count);

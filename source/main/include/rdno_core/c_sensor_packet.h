@@ -49,17 +49,18 @@ namespace ncore
         namespace SensorType
         {
             typedef u8  Value;
-            const Value Temperature = 0x0;   // (float, °C)
-            const Value Humidity    = 0x1;   // (float, %)
-            const Value Pressure    = 0x2;   // (float, hPa)
-            const Value Light       = 0x3;   // (float, lux)
-            const Value CO2         = 0x4;   // (float, ppm)
-            const Value VOC         = 0x5;   // (float, ppm)
-            const Value PM1_0       = 0x6;   // (float, µg/m3)
-            const Value PM2_5       = 0x7;   // (float, µg/m3)
-            const Value PM10        = 0x8;   // (float, µg/m3)
-            const Value Noise       = 0x9;   // (float, dB)
-            const Value Presence    = 0x10;  // (float, 0.0-1.0)
+            const Value Temperature = 0x0;   // (s16, °C)
+            const Value Humidity    = 0x1;   // (u8, %)
+            const Value Pressure    = 0x2;   // (u16, hPa)
+            const Value Light       = 0x3;   // (u16, lux)
+            const Value CO2         = 0x4;   // (u16, ppm)
+            const Value VOC         = 0x5;   // (u16, ppm)
+            const Value PM1_0       = 0x6;   // (u16, µg/m3)
+            const Value PM2_5       = 0x7;   // (u16, µg/m3)
+            const Value PM10        = 0x8;   // (u16, µg/m3)
+            const Value Noise       = 0x9;   // (u16, dB)
+            const Value Presence    = 0x10;  // (u8, 0 or 1)
+            const Value Distance    = 0x11;  // (u16, cm)
             const Value Target      = 0x20;  // (channel index indicates X, Y, Z axis)
         };  // namespace SensorType
 

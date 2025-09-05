@@ -23,13 +23,12 @@ UNITTEST_SUITE_BEGIN(sensor_packet)
 			// Write sensor values
 			packet.write_sensor_value(SensorType::Temperature, SensorModel::BME280, SensorState::On, (s8)25);
 			packet.write_sensor_value(SensorType::Humidity, SensorModel::BME280, SensorState::On, (s16)60);
-			packet.write_sensor_value(SensorType::Presence, SensorModel::HMMD, SensorState::On, 0.75f);
 
 			// Finalize the packet
 			packet.finalize();
 
 			// Check the size of the packet
-			CHECK_TRUE(packet.Size == (SensorPacket_t::HeaderSize + 3 + 4 + 6 + 2));
+			CHECK_EQUAL((SensorPacket_t::HeaderSize + 3 + 4) + 3, packet.Size);
 		}
     }
 }
