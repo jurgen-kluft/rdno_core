@@ -1,32 +1,22 @@
 #include "rdno_core/c_adc.h"
 
 #ifdef TARGET_ESP32
-
 #    include "Arduino.h"
-
-namespace ncore
-{
-    namespace nadc
-    {
-        s32 analog_read(u8 pin)
-        {
-            return ::analogRead(pin);
-        }
-
-    }  // namespace nadc
-}  // namespace ncore
-
-#else
-
-namespace ncore
-{
-    namespace nadc
-    {
-        s32 analog_read(u8 pin)
-        {
-            return 42;
-        }
-    }  // namespace nadc
-}  // namespace ncore
-
 #endif
+
+namespace ncore
+{
+    namespace nadc
+    {
+        s32 analog_read(u8 pin)
+        {
+#ifdef TARGET_ESP32
+            return ::analogRead(pin);
+#else
+            return 42;  // Dummy value
+#endif
+        }
+
+    }  // namespace nadc
+}  // namespace ncore
+

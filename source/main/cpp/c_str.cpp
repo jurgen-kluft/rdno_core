@@ -582,38 +582,23 @@ namespace ncore
         dest.m_const             = dest.m_ascii;
     }
 
-    void to_str(str_t& dest, s32 value, s16 base)
+    void to_str(str_t& dest, byte value, s16 base)
     {
         if (dest.m_ascii == nullptr || base < 2 || base > 36)
             return;  // destination is not mutable or invalid base
 
-        bool isNegative = (value < 0);
-        u32  uvalue     = isNegative ? (u32)(-value) : (u32)value;
+        if (dest.m_eos - dest.m_end < 2)
+            return;
+        to_str(dest, (u32)value, base);
+    }
 
-        // Convert integer to string in reverse order
-        const s16 begin = dest.m_end;
-        do
-        {
-            u32 digit                  = uvalue % base;
-            dest.m_ascii[dest.m_end++] = to_dec_char((u8)digit);
-            uvalue /= base;
-        } while (uvalue > 0 && dest.m_end < dest.m_eos);
-
-        if (isNegative && dest.m_end < dest.m_eos)
+    void to_str(str_t& dest, s32 value, s16 base)
+    {
+        if (dest.m_ascii == nullptr || base < 2 || base > 36)
+            return;  // destination is not mutable or invalid base
+        if (value < 0)
             dest.m_ascii[dest.m_end++] = '-';
-
-        // Reverse the string portion we just wrote
-        s16 left  = begin;
-        s16 right = dest.m_end - 1;
-        while (left < right)
-        {
-            char temp           = dest.m_ascii[left];
-            dest.m_ascii[left]  = dest.m_ascii[right];
-            dest.m_ascii[right] = temp;
-            left++;
-            right--;
-        }
-        dest.m_ascii[dest.m_end] = '\0';
+        to_str(dest, (u32)((value < 0) ? -value : value), base);
     }
 
     void to_str(str_t& dest, u32 value, s16 base)
@@ -627,7 +612,7 @@ namespace ncore
         do
         {
             u32 digit                  = uvalue % base;
-            dest.m_ascii[dest.m_end++] = to_dec_char((u8)digit);
+            dest.m_ascii[dest.m_end++] = to_hex_char((u8)digit, false);
             uvalue /= base;
         } while (uvalue > 0 && dest.m_end < dest.m_eos);
 
