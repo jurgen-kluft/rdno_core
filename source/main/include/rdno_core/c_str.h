@@ -127,6 +127,10 @@ namespace ncore
     s16 str_join(str_t& dest, char sep, const str_t* src_array, s16 array_count);
     s16 str_join(str_t& dest, const str_t& sep, const str_t* src_array, s16 array_count);
 
+    // printing to serial -------------------------------------------------------------------
+    void str_print(const str_t& s);
+    void str_println(const str_t& s);
+
 }  // namespace ncore
 
 #endif  // __RDNO_CORE_STR_H__

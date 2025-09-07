@@ -76,7 +76,8 @@ UNITTEST_SUITE_BEGIN(nvstore)
 
             CHECK_TRUE(config.m_param_types[5] == nvstore::PARAM_TYPE_S32);
 
-            s32 remote_port = nvstore::get_int(&config, 5, 123);
+            s32 remote_port;
+            CHECK_TRUE(nvstore::get_int(&config, 5, remote_port));
             CHECK_EQUAL(1234, remote_port);
         }
     }

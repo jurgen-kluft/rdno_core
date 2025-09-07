@@ -45,7 +45,7 @@ namespace ncore
         struct config_t
         {
             s8   m_param_types[PARAM_ID_MAX_COUNT];
-            s32  m_param_values[PARAM_ID_MAX_COUNT];  // For strings: (index * 32) + length
+            s32  m_param_values[PARAM_ID_MAX_COUNT];                                 // For strings: (index * 32) + length
             char m_strings[PARAM_ID_STRING_MAX_COUNT * PARAM_ID_STRING_MAX_LENGTH];  // Maximum of 32 strings of max 32 characters each
         };
 
@@ -58,9 +58,9 @@ namespace ncore
         bool set_string(config_t* config, s16 id, str_t const& str);
         bool get_string(const config_t* config, s16 id, str_t& outStr);
         void set_int(config_t* config, s16 id, s32 value);
-        s32  get_int(const config_t* config, s16 id, s32 defaultValue = 0);
+        bool get_int(const config_t* config, s16 id, s32& outValue);
         void set_bool(config_t* config, s16 id, bool value);
-        bool get_bool(const config_t* config, s16 id, bool defaultValue = false);
+        bool get_bool(const config_t* config, s16 id, bool& outValue);
 
         void reset(config_t* config);
         void save(config_t* config);

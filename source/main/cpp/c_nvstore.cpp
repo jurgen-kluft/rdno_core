@@ -361,11 +361,12 @@ namespace ncore
             config->m_param_values[id] = value;
         }
 
-        s32 get_int(const config_t* config, s16 id, s32 defaultValue)
+        bool get_int(const config_t* config, s16 id, s32& outValue)
         {
             if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_S32)
-                return defaultValue;
-            return config->m_param_values[id];
+                return false;
+            outValue = config->m_param_values[id];
+            return true;
         }
 
         void set_bool(config_t* config, s16 id, bool value)
@@ -376,11 +377,12 @@ namespace ncore
             config->m_param_values[id] = value ? 1 : 0;
         }
 
-        bool get_bool(const config_t* config, s16 id, bool defaultValue)
+        bool get_bool(const config_t* config, s16 id, bool& outValue)
         {
             if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_BOOL)
-                return defaultValue;
-            return config->m_param_values[id] == 1;
+                return false;
+            outValue = config->m_param_values[id] == 1;
+            return true;
         }
 
     }  // namespace nvstore

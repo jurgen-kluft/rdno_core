@@ -22,6 +22,7 @@ namespace ncore
     {
         void SensorPacket_t::begin(u8 sequence, u8 version, DeviceLocation::Value location)
         {
+            Size         = 0;
             Capacity     = sizeof(Data);  // Maximum size of the packet
             Data[Size++] = 0;             // Placeholder for length (will be set in finalize), will count sensor values
             Data[Size++] = sequence;      // Sequence number
@@ -31,39 +32,40 @@ namespace ncore
 
         s32 SensorPacket_t::finalize()
         {
-            const s32 num_sensor_values = Data[0];
+            const s32 num_sensor_values = Data[LengthOffset];
             while ((Size & 0x03) != 0)  // Align size to 4 bytes
             {
                 Data[Size++] = 0xFE;
             }
-            Data[0] = (Size >> 2) & 0xFF;  // Set the length (number of words) of the packet
+            Data[LengthOffset] = (Size >> 2) & 0xFF;  // Set the length (number of words) of the packet
 
             return num_sensor_values;
         }
 
         void SensorPacket_t::write_sensor_value(SensorType::Value type, s32 value) { write_sensor_value(type, (u32)value); }
-
         void SensorPacket_t::write_sensor_value(SensorType::Value type, u32 value)
         {
+            Data[Size++] = type;
+
             // Write the sensor value to the packet
             SensorFieldType::Value field_type = ToSensorFieldType(type);
             switch (field_type)
             {
                 case SensorFieldType::TypeU8:
                 case SensorFieldType::TypeS8:
-                    Data[0]++;  // Increment the sensor value count
+                    Data[LengthOffset]++;  // Increment the sensor value count
                     Data[Size++] = value & 0xFF;
                     break;
                 case SensorFieldType::TypeU16:
                 case SensorFieldType::TypeS16:
-                    Data[0]++;  // Increment the sensor value count
+                    Data[LengthOffset]++;  // Increment the sensor value count
                     Data[Size++] = value & 0xFF;
                     value        = value >> 8;
                     Data[Size++] = value & 0xFF;
                     break;
                 case SensorFieldType::TypeU32:
                 case SensorFieldType::TypeS32:
-                    Data[0]++;  // Increment the sensor value count
+                    Data[LengthOffset]++;  // Increment the sensor value count
                     Data[Size++] = value & 0xFF;
                     value        = value >> 8;
                     Data[Size++] = value & 0xFF;
@@ -74,6 +76,7 @@ namespace ncore
                     break;
                 default: break;  // Ignore unknown types
             }
+        }
 
-        }  // namespace nsensor
-    }  // namespace ncore
+    }  // namespace nsensor
+}  // namespace ncore

@@ -1,5 +1,6 @@
 #include "rdno_core/c_str.h"
 #include "rdno_core/c_memory.h"
+#include "rdno_core/c_serial.h"
 
 namespace ncore
 {
@@ -830,6 +831,43 @@ namespace ncore
             }
         }
         return trimmed;
+    }
+
+    void str_print(const str_t& s)
+    {
+        if (s.m_ascii != nullptr && s.m_str < s.m_end)
+        {
+            const char e       = s.m_ascii[s.m_end];
+            s.m_ascii[s.m_end] = '\0';
+
+            nserial::print(&s.m_const[s.m_str]);
+
+            s.m_ascii[s.m_end] = e;
+        }
+        else if (s.m_const != nullptr)
+        {
+            nserial::print(s.m_const);
+        }
+    }
+
+    void str_println(const str_t& s)
+    {
+        if (s.m_ascii != nullptr)
+        {
+            if (s.m_str < s.m_end)
+            {
+                const char e       = s.m_ascii[s.m_end];
+                s.m_ascii[s.m_end] = '\0';
+
+                nserial::println(&s.m_const[s.m_str]);
+
+                s.m_ascii[s.m_end] = e;
+            }
+        }
+        else if (s.m_const != nullptr)
+        {
+            nserial::println(s.m_const);
+        }
     }
 
 }  // namespace ncore
