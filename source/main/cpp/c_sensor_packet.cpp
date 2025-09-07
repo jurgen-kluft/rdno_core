@@ -7,140 +7,73 @@
 //     s32  Capacity;
 
 //     void begin();
-
-//     void write_header(DeviceLocation::Value location, DeviceLabel::Value label);
-
-//     void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, s8 value);
-//     void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, s16 value);
-//     void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, s32 value);
-
-//     void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u8 value);
-//     void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u16 value);
-//     void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u32 value);
-
-//     void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, f32 value);
-
+//     void write_header(DeviceLocation::Value location);
+//     void write_sensor_value(SensorType::Value type,  s8 value);
+//     void write_sensor_value(SensorType::Value type,  s16 value);
+//     void write_sensor_value(SensorType::Value type,  s32 value);
+//     void write_sensor_value(SensorType::Value type,  u8 value);
+//     void write_sensor_value(SensorType::Value type,  u16 value);
+//     void write_sensor_value(SensorType::Value type,  u32 value);
 //     void end(u16 sequence, u8 version);
 // };
 namespace ncore
 {
     namespace nsensor
     {
-        void SensorPacket_t::begin(u8 sequence, u8 version)
+        void SensorPacket_t::begin(u8 sequence, u8 version, DeviceLocation::Value location)
         {
             Capacity     = sizeof(Data);  // Maximum size of the packet
-            Size         = 1;             // Skip length, will be set during finalize
+            Data[Size++] = 0;             // Placeholder for length (will be set in finalize), will count sensor values
             Data[Size++] = sequence;      // Sequence number
             Data[Size++] = version;       // Version number
+            Data[Size++] = location;      // Device location
         }
 
-        void SensorPacket_t::finalize()
+        s32 SensorPacket_t::finalize()
         {
-            // Align size to 4 bytes
-            while ((Size & 0x03) != 0)
+            const s32 num_sensor_values = Data[0];
+            while ((Size & 0x03) != 0)  // Align size to 4 bytes
             {
                 Data[Size++] = 0xFE;
             }
+            Data[0] = (Size >> 2) & 0xFF;  // Set the length (number of words) of the packet
 
-            // Set the length (number of words) of the packet 
-            Data[0] = (Size >> 2) & 0xFF;
+            return num_sensor_values;
         }
 
-        void SensorPacket_t::write_info(DeviceLocation::Value location, DeviceLabel::Value label)
-        {
-            // Write the location, label and sensor value count to the packet
-            Data[Size++] = location;
-            Data[Size++] = label;
-            Data[Size++] = 0;  // Count of sensor values, will be updated whenever a sensor value is written
-        }
+        void SensorPacket_t::write_sensor_value(SensorType::Value type, s32 value) { write_sensor_value(type, (u32)value); }
 
-        void SensorPacket_t::write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, s8 value)
+        void SensorPacket_t::write_sensor_value(SensorType::Value type, u32 value)
         {
-            Data[SensorCountOffset]++;  // Increment the count of sensor values
-
             // Write the sensor value to the packet
-            FieldType::Value field_type = FieldType::TypeS8;
-            Data[Size++]                = (type << 4) | (model);
-            Data[Size++]                = (state << 4) | (field_type);
+            SensorFieldType::Value field_type = ToSensorFieldType(type);
+            switch (field_type)
+            {
+                case SensorFieldType::TypeU8:
+                case SensorFieldType::TypeS8:
+                    Data[0]++;  // Increment the sensor value count
+                    Data[Size++] = value & 0xFF;
+                    break;
+                case SensorFieldType::TypeU16:
+                case SensorFieldType::TypeS16:
+                    Data[0]++;  // Increment the sensor value count
+                    Data[Size++] = value & 0xFF;
+                    value        = value >> 8;
+                    Data[Size++] = value & 0xFF;
+                    break;
+                case SensorFieldType::TypeU32:
+                case SensorFieldType::TypeS32:
+                    Data[0]++;  // Increment the sensor value count
+                    Data[Size++] = value & 0xFF;
+                    value        = value >> 8;
+                    Data[Size++] = value & 0xFF;
+                    value        = value >> 8;
+                    Data[Size++] = value & 0xFF;
+                    value        = value >> 8;
+                    Data[Size++] = value & 0xFF;
+                    break;
+                default: break;  // Ignore unknown types
+            }
 
-            Data[Size++] = value;
-        }
-
-        void SensorPacket_t::write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, s16 value)
-        {
-            Data[SensorCountOffset]++;  // Increment the count of sensor values
-
-            // Write the sensor value to the packet
-            FieldType::Value field_type = FieldType::TypeS16;
-            Data[Size++]                = (type << 4) | (model);
-            Data[Size++]                = (state << 4) | (field_type);
-
-            Data[Size++] = value & 0xFF;
-            value        = value >> 8;
-            Data[Size++] = value & 0xFF;
-        }
-
-        void SensorPacket_t::write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, s32 value)
-        {
-            Data[SensorCountOffset]++;  // Increment the count of sensor values
-
-            // Write the sensor value to the packet
-            FieldType::Value field_type = FieldType::TypeS32;
-            Data[Size++]                = (type << 4) | (model);
-            Data[Size++]                = (state << 4) | (field_type);
-
-            Data[Size++] = value & 0xFF;
-            value        = value >> 8;
-            Data[Size++] = value & 0xFF;
-            value        = value >> 8;
-            Data[Size++] = value & 0xFF;
-            value        = value >> 8;
-            Data[Size++] = value & 0xFF;
-        }
-
-        void SensorPacket_t::write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u8 value)
-        {
-            Data[SensorCountOffset]++;  // Increment the count of sensor values
-
-            // Write the sensor value to the packet
-            FieldType::Value field_type = FieldType::TypeU8;
-            Data[Size++]                = (type << 4) | (model);
-            Data[Size++]                = (state << 4) | (field_type);
-
-            Data[Size++] = value;
-        }
-
-        void SensorPacket_t::write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u16 value)
-        {
-            Data[SensorCountOffset]++;  // Increment the count of sensor values
-
-            // Write the sensor value to the packet
-            FieldType::Value field_type = FieldType::TypeU16;
-            Data[Size++]                = (type << 4) | (model);
-            Data[Size++]                = (state << 4) | (field_type);
-
-            Data[Size++] = value & 0xFF;
-            value        = value >> 8;
-            Data[Size++] = value & 0xFF;
-        }
-
-        void SensorPacket_t::write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u32 value)
-        {
-            Data[SensorCountOffset]++;  // Increment the count of sensor values
-
-            // Write the sensor value to the packet
-            FieldType::Value field_type = FieldType::TypeU32;
-            Data[Size++]                = (type << 4) | (model);
-            Data[Size++]                = (state << 4) | (field_type);
-
-            Data[Size++] = value & 0xFF;
-            value        = value >> 8;
-            Data[Size++] = value & 0xFF;
-            value        = value >> 8;
-            Data[Size++] = value & 0xFF;
-            value        = value >> 8;
-            Data[Size++] = value & 0xFF;
-        }
-
-    }  // namespace nsensor
-}  // namespace ncore
+        }  // namespace nsensor
+    }  // namespace ncore

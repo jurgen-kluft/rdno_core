@@ -39,7 +39,8 @@ namespace ncore
     {
         void begin(nbaud::Enum baud = nbaud::Rate115200);
         void print(const char* val);
-        void print(const u8 val, bool hex = false);
+        void print(const s32 val);
+        void print(const u32 val, bool hex = false);
         void print(const IPAddress_t& address);
         void print(const MACAddress_t& address);
         void println(const char* val);

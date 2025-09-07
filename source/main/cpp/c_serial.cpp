@@ -1,5 +1,6 @@
 #include "rdno_core/c_serial.h"
 #include "rdno_core/c_timer.h"
+#include "rdno_core/c_str.h"
 
 #ifdef TARGET_ESP32
 
@@ -25,19 +26,30 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
         void print(const char* val) { Serial.print(val); }
 
-        void print(const u8 val, bool hex)
+        void print(const s32 val)
+        {
+            char strBuffer[16];
+            str_t str = str_mutable(strBuffer, sizeof(strBuffer));
+            to_str(str, val, 10);
+            Serial.print(str.m_const);
+        }
+
+        void print(const u32 val, bool hex)
         {
             if (hex)
             {
-                if (val < 16)
-                {
-                    Serial.print("0");
-                }
-                Serial.print(val, HEX);
+                char strBuffer[11];  // "0x" + 8 hex digits + null terminator
+                str_t str = str_mutable(strBuffer, sizeof(strBuffer));
+                str_append(str, "0x");
+                to_str(str, val, 16);
+                Serial.print(str.m_const);
             }
             else
             {
-                Serial.print((unsigned int)val);
+                char strBuffer[12];  // Max 10 digits for u32 + null terminator
+                str_t str = str_mutable(strBuffer, sizeof(strBuffer));
+                to_str(str, val, 10);
+                Serial.print(str.m_const);
             }
         }
 

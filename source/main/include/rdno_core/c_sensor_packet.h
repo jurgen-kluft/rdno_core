@@ -11,7 +11,7 @@ namespace ncore
     {
         namespace DeviceLocation
         {
-            typedef u8 Value;
+            typedef u8  Value;
             const Value Unknown   = 0;
             const Value Location1 = 0x01;
             const Value Location2 = 0x02;
@@ -39,56 +39,77 @@ namespace ncore
         namespace SensorModel
         {
             typedef u8  Value;
-            const Value GPIO   = 0x0;   // Generic GPIO sensor
+            const Value GPIO   = 0x00;  // Generic GPIO sensor
             const Value BH1750 = 0x10;  // Light sensor
-            const Value BME280 = 0x11;  // Temperature, Humidity, Pressure sensor
-            const Value SCD4X  = 0x12;  // CO2, Temperature, Humidity sensor
-            const Value HMMD   = 0x13;  // Presence (Doppler radar) sensor
+            const Value BME280 = 0x20;  // Temperature, Humidity, Pressure sensor
+            const Value SCD4X  = 0x30;  // CO2, Temperature, Humidity sensor
+            const Value HMMD   = 0x40;  // Presence (Doppler radar) sensor
         };  // namespace SensorModel
-
-        namespace SensorType
-        {
-            typedef u8  Value;
-            const Value Temperature = 0x0;   // (s16, °C)
-            const Value Humidity    = 0x1;   // (u8, %)
-            const Value Pressure    = 0x2;   // (u16, hPa)
-            const Value Light       = 0x3;   // (u16, lux)
-            const Value CO2         = 0x4;   // (u16, ppm)
-            const Value VOC         = 0x5;   // (u16, ppm)
-            const Value PM1_0       = 0x6;   // (u16, µg/m3)
-            const Value PM2_5       = 0x7;   // (u16, µg/m3)
-            const Value PM10        = 0x8;   // (u16, µg/m3)
-            const Value Noise       = 0x9;   // (u16, dB)
-            const Value Presence    = 0x10;  // (u8, 0 or 1)
-            const Value Distance    = 0x11;  // (u16, cm)
-            const Value Target      = 0x20;  // (channel index indicates X, Y, Z axis)
-        };  // namespace SensorType
 
         namespace SensorState
         {
             typedef u8  Value;
-            const Value Off   = 0x1;
-            const Value On    = 0x2;
-            const Value Error = 0x3;
-        };  // namespace SensorState
+            const Value Off   = 0x10;
+            const Value On    = 0x20;
+            const Value Error = 0x30;
+        }  // namespace SensorState
 
-        namespace FieldType
+        namespace SensorType
         {
             typedef u8  Value;
-            const Value TypeS8  = 0x0;
-            const Value TypeS16 = 0x1;
-            const Value TypeS32 = 0x2;
-            const Value TypeU8  = 0x3;
-            const Value TypeU16 = 0x4;
-            const Value TypeU32 = 0x5;
-        };  // namespace FieldType
+            const Value Temperature = 0x00;  // (s8, °C)
+            const Value Humidity    = 0x01;  // (u8, %)
+            const Value Pressure    = 0x02;  // (u16, hPa)
+            const Value Light       = 0x03;  // (u16, lux)
+            const Value CO2         = 0x04;  // (u16, ppm)
+            const Value VOC         = 0x05;  // (u16, ppm)
+            const Value PM1_0       = 0x06;  // (u16, µg/m3)
+            const Value PM2_5       = 0x07;  // (u16, µg/m3)
+            const Value PM10        = 0x08;  // (u16, µg/m3)
+            const Value Noise       = 0x09;  // (u8, dB)
+            const Value Presence    = 0x0A;  // (u8, 0=none, 1-8=target ID)
+            const Value Distance    = 0x0B;  // (u16, cm)
+            const Value UV          = 0x0C;  // (u8, index)
+            const Value CO          = 0x0D;  // (u16, ppm/10)
+            const Value Vibration   = 0x0E;  // (u8, 0=none, 1=low, 2=medium, 3=high)
+            const Value State       = 0x0F;  // (u16 (u8[2]), sensor model, sensor state)
+        };  // namespace SensorType
 
-        namespace DeviceLabel
+        namespace SensorFieldType
         {
-            typedef byte Value;
-            const Value  Presence   = 0x01;
-            const Value  AirQuality = 0x02;
-        }  // namespace DeviceLabel
+            typedef s8  Value;
+            const Value TypeNone = 0x00;
+            const Value TypeS8   = 0x01;
+            const Value TypeS16  = 0x02;
+            const Value TypeS32  = 0x03;
+            const Value TypeU8   = 0x04;
+            const Value TypeU16  = 0x05;
+            const Value TypeU32  = 0x06;
+        }  // namespace SensorFieldType
+
+        inline SensorFieldType::Value ToSensorFieldType(const SensorType::Value type)
+        {
+            switch (type)
+            {
+                case SensorType::Temperature: return SensorFieldType::TypeS8;
+                case SensorType::Humidity: return SensorFieldType::TypeU8;
+                case SensorType::Pressure: return SensorFieldType::TypeU16;
+                case SensorType::Light: return SensorFieldType::TypeU16;
+                case SensorType::CO2: return SensorFieldType::TypeU16;
+                case SensorType::VOC: return SensorFieldType::TypeU16;
+                case SensorType::PM1_0: return SensorFieldType::TypeU16;
+                case SensorType::PM2_5: return SensorFieldType::TypeU16;
+                case SensorType::PM10: return SensorFieldType::TypeU16;
+                case SensorType::Noise: return SensorFieldType::TypeU8;
+                case SensorType::Presence: return SensorFieldType::TypeU8;
+                case SensorType::Distance: return SensorFieldType::TypeU16;
+                case SensorType::UV: return SensorFieldType::TypeU8;
+                case SensorType::CO: return SensorFieldType::TypeU8;
+                case SensorType::Vibration: return SensorFieldType::TypeU8;
+                case SensorType::State: return SensorFieldType::TypeU16;  // Note: 2 bytes (model and state)
+                default: return SensorFieldType::TypeNone;
+            }
+        }
 
         // Note: Little Endian byte order
         // Packet structure
@@ -97,27 +118,18 @@ namespace ncore
         //     u8                    sequence; // Sequence number of the packet
         //     u8                    version;  // Version of the packet structure
         //     DeviceLocation::Value location;
-        //     DeviceLabel::Value    label;
-        //     u8                    count;    // Number of sensor values in the packet (max 16)
-
         //     // sensor value 1
-        //     u8 type_and_channel;
-        //     u8 state_and_field_type;
+        //     u8 type;                        // SensorType (also implies sensor field type)
         //     One of the following:
         //         - s8  s8_value;
-        //         - s16 s16_value;
-        //         - s32 s32_value;
         //         - u8  u8_value;
+        //         - s16 s16_value;
         //         - u16 u16_value;
+        //         - s32 s32_value;
         //         - u32 u32_value;
-        //         - f32 f32_value;
-
         //     // sensor value 2
-
-        //     // ... (up to max 16 sensor values)
-
-        //     Padding to align to 4 bytes
-
+        //     // ... 
+        //     Padding to align packet size to 4 bytes
         // };
 
         struct SensorPacket_t
@@ -129,23 +141,18 @@ namespace ncore
             enum
             {
                 // Packet header
-                HeaderSize        = 1 + 1 + 1 + 1 + 1 + 1,  // length, sequence, version, location, label, count
-                LengthOffset      = 0,
-                SensorCountOffset = 5,
+                HeaderSize     = 1 + 1 + 1 + 1,  // length, sequence, version, location
+                LengthOffset   = 0,
+                SequenceOffset = 1,
+                VersionOffset  = 2,
+                LocationOffset = 3,
             };
 
-            void begin(u8 sequence, u8 version);
-            void finalize();
+            void begin(u8 sequence, u8 version, DeviceLocation::Value location);
+            s32  finalize();  // returns the number of sensor values written
 
-            void write_info(DeviceLocation::Value location, DeviceLabel::Value label);
-
-            void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, s8 value);
-            void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, s16 value);
-            void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, s32 value);
-
-            void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u8 value);
-            void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u16 value);
-            void write_sensor_value(SensorType::Value type, SensorModel::Value model, SensorState::Value state, u32 value);
+            void write_sensor_value(SensorType::Value type, s32 value);
+            void write_sensor_value(SensorType::Value type, u32 value);
         };
 
     }  // namespace nsensor

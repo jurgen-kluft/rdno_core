@@ -1,0 +1,22 @@
+#include "rdno_core/c_wire.h"
+
+#ifdef TARGET_ESP32
+#    include "Arduino.h"
+#    include "Wire.h"
+#endif
+
+namespace ncore
+{
+    namespace nwire
+    {
+        void begin(s32 sdaPin, s32 sclPin)
+        {
+#ifdef TARGET_ESP32
+            Wire.begin(sdaPin, sclPin);
+#else
+            (void)sdaPin;
+            (void)sclPin;
+#endif
+        }
+    }  // namespace nwire
+}  // namespace ncore

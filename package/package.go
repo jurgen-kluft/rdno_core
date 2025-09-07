@@ -32,9 +32,6 @@ func GetPackage() *denv.Package {
 	mainpkg := denv.NewPackage(repo_path, repo_name)
 	mainpkg.AddPackage(cunittestpkg)
 
-	// main library
-	mainlib := denv.SetupCppLibProject(mainpkg, name)
-
 	// esp32 core library
 	esp32corelib := denv.SetupCppLibProjectForArduino(mainpkg, "esp32-core")
 	esp32corelib.ClearIncludes()
@@ -42,6 +39,12 @@ func GetPackage() *denv.Package {
 	esp32corelib.AddEnvironmentVariable("ESP_SDK")
 	esp32corelib.AddInclude("{ESP_SDK}", "cores/esp32", "")
 	esp32corelib.SourceFilesFrom("{ESP_SDK}", "cores/esp32", "")
+	esp32corelib.AddInclude("{ESP_SDK}", "libraries/Wire", "src")
+	esp32corelib.SourceFilesFrom("{ESP_SDK}", "libraries/Wire", "src")
+
+	// main library
+	mainlib := denv.SetupCppLibProject(mainpkg, name)
+	mainlib.AddDependencies(esp32corelib)
 
 	// test library
 	testlib := denv.SetupCppTestLibProject(mainpkg, name)

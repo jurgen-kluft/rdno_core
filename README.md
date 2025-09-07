@@ -18,3 +18,10 @@ sure that you have a environment variable named `ESP_SDK` that points to the loc
 ```bash
 export ESP_SDK=~/sdk/Arduino/esp32
 ```
+
+# ESP32 SDK Version
+
+Currently at commit `6f92b604f62568eced0e519b01d17af00b80ebe4` (May 13, 2025).
+
+Going to try commit at tag 3.1.3, since there are issues with I2C.
+`dbfde15b6ac25720c9132ebd33decf6b34d5e2af        refs/tags/3.1.3`
