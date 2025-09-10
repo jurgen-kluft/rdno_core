@@ -25,19 +25,18 @@ namespace ncore
         {
             // WiFi parameters
             PARAM_ID_STRING_COUNT  = 0,
-            PARAM_ID_SSID          = 1,
-            PARAM_ID_PASSWORD      = 2,
+            PARAM_ID_WIFI_SSID     = 1,
+            PARAM_ID_WIFI_PASSWORD = 2,
             PARAM_ID_AP_SSID       = 3,
             PARAM_ID_AP_PASSWORD   = 4,
             PARAM_ID_REMOTE_SERVER = 5,
             PARAM_ID_REMOTE_PORT   = 6,
-            PARAM_ID_HOSTNAME      = 7,
 
             PARAM_ID_SENSOR_READ_INTERVAL = 10,  // Interval in milli-seconds to read sensors
             PARAM_ID_SENSOR_SEND_INTERVAL = 11,  // Interval in milli-seconds to send sensor data to server
 
-            PARAM_ID_MAX_COUNT         = 64,
-            PARAM_ID_STRING_MAX_COUNT  = 32,
+            PARAM_ID_MAX_COUNT         = 32,
+            PARAM_ID_STRING_MAX_COUNT  = 16,
             PARAM_ID_STRING_MAX_LENGTH = 32,
         };
 
@@ -49,7 +48,7 @@ namespace ncore
             char m_strings[PARAM_ID_STRING_MAX_COUNT * PARAM_ID_STRING_MAX_LENGTH];  // Maximum of 32 strings of max 32 characters each
         };
 
-        // Message example: "ssid=OBNOSIS8, password=MySecretPassword, remote_server=10.0.0.22, remote_port=1234"
+        // Message example: "ssid=OBNOSIS8, password=MySecretPassword, remote_server=10.0.0.22, remote_port=1234, device_name=Bedroom.1."
         bool parse_keyvalue(str_t& msg, str_t& outKey, str_t& outValue);
         void parse_value(config_t* config, s16 id, str_t const& str);
         void parse_int(config_t* config, s16 id, str_t const& str);

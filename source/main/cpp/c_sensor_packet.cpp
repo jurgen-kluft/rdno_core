@@ -6,15 +6,9 @@
 //     s32  Size;
 //     s32  Capacity;
 
-//     void begin();
-//     void write_header(DeviceLocation::Value location);
-//     void write_sensor_value(SensorType::Value type,  s8 value);
-//     void write_sensor_value(SensorType::Value type,  s16 value);
+//     void begin(u16 sequence, u8 version);
 //     void write_sensor_value(SensorType::Value type,  s32 value);
-//     void write_sensor_value(SensorType::Value type,  u8 value);
-//     void write_sensor_value(SensorType::Value type,  u16 value);
-//     void write_sensor_value(SensorType::Value type,  u32 value);
-//     void end(u16 sequence, u8 version);
+//     s32 finalize();
 // };
 namespace ncore
 {
