@@ -20,24 +20,23 @@ namespace ncore
 {
     namespace nsensor
     {
-        void SensorPacket_t::begin(u8 sequence, u8 version, DeviceLocation::Value location)
+        void SensorPacket_t::begin(u8 sequence, u8 version)
         {
             Size         = 0;
             Capacity     = sizeof(Data);  // Maximum size of the packet
             Data[Size++] = 0;             // Placeholder for length (will be set in finalize), will count sensor values
             Data[Size++] = sequence;      // Sequence number
             Data[Size++] = version;       // Version number
-            Data[Size++] = location;      // Device location
         }
 
         s32 SensorPacket_t::finalize()
         {
             const s32 num_sensor_values = Data[LengthOffset];
-            while ((Size & 0x03) != 0)  // Align size to 4 bytes
+            while ((Size & 0x01) != 0)  // Align size to 2 bytes
             {
                 Data[Size++] = 0xFE;
             }
-            Data[LengthOffset] = (Size >> 2) & 0xFF;  // Set the length (number of words) of the packet
+            Data[LengthOffset] = (Size >> 1) & 0xFF;  // Set the length (number of words) of the packet
 
             return num_sensor_values;
         }

@@ -9,33 +9,6 @@ namespace ncore
 {
     namespace nsensor
     {
-        namespace DeviceLocation
-        {
-            typedef u8  Value;
-            const Value Unknown   = 0;
-            const Value Location1 = 0x01;
-            const Value Location2 = 0x02;
-            const Value Location3 = 0x03;
-            const Value Location4 = 0x04;
-            const Value Location5 = 0x05;
-            const Value Location6 = 0x06;
-            const Value Location7 = 0x07;
-            const Value Location8 = 0x08;
-            const Value Location9 = 0x09;
-            // Note: Max 15 locations
-            const Value Location15 = 0x0F;
-
-            const Value Bedroom    = 0x10;
-            const Value Livingroom = 0x20;
-            const Value Kitchen    = 0x30;
-            const Value Bathroom   = 0x40;
-            const Value Hallway    = 0x50;
-            const Value Balcony    = 0x60;
-            const Value Study      = 0x70;
-            const Value Pantry     = 0x80;
-            // Note: Max 15 rooms
-        }  // namespace DeviceLocation
-
         namespace SensorModel
         {
             typedef u8  Value;
@@ -114,12 +87,12 @@ namespace ncore
         // Note: Little Endian byte order
         // Packet structure
         // {
-        //     u8                    length;   // Number of u32 in the packet
-        //     u8                    sequence; // Sequence number of the packet
-        //     u8                    version;  // Version of the packet structure
-        //     DeviceLocation::Value location;
+        //     u8 length;   // Number of u32 in the packet
+        //     u8 sequence; // Sequence number of the packet
+        //     u8 version;  // Version of the packet structure
+        //     
         //     // sensor value 1
-        //     u8 type;                        // SensorType (also implies sensor field type)
+        //     u8 type;     // SensorType (also implies sensor field type)
         //     One of the following:
         //         - s8  s8_value;
         //         - u8  u8_value;
@@ -129,12 +102,12 @@ namespace ncore
         //         - u32 u32_value;
         //     // sensor value 2
         //     // ... 
-        //     Padding to align packet size to 4 bytes
+        //     Padding to align packet size to 2 bytes
         // };
 
         struct SensorPacket_t
         {
-            byte Data[256];
+            byte Data[512];
             s32  Size;
             s32  Capacity;
 
@@ -148,7 +121,7 @@ namespace ncore
                 LocationOffset = 3,
             };
 
-            void begin(u8 sequence, u8 version, DeviceLocation::Value location);
+            void begin(u8 sequence, u8 version);
             s32  finalize();  // returns the number of sensor values written
 
             void write_sensor_value(SensorType::Value type, s32 value);
