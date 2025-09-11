@@ -171,7 +171,11 @@ namespace ncore
             return s_valid;
         }
 
-        void reset(config_t* config) { g_memset(config, 0, sizeof(config_t)); }
+        void reset(config_t* config) 
+        { 
+            g_memset(config, 0, sizeof(config_t)); 
+            config->m_version = NVSTORE_VERSION;
+        }
 
         void save(config_t* config)
         {
@@ -210,6 +214,12 @@ namespace ncore
                 if (err == ESP_OK && required_size == sizeof(config_t))
                 {
                     err = nvs_get_blob(storage_handle, "config_t", (void*)config, &required_size);
+                    if (config->m_version != NVSTORE_VERSION)
+                    {
+                        nserial::println("NVS config version mismatch, reset to defaults");
+                        reset(config);
+                        err = ESP_ERR_NVS_INVALID_LENGTH;
+                    }
                     print_nvs_error("nvs_get_blob2, error = ", err);
                 }
                 else

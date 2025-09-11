@@ -40,9 +40,15 @@ namespace ncore
             PARAM_ID_STRING_MAX_LENGTH = 32,
         };
 
+        enum
+        {
+            NVSTORE_VERSION = 0x00010000,
+        };
+
         // 1.3 KB fixed size configuration structure
         struct config_t
         {
+            u32  m_version;
             s8   m_param_types[PARAM_ID_MAX_COUNT];
             s32  m_param_values[PARAM_ID_MAX_COUNT];                                 // For strings: (index * 32) + length
             char m_strings[PARAM_ID_STRING_MAX_COUNT * PARAM_ID_STRING_MAX_LENGTH];  // Maximum of 32 strings of max 32 characters each

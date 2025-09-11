@@ -35,30 +35,28 @@ namespace ncore
             return num_sensor_values;
         }
 
-        void SensorPacket_t::write_sensor_value(SensorType::Value type, s32 value) { write_sensor_value(type, (u32)value); }
-        void SensorPacket_t::write_sensor_value(SensorType::Value type, u32 value)
+        void SensorPacket_t::write_sensor_value(SensorType::Value type, s32 value)
         {
-            Data[Size++] = type;
-
             // Write the sensor value to the packet
             SensorFieldType::Value field_type = ToSensorFieldType(type);
+
             switch (field_type)
             {
-                case SensorFieldType::TypeU8:
                 case SensorFieldType::TypeS8:
                     Data[LengthOffset]++;  // Increment the sensor value count
+                    Data[Size++] = type;
                     Data[Size++] = value & 0xFF;
                     break;
-                case SensorFieldType::TypeU16:
                 case SensorFieldType::TypeS16:
                     Data[LengthOffset]++;  // Increment the sensor value count
+                    Data[Size++] = type;
                     Data[Size++] = value & 0xFF;
                     value        = value >> 8;
                     Data[Size++] = value & 0xFF;
                     break;
-                case SensorFieldType::TypeU32:
                 case SensorFieldType::TypeS32:
                     Data[LengthOffset]++;  // Increment the sensor value count
+                    Data[Size++] = type;
                     Data[Size++] = value & 0xFF;
                     value        = value >> 8;
                     Data[Size++] = value & 0xFF;

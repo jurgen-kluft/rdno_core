@@ -110,7 +110,7 @@ namespace ncore
     bool from_str(const str_t& s, f32* outValue);
 
     void to_str(str_t& dest, bool value);
-    void to_str(str_t& dest, byte value, s16 base = 10);
+    void to_str(str_t& dest, byte value, s8 chars = 0, s16 base = 10);
     void to_str(str_t& dest, s32 value, s16 base = 10);
     void to_str(str_t& dest, u32 value, s16 base = 10);
     void to_str(str_t& dest, f32 value, s16 num_fractional_digits = 2);

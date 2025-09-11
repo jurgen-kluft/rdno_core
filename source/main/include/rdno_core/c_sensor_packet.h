@@ -52,12 +52,9 @@ namespace ncore
         {
             typedef s8  Value;
             const Value TypeNone = 0x00;
-            const Value TypeS8   = 0x01;
-            const Value TypeS16  = 0x02;
-            const Value TypeS32  = 0x03;
-            const Value TypeU8   = 0x04;
-            const Value TypeU16  = 0x05;
-            const Value TypeU32  = 0x06;
+            const Value TypeS8   = 0x08;
+            const Value TypeS16  = 0x10;
+            const Value TypeS32  = 0x20;
         }  // namespace SensorFieldType
 
         inline SensorFieldType::Value ToSensorFieldType(const SensorType::Value type)
@@ -65,21 +62,21 @@ namespace ncore
             switch (type)
             {
                 case SensorType::Temperature: return SensorFieldType::TypeS8;
-                case SensorType::Humidity: return SensorFieldType::TypeU8;
-                case SensorType::Pressure: return SensorFieldType::TypeU16;
-                case SensorType::Light: return SensorFieldType::TypeU16;
-                case SensorType::CO2: return SensorFieldType::TypeU16;
-                case SensorType::VOC: return SensorFieldType::TypeU16;
-                case SensorType::PM1_0: return SensorFieldType::TypeU16;
-                case SensorType::PM2_5: return SensorFieldType::TypeU16;
-                case SensorType::PM10: return SensorFieldType::TypeU16;
-                case SensorType::Noise: return SensorFieldType::TypeU8;
-                case SensorType::Presence: return SensorFieldType::TypeU8;
-                case SensorType::Distance: return SensorFieldType::TypeU16;
-                case SensorType::UV: return SensorFieldType::TypeU8;
-                case SensorType::CO: return SensorFieldType::TypeU8;
-                case SensorType::Vibration: return SensorFieldType::TypeU8;
-                case SensorType::State: return SensorFieldType::TypeU16;  // Note: 2 bytes (model and state)
+                case SensorType::Humidity: return SensorFieldType::TypeS8;
+                case SensorType::Pressure: return SensorFieldType::TypeS16;
+                case SensorType::Light: return SensorFieldType::TypeS16;
+                case SensorType::CO2: return SensorFieldType::TypeS16;
+                case SensorType::VOC: return SensorFieldType::TypeS16;
+                case SensorType::PM1_0: return SensorFieldType::TypeS16;
+                case SensorType::PM2_5: return SensorFieldType::TypeS16;
+                case SensorType::PM10: return SensorFieldType::TypeS16;
+                case SensorType::Noise: return SensorFieldType::TypeS8;
+                case SensorType::Presence: return SensorFieldType::TypeS8;
+                case SensorType::Distance: return SensorFieldType::TypeS16;
+                case SensorType::UV: return SensorFieldType::TypeS8;
+                case SensorType::CO: return SensorFieldType::TypeS8;
+                case SensorType::Vibration: return SensorFieldType::TypeS8;
+                case SensorType::State: return SensorFieldType::TypeS32;  
                 default: return SensorFieldType::TypeNone;
             }
         }
@@ -125,7 +122,6 @@ namespace ncore
             s32  finalize();  // returns the number of sensor values written
 
             void write_sensor_value(SensorType::Value type, s32 value);
-            void write_sensor_value(SensorType::Value type, u32 value);
         };
 
     }  // namespace nsensor
