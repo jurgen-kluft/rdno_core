@@ -2,7 +2,8 @@
 #include "rdno_core/c_memory.h"
 
 #ifdef TARGET_ESP32
-#    include <Arduino.h>
+#    include "Arduino.h"
+#    include "esp32-hal-psram.h"
 #endif
 
 namespace ncore
@@ -22,5 +23,59 @@ namespace ncore
             to_str(str, (u32)(chipid >> 16), 16);
             to_str(str, (u32)(chipid & 0xFFFF), 16);
         }
+
+        bool init_psram()
+        {
+#ifdef TARGET_ESP32
+            return psramInit();
+#else
+            return true;
+#endif
+        }
+
+        bool has_psram()
+        {
+#ifdef TARGET_ESP32
+            return psramFound();
+#else
+            return true;
+#endif
+        }
+
+        s32   total_psram()
+        {
+#ifdef TARGET_ESP32
+            return (s32)ESP.getPsramSize();
+#else
+            return 32 * 1024 * 1024;  // Assume 32MB for non-ESP32 platforms
+#endif
+        }
+        s32   free_psram()
+        {
+#ifdef TARGET_ESP32
+            return (s32)ESP.getFreePsram();
+#else
+            return (s32)(32 * 1024 * 1024 - malloc_used());  // Assume 32MB for non-ESP32 platforms
+#endif
+        }
+
+        byte* alloc_psram(u32 size)
+        {
+#ifdef TARGET_ESP32
+            return (byte*)ps_malloc(size);
+#else
+            return (byte*)malloc(size);
+#endif
+        }
+
+        void dealloc_psram(byte* ptr)
+        {
+#ifdef TARGET_ESP32
+            free(ptr);  // ps_free does not exist, use free instead
+#else
+            free(ptr);
+#endif
+        }
+
     }  // namespace nsystem
 }  // namespace ncore
