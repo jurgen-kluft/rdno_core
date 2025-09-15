@@ -13,15 +13,26 @@ namespace ncore
             ::pinMode(pin, mode);
         }
 
-        s8 read_pin(s8 pin)
+        s8 read_digital(s8 pin)
         {
             return ::digitalRead(pin);
+        }
+
+        s32 read_analog(s8 pin)
+        {
+            return ::analogRead(pin);
         }
 
         void write_pin(s8 pin, s8 value)
         {
             ::digitalWrite(pin, value);
         }
+
+        void set_wakeup_pin(s8 pin, s8 mode)
+        {
+            ::esp_sleep_enable_ext0_wakeup((gpio_num_t)pin, mode);
+        }
+
     }  // namespace npin
 }  // namespace ncore
 
@@ -33,7 +44,7 @@ namespace ncore
     {
         // GPIO simulation
         static u8 GPIOModes[PinsMax]  = {0};
-        static u8 GPIOValues[PinsMax] = {0};
+        static s32 GPIOValues[PinsMax] = {0};
 
         void set_pinmode(s8 pin, s8 mode)
         {
@@ -43,7 +54,16 @@ namespace ncore
             }
         }
 
-        s8 read_pin(s8 pin)
+        s8 read_digital(s8 pin)
+        {
+            if (is_valid(pin))
+            {
+                return GPIOValues[pin];
+            }
+            return 0;
+        }
+
+        s32 read_analog(s8 pin)
         {
             if (is_valid(pin))
             {
@@ -59,6 +79,12 @@ namespace ncore
                 GPIOValues[pin] = value;
             }
         }
+
+        void set_wakeup_pin(s8 pin, s8 mode)
+        {
+            // Not supported in simulation
+        }
+        
     }  // namespace npin
 }  // namespace ncore
 

@@ -11,8 +11,12 @@ namespace ncore
 
     namespace nsystem
     {
-        void get_unique_id(str_t& str);  // get a unique ID for this device (e.g. chip ID or MAC address)
-    }
-}  // namespace ncore
+        void get_unique_id(str_t& str); // get a unique ID for this device (e.g. chip ID or MAC address)
 
-#endif  // __RDNO_CORE_SYSTEM_H__
+        void start_deepsleep();            // start deep sleep (external wakeup only)
+        void start_deepsleep(u32 seconds); // start deep sleep with a timer wakeup
+
+    } // namespace nsystem
+} // namespace ncore
+
+#endif // __RDNO_CORE_SYSTEM_H__

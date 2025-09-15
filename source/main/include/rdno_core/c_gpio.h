@@ -71,11 +71,17 @@ namespace ncore
 
         // Read reads the value from a specified digital pin, either HIGH or LOW.
         // @see: https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalread/
-        s8 read_pin(s8 pin);
+        s8 read_digital(s8 pin);
+        s32 read_analog(s8 pin);
 
         // Write sets a HIGH or a LOW value to a digital pin.
         // @see: https://docs.arduino.cc/reference/en/language/functions/digital-io/digitalwrite/
-        void write_pin(s8 pin, s8 value);
+        void digital_write(s8 pin, s8 value);
+
+        // Wakeup pin can be used to wake up the device from deep sleep mode.
+        // The pin can be configured to trigger on a HIGH or LOW signal.
+        void set_wakeup_pin(s8 pin, s8 mode);
+
     }  // namespace npin
 }  // namespace ncore
 
