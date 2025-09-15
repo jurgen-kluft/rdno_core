@@ -583,14 +583,56 @@ namespace ncore
         dest.m_const             = dest.m_ascii;
     }
 
-    void to_str(str_t& dest, byte value, s16 base)
+    void to_str(str_t& dest, byte value, s8 chars, s16 base)
     {
         if (dest.m_ascii == nullptr || base < 2 || base > 36)
             return;  // destination is not mutable or invalid base
 
         if (dest.m_eos - dest.m_end < 2)
             return;
-        to_str(dest, (u32)value, base);
+
+        if (base == 16 && chars == 0)
+        {
+            chars = 2;  // Default to 2 characters for hex if not specified
+        }
+        else if (base == 10 && chars == 0)
+        {
+            if (value >= 100)
+                chars = 3;
+            else if (value >= 10)
+                chars = 2;
+            else
+                chars = 1;
+        }
+
+        const s16 begin = dest.m_end;
+        s16       count = 0;
+        do
+        {
+            const u32 digit            = value % base;
+            dest.m_ascii[dest.m_end++] = to_hex_char((u8)digit, false);
+            value /= base;
+            count++;
+        } while (value > 0 && dest.m_end < dest.m_eos && (chars == 0 || count < chars));
+
+        // If a specific number of characters is requested, pad with leading zeros
+        while (chars > 0 && count < chars && dest.m_end < dest.m_eos)
+        {
+            dest.m_ascii[dest.m_end++] = '0';
+            count++;
+        }
+        // Reverse the string portion we just wrote
+        s16 left  = begin;
+        s16 right = dest.m_end - 1;
+        while (left < right)
+        {
+            char temp           = dest.m_ascii[left];
+            dest.m_ascii[left]  = dest.m_ascii[right];
+            dest.m_ascii[right] = temp;
+            left++;
+            right--;
+        }
+        dest.m_ascii[dest.m_end] = '\0';
     }
 
     void to_str(str_t& dest, s32 value, s16 base)

@@ -23,10 +23,10 @@ namespace ncore
             const char ch = iter.m_str < iter.m_end ? iter.m_const[iter.m_str] : '.';
             if (ch == '.')
             {
-                if (partChars == 0 || partChars > 3 ||  partIndex >= 4 || partValue > 255)
-                    return false; // Invalid format or too many parts
+                if (partChars == 0 || partChars > 3 || partIndex >= 4 || partValue > 255)
+                    return false;  // Invalid format or too many parts
                 if ((partValue <= 9 && partChars != 1) || (partValue > 9 && partValue <= 99 && partChars != 2))
-                    return false; // Leading zero is not allowed
+                    return false;  // Leading zero is not allowed
                 outAddr.m_address[partIndex++] = (byte)partValue;
                 partValue                      = 0;
                 partChars                      = 0;
@@ -35,7 +35,7 @@ namespace ncore
             {
                 const byte digit = from_char(ch);
                 if (digit > 9)
-                    return false; // Invalid character
+                    return false;  // Invalid character
                 partValue = partValue * 10 + digit;
                 partChars++;
             }
@@ -58,7 +58,7 @@ namespace ncore
             if (ch == ':')
             {
                 if (partValue > 255 || partChars == 0 || partChars > 2 || partIndex >= 6)
-                    return false; // Invalid format, too little or too many parts
+                    return false;  // Invalid format, too little or too many parts
                 outAddr.m_address[partIndex++] = partValue;
                 partValue                      = 0;
                 partChars                      = 0;
@@ -70,7 +70,7 @@ namespace ncore
             }
             else
             {
-                return false; // Invalid character
+                return false;  // Invalid character
             }
 
             iter.m_str++;
@@ -79,13 +79,39 @@ namespace ncore
         return (partIndex == 6);
     }
 
+    void to_str(str_t& str, const IPAddress_t& address)
+    {
+        to_str(str, (u32)address.m_address[0], 10);
+        str_append(str, ".");
+        to_str(str, (u32)address.m_address[1], 10);
+        str_append(str, ".");
+        to_str(str, (u32)address.m_address[2], 10);
+        str_append(str, ".");
+        to_str(str, (u32)address.m_address[3], 10);
+    }
+
+    void to_str(str_t& str, const MACAddress_t& address)
+    {
+        to_str(str, address.m_address[0], 2, 16);
+        str_append(str, ":");
+        to_str(str, address.m_address[1], 2, 16);
+        str_append(str, ":");
+        to_str(str, address.m_address[2], 2, 16);
+        str_append(str, ":");
+        to_str(str, address.m_address[3], 2, 16);
+        str_append(str, ":");
+        to_str(str, address.m_address[4], 2, 16);
+        str_append(str, ":");
+        to_str(str, address.m_address[5], 2, 16);
+    }
+
     bool is_valid_SSID(str_t const& str)
     {
         str_t iter = str;
         while (iter.m_str < iter.m_end)
         {
             const char ch = iter.m_const[iter.m_str];
-            if (ch < 32 || ch > 126) // Printable ASCII range
+            if (ch < 32 || ch > 126)  // Printable ASCII range
                 return false;
             iter.m_str++;
         }
@@ -99,7 +125,7 @@ namespace ncore
         while (iter.m_str < iter.m_end)
         {
             const char ch = iter.m_const[iter.m_str];
-            if (ch < 32 || ch > 126) // Printable ASCII range
+            if (ch < 32 || ch > 126)  // Printable ASCII range
                 return false;
             iter.m_str++;
         }
@@ -113,9 +139,6 @@ namespace ncore
         return from_string(str, addr);
     }
 
-    bool is_valid_port(s32 port)
-    {
-        return port > 1023 && port <= 65535;
-    }
+    bool is_valid_port(s32 port) { return port > 1023 && port <= 65535; }
 
-} // namespace ncore
+}  // namespace ncore

@@ -28,7 +28,7 @@ namespace ncore
 
         void print(const s32 val)
         {
-            char strBuffer[16];
+            char  strBuffer[16];
             str_t str = str_mutable(strBuffer, sizeof(strBuffer));
             to_str(str, val, 10);
             Serial.print(str.m_const);
@@ -38,7 +38,7 @@ namespace ncore
         {
             if (hex)
             {
-                char strBuffer[11];  // "0x" + 8 hex digits + null terminator
+                char  strBuffer[11];  // "0x" + 8 hex digits + null terminator
                 str_t str = str_mutable(strBuffer, sizeof(strBuffer));
                 str_append(str, "0x");
                 to_str(str, val, 16);
@@ -46,7 +46,7 @@ namespace ncore
             }
             else
             {
-                char strBuffer[12];  // Max 10 digits for u32 + null terminator
+                char  strBuffer[12];  // Max 10 digits for u32 + null terminator
                 str_t str = str_mutable(strBuffer, sizeof(strBuffer));
                 to_str(str, val, 10);
                 Serial.print(str.m_const);
@@ -55,28 +55,18 @@ namespace ncore
 
         void print(const IPAddress_t& address)
         {
-            Serial.print((unsigned int)address.m_address[0]);
-            Serial.print(".");
-            Serial.print((unsigned int)address.m_address[1]);
-            Serial.print(".");
-            Serial.print((unsigned int)address.m_address[2]);
-            Serial.print(".");
-            Serial.print((unsigned int)address.m_address[3]);
+            char  strBuffer[20];
+            str_t str = str_mutable(strBuffer, sizeof(strBuffer));
+            to_str(str, address);
+            Serial.print(str.m_const);
         }
 
-        void print(const MACAddress_t& address)
+        void print(const MACAddress_t& mac)
         {
-            Serial.print((unsigned int)address.m_address[0]);
-            Serial.print(":");
-            Serial.print((unsigned int)address.m_address[1]);
-            Serial.print(":");
-            Serial.print((unsigned int)address.m_address[2]);
-            Serial.print(":");
-            Serial.print((unsigned int)address.m_address[3]);
-            Serial.print(":");
-            Serial.print((unsigned int)address.m_address[4]);
-            Serial.print(":");
-            Serial.print((unsigned int)address.m_address[5]);
+            char  strBuffer[20];
+            str_t str = str_mutable(strBuffer, sizeof(strBuffer));
+            to_str(str, mac);
+            Serial.print(str.m_const);
         }
 
         // Println prints data to the serial port as human-readable ASCII text followed by a
