@@ -10,7 +10,11 @@ namespace ncore
     {
         void set_pinmode(s8 pin, s8 mode)
         {
-            ::pinMode(pin, mode);
+            switch (mode)
+            {
+                case ModeInput: ::pinMode(pin, INPUT); break;
+                case ModeOutput: ::pinMode(pin, OUTPUT); break;
+            }
         }
 
         s8 read_digital(s8 pin)

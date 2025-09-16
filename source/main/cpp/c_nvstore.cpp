@@ -333,7 +333,7 @@ namespace ncore
 
                 str_index                  = config->m_param_values[PARAM_ID_STRING_COUNT];
                 config->m_param_types[id]  = PARAM_TYPE_STRING;
-                config->m_param_values[id] = (str_index * PARAM_ID_STRING_MAX_LENGTH) + str_len(str);
+                config->m_param_values[id] = (str_index << 8) | str_len(str);
                 config->m_param_values[PARAM_ID_STRING_COUNT] += 1;
             }
             else
@@ -355,8 +355,8 @@ namespace ncore
             if (config->m_param_types[id] != PARAM_TYPE_STRING)
                 return false;
             s32 const str_value  = config->m_param_values[id];
-            s32 const str_index  = str_value / PARAM_ID_STRING_MAX_LENGTH;
-            s32 const str_length = str_value & (PARAM_ID_STRING_MAX_LENGTH - 1);
+            s32 const str_index  = str_value >> 8;
+            s32 const str_length = str_value & 0xFF;
             if (str_index < 0 || str_index >= config->m_param_values[PARAM_ID_STRING_COUNT])
                 return false;
             outStr = str_const_n(&config->m_strings[str_index * PARAM_ID_STRING_MAX_LENGTH], str_length);

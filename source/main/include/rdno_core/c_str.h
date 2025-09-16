@@ -7,8 +7,6 @@
 
 namespace ncore
 {
-    // reference: github, maxim2266/str
-
     // -------------------------------------------------------------------------------
     // character functions
     // '0' = 0x30, '9' = 0x39, 'A' = 0x41, 'Z' = 0x5A, 'a' = 0x61, 'z' = 0x7A
