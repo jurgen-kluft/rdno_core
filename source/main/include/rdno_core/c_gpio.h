@@ -1,5 +1,5 @@
-#ifndef __RDNO_CORE_DIO_H__
-#define __RDNO_CORE_DIO_H__
+#ifndef __RDNO_CORE_GPIO_H__
+#define __RDNO_CORE_GPIO_H__
 #include "rdno_core/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
@@ -9,7 +9,7 @@
 
 namespace ncore
 {
-    namespace npin
+    namespace ngpio
     {
         const s8 High       = 1;
         const s8 Low        = 0;
@@ -80,9 +80,9 @@ namespace ncore
 
         // Wakeup pin can be used to wake up the device from deep sleep mode.
         // The pin can be configured to trigger on a HIGH or LOW signal.
-        void set_wakeup_pin(s8 pin, s8 mode);
+        void set_wakeup_pin(s8 pin, s8 trigger);
 
     }  // namespace npin
 }  // namespace ncore
 
-#endif  // __RDNO_CORE_DIO_H__
+#endif  // __RDNO_CORE_GPIO_H__

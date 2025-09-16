@@ -1,4 +1,4 @@
-#include "rdno_core/c_dio.h"
+#include "rdno_core/c_gpio.h"
 
 #ifdef TARGET_ESP32
 
@@ -6,7 +6,7 @@
 
 namespace ncore
 {
-    namespace npin
+    namespace ngpio
     {
         void set_pinmode(s8 pin, s8 mode)
         {
@@ -28,19 +28,23 @@ namespace ncore
             ::digitalWrite(pin, value);
         }
 
-        void set_wakeup_pin(s8 pin, s8 mode)
+        void set_wakeup_pin(s8 pin, s8 trigger)
         {
-            ::esp_sleep_enable_ext0_wakeup((gpio_num_t)pin, mode);
+            switch (trigger)
+            {
+                case High : ::esp_deep_sleep_enable_gpio_wakeup((gpio_num_t)pin, ESP_GPIO_WAKEUP_GPIO_HIGH);
+                case Low : ::esp_deep_sleep_enable_gpio_wakeup((gpio_num_t)pin, ESP_GPIO_WAKEUP_GPIO_LOW);
+            }
         }
 
-    }  // namespace npin
+    }  // namespace ngpio
 }  // namespace ncore
 
 #else
 
 namespace ncore
 {
-    namespace npin
+    namespace ngpio
     {
         // GPIO simulation
         static u8 GPIOModes[PinsMax]  = {0};
@@ -85,7 +89,7 @@ namespace ncore
             // Not supported in simulation
         }
         
-    }  // namespace npin
+    }  // namespace ngpio
 }  // namespace ncore
 
 #endif
