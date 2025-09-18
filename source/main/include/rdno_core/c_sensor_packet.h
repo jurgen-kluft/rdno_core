@@ -76,7 +76,7 @@ namespace ncore
                 case SensorType::UV: return SensorFieldType::TypeS8;
                 case SensorType::CO: return SensorFieldType::TypeS8;
                 case SensorType::Vibration: return SensorFieldType::TypeS8;
-                case SensorType::State: return SensorFieldType::TypeS32;  
+                case SensorType::State: return SensorFieldType::TypeS32;
                 default: return SensorFieldType::TypeNone;
             }
         }
@@ -85,9 +85,8 @@ namespace ncore
         // Packet structure
         // {
         //     u8 length;   // Number of u32 in the packet
-        //     u8 sequence; // Sequence number of the packet
-        //     u8 version;  // Version of the packet structure
-        //     
+        //     u8 time[3];  // Time sync of the packet (bit 23 indicates if this packet was sent immediately upon creation)
+        //
         //     // sensor value 1
         //     u8 type;     // SensorType (also implies sensor field type)
         //     One of the following:
@@ -98,7 +97,7 @@ namespace ncore
         //         - s32 s32_value;
         //         - u32 u32_value;
         //     // sensor value 2
-        //     // ... 
+        //     // ...
         //     Padding to align packet size to 2 bytes
         // };
 
@@ -111,14 +110,12 @@ namespace ncore
             enum
             {
                 // Packet header
-                HeaderSize     = 1 + 1 + 1 + 1,  // length, sequence, version, location
-                LengthOffset   = 0,
-                SequenceOffset = 1,
-                VersionOffset  = 2,
-                LocationOffset = 3,
+                HeaderSize   = 1 + 3,  // length, time
+                LengthOffset = 0,
+                TimeOffset   = 1,
             };
 
-            void begin(u8 sequence, u8 version);
+            void begin(u32 time_ms, bool immediate=true);
             s32  finalize();  // returns the number of sensor values written
 
             void write_sensor_value(SensorType::Value type, s32 value);

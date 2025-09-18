@@ -72,7 +72,11 @@ namespace ncore
         // Println prints data to the serial port as human-readable ASCII text followed by a
         // carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void println(const char* val) { Serial.println(val); }
+        void println(const char* val) 
+        { 
+            // Prints the string followed by a newline
+            Serial.println(val); 
+        }
 
     }  // namespace nserial
 

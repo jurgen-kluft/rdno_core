@@ -6,7 +6,7 @@
 //     s32  Size;
 //     s32  Capacity;
 
-//     void begin(u16 sequence, u8 version);
+//     void begin(u32 time_ms);
 //     void write_sensor_value(SensorType::Value type,  s32 value);
 //     s32 finalize();
 // };
@@ -14,13 +14,16 @@ namespace ncore
 {
     namespace nsensor
     {
-        void SensorPacket_t::begin(u8 sequence, u8 version)
+        void SensorPacket_t::begin(u32 time_ms, bool immediate)
         {
-            Size         = 0;
-            Capacity     = sizeof(Data);  // Maximum size of the packet
-            Data[Size++] = 0;             // Placeholder for length (will be set in finalize), will count sensor values
-            Data[Size++] = sequence;      // Sequence number
-            Data[Size++] = version;       // Version number
+            Size         = 0;                                             //
+            Capacity     = sizeof(Data);                                  // Maximum size of the packet
+            Data[Size++] = 0;                                             // Placeholder for length (will be set in finalize), will count sensor values
+            Data[Size++] = time_ms & 0xFF;                                // Time sync (3 bytes)
+            time_ms      = time_ms >> 8;                                  //
+            Data[Size++] = time_ms & 0xFF;                                //
+            time_ms      = time_ms >> 8;                                  //
+            Data[Size++] = (time_ms & 0x7F) | (immediate ? 0x80 : 0x00);  // Bit 23 indicates if this packet was sent immediately upon creation
         }
 
         s32 SensorPacket_t::finalize()

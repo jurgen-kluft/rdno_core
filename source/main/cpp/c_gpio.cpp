@@ -1,7 +1,6 @@
 #include "rdno_core/c_gpio.h"
 
 #ifdef TARGET_ESP32
-
 #include "Arduino.h"
 
 namespace ncore
@@ -34,11 +33,11 @@ namespace ncore
 
         void set_wakeup_pin(s8 pin, s8 trigger)
         {
-            switch (trigger)
-            {
-                case High : ::esp_deep_sleep_enable_gpio_wakeup((gpio_num_t)pin, ESP_GPIO_WAKEUP_GPIO_HIGH);
-                case Low : ::esp_deep_sleep_enable_gpio_wakeup((gpio_num_t)pin, ESP_GPIO_WAKEUP_GPIO_LOW);
-            }
+            // switch (trigger)
+            // {
+            //     case High : ::esp_deep_sleep_enable_gpio_wakeup((gpio_num_t)pin, ESP_GPIO_WAKEUP_GPIO_HIGH);
+            //     case Low : ::esp_deep_sleep_enable_gpio_wakeup((gpio_num_t)pin, ESP_GPIO_WAKEUP_GPIO_LOW);
+            // }
         }
 
     }  // namespace ngpio

@@ -81,7 +81,7 @@ namespace ncore
         void start_deepsleep()            // start deep sleep (external wakeup only)
         {
 #ifdef TARGET_ESP32
-            esp_deep_sleep_start(); 
+            //esp_deep_sleep_start(); 
 #else
             // For non-ESP32 platforms, we can just simulate deep sleep by halting execution
 #endif
@@ -90,8 +90,8 @@ namespace ncore
         void start_deepsleep(u32 seconds) // start deep sleep with a timer wakeup
         {
 #ifdef TARGET_ESP32
-            esp_sleep_enable_timer_wakeup((uint64_t)seconds * 1000000);
-            esp_deep_sleep_start();
+            //esp_sleep_enable_timer_wakeup((uint64_t)seconds * 1000000);
+            //esp_deep_sleep_start();
 #else
             // For non-ESP32 platforms, we can just simulate deep sleep by halting execution
 #endif
