@@ -22,6 +22,11 @@ namespace ncore
         {
             ::delay(ms);
         }
+
+        void delay_us(u32 us)
+        {
+            ::delayMicroseconds(us);
+        }
     }  // namespace ntimer
 }  // namespace ncore
 
@@ -47,6 +52,11 @@ namespace ncore
         void delay(u32 ms)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+        }
+
+        void delay_us(u32 us)
+        {
+            std::this_thread::sleep_for(std::chrono::microseconds(us));
         }
     }  // namespace ntimer
 }  // namespace ncore

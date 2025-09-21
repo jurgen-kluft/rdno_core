@@ -25,6 +25,7 @@ namespace ncore
             Rate38400  = 38400,
             Rate57600  = 57600,
             Rate115200 = 115200,
+            Rate256000  = 256000,
         };
     }
     namespace nconfig
@@ -54,6 +55,7 @@ namespace ncore
         void println(const char* val);
         void write(const byte* data, s32 length);
         s32  read_until(char terminator, char* outString, s32 outMaxLength);
+        s32  read_bytes(byte* outData, s32 outMaxLength);
     }  // namespace nserial1
 
     namespace nserial2

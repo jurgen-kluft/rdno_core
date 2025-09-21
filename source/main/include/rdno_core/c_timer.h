@@ -15,6 +15,7 @@ namespace ncore
         // Delay waits for n milliseconds before resuming execution.
         // @see: https://docs.arduino.cc/language-reference/en/functions/time/delay/
         void delay(u32 ms);
+        void delay_us(u32 us);
     }  // namespace ntimer
 }  // namespace ncore
 

@@ -30,22 +30,23 @@ namespace ncore
         namespace SensorType
         {
             typedef u8  Value;
-            const Value Temperature = 0x00;  // (s8, °C)
-            const Value Humidity    = 0x01;  // (u8, %)
-            const Value Pressure    = 0x02;  // (u16, hPa)
-            const Value Light       = 0x03;  // (u16, lux)
-            const Value CO2         = 0x04;  // (u16, ppm)
-            const Value VOC         = 0x05;  // (u16, ppm)
-            const Value PM1_0       = 0x06;  // (u16, µg/m3)
-            const Value PM2_5       = 0x07;  // (u16, µg/m3)
-            const Value PM10        = 0x08;  // (u16, µg/m3)
-            const Value Noise       = 0x09;  // (u8, dB)
-            const Value Presence    = 0x0A;  // (u8, 0=none, 1-8=target ID)
-            const Value Distance    = 0x0B;  // (u16, cm)
-            const Value UV          = 0x0C;  // (u8, index)
-            const Value CO          = 0x0D;  // (u16, ppm/10)
-            const Value Vibration   = 0x0E;  // (u8, 0=none, 1=low, 2=medium, 3=high)
-            const Value State       = 0x0F;  // (u16 (u8[2]), sensor model, sensor state)
+            const Value Unknown     = 0x00;
+            const Value Temperature = 0x01;  // (s8, °C)
+            const Value Humidity    = 0x02;  // (u8, %)
+            const Value Pressure    = 0x03;  // (u16, hPa)
+            const Value Light       = 0x04;  // (u16, lux)
+            const Value CO2         = 0x05;  // (u16, ppm)
+            const Value VOC         = 0x06;  // (u16, ppm)
+            const Value PM1_0       = 0x07;  // (u16, µg/m3)
+            const Value PM2_5       = 0x08;  // (u16, µg/m3)
+            const Value PM10        = 0x09;  // (u16, µg/m3)
+            const Value Noise       = 0x0A;  // (u8, dB)
+            const Value Presence    = 0x0B;  // (u8, 0=none, 1-8=target ID)
+            const Value Distance    = 0x0C;  // (u16, cm)
+            const Value UV          = 0x0D;  // (u8, index)
+            const Value CO          = 0x0E;  // (u16, ppm/10)
+            const Value Vibration   = 0x0F;  // (u8, 0=none, 1=low, 2=medium, 3=high)
+            const Value State       = 0x10;  // (u16 (u8[2]), sensor model, sensor state)
         };  // namespace SensorType
 
         namespace SensorFieldType
@@ -84,22 +85,24 @@ namespace ncore
         // Note: Little Endian byte order
         // Packet structure
         // {
-        //     u8 length;   // Number of u32 in the packet
-        //     u8 time[3];  // Time sync of the packet (bit 23 indicates if this packet was sent immediately upon creation)
+        //     u8 length;       // Number of u32 in the packet
+        //     u8 version;      // Packet version (currently 1)
+        //     u8 timesync[4];  // Time sync of the packet (bit 31 indicates if this packet is a time sync packet)
         //
         //     // sensor value 1
-        //     u8 type;     // SensorType (also implies sensor field type)
-        //     One of the following:
-        //         - s8  s8_value;
-        //         - u8  u8_value;
-        //         - s16 s16_value;
-        //         - u16 u16_value;
-        //         - s32 s32_value;
-        //         - u32 u32_value;
+        //     u8 type;           // SensorType (also implies sensor field type)
+        //     s8|s16|s32 value;  // Sensor value (size depends on sensor type)
+        //  
         //     // sensor value 2
-        //     // ...
+        //     u8 type;           // SensorType (also implies sensor field type)
+        //     s8|s16|s32 value;  // Sensor value (size depends on sensor type)
+        //
+        //     ...
+        //
         //     Padding to align packet size to 2 bytes
         // };
+
+        const u8 SensorPacket_Version = 1;
 
         struct SensorPacket_t
         {
@@ -110,12 +113,16 @@ namespace ncore
             enum
             {
                 // Packet header
-                HeaderSize   = 1 + 3,  // length, time
-                LengthOffset = 0,
-                TimeOffset   = 1,
+                HeaderSize    = 1 + 1 + 4,  // length, version, time-sync
+                LengthOffset  = 0,
+                VersionOffset = 1,
+                TimeOffset    = 2,
             };
 
-            void begin(u32 time_ms, bool immediate=true);
+            // Periodically it is recommended to send a packet with the time_sync flag set to true
+            // This allows the receiver to resync its reference time with the sender.
+            // Note: Upon connecting to the remote, the first packet should always have time_sync=true
+            void begin(u32 time_ms, bool time_sync = true);
             s32  finalize();  // returns the number of sensor values written
 
             void write_sensor_value(SensorType::Value type, s32 value);

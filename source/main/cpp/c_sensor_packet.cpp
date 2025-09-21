@@ -5,8 +5,7 @@
 //     byte Data[128];
 //     s32  Size;
 //     s32  Capacity;
-
-//     void begin(u32 time_ms);
+//     void begin(u32 time_ms, bool time_sync = true);
 //     void write_sensor_value(SensorType::Value type,  s32 value);
 //     s32 finalize();
 // };
@@ -14,16 +13,19 @@ namespace ncore
 {
     namespace nsensor
     {
-        void SensorPacket_t::begin(u32 time_ms, bool immediate)
+        void SensorPacket_t::begin(u32 time_ms, bool time_sync)
         {
             Size         = 0;                                             //
             Capacity     = sizeof(Data);                                  // Maximum size of the packet
             Data[Size++] = 0;                                             // Placeholder for length (will be set in finalize), will count sensor values
-            Data[Size++] = time_ms & 0xFF;                                // Time sync (3 bytes)
+            Data[Size++] = SensorPacket_Version;                          // Packet version
+            Data[Size++] = time_ms & 0xFF;                                // Time sync (4 bytes)
+            time_ms      = time_ms >> 8;                                  // 
+            Data[Size++] = time_ms & 0xFF;                                //
             time_ms      = time_ms >> 8;                                  //
             Data[Size++] = time_ms & 0xFF;                                //
             time_ms      = time_ms >> 8;                                  //
-            Data[Size++] = (time_ms & 0x7F) | (immediate ? 0x80 : 0x00);  // Bit 23 indicates if this packet was sent immediately upon creation
+            Data[Size++] = (time_ms & 0x7F) | (time_sync ? 0x80 : 0x00);  // Bit 31 indicates if this packet is a time sync packet
         }
 
         s32 SensorPacket_t::finalize()

@@ -1,3 +1,4 @@
+#include "rdno_core/c_log.h"
 #include "rdno_core/c_serial.h"
 #include "rdno_core/c_timer.h"
 #include "rdno_core/c_str.h"
@@ -72,10 +73,10 @@ namespace ncore
         // Println prints data to the serial port as human-readable ASCII text followed by a
         // carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void println(const char* val) 
-        { 
+        void println(const char* val)
+        {
             // Prints the string followed by a newline
-            Serial.println(val); 
+            Serial.println(val);
         }
 
     }  // namespace nserial
@@ -96,6 +97,8 @@ namespace ncore
             {
                 Serial1.begin(baud, configValue, rxPin, txPin);
             }
+#    else
+            nlog::error("nserial1::begin: Serial1 not available on this platform.");
 #    endif
         }
 
@@ -103,8 +106,10 @@ namespace ncore
         {
 #    if SOC_UART_NUM > 1
             return Serial1.available();
-#    endif
+#    else
+            nlog::error("nserial1::available: Serial1 not available on this platform.");
             return 0;  // Invalid port
+#    endif
         }
 
         // Print prints data to the serial port as human-readable ASCII text.
@@ -113,6 +118,8 @@ namespace ncore
         {
 #    if SOC_UART_NUM > 1
             Serial1.print(val);
+#    else
+            nlog::error("nserial1::print: Serial1 not available on this platform.");
 #    endif
         }
 
@@ -123,6 +130,8 @@ namespace ncore
         {
 #    if SOC_UART_NUM > 1
             Serial1.println(val);
+#    else
+            nlog::error("nserial1::println: Serial1 not available on this platform.");
 #    endif
         }
 
@@ -132,6 +141,8 @@ namespace ncore
         {
 #    if SOC_UART_NUM > 1
             Serial1.write(data, length);
+#    else
+            nlog::error("nserial1::write: Serial1 not available on this platform.");
 #    endif
         }
 
@@ -141,9 +152,23 @@ namespace ncore
             s32 n = 0;
 #    if SOC_UART_NUM > 1
             n = Serial1.readBytesUntil(terminator, outString, outMaxLength);
+#    else
+            nlog::error("nserial1::read_until: Serial1 not available on this platform.");
 #    endif
             return n;
         }
+
+        s32 read_bytes(byte* outData, s32 outMaxLength)
+        {
+            s32 n = 0;
+#    if SOC_UART_NUM > 1
+            n = (s32)Serial1.readBytes(outData, outMaxLength);
+#    else
+            nlog::error("nserial1::read_bytes: Serial1 not available on this platform.");
+#    endif
+            return n;
+        }
+
     }  // namespace nserial1
 
     namespace nserial2
@@ -162,6 +187,8 @@ namespace ncore
             {
                 Serial2.begin(baud, configValue, rxPin, txPin);
             }
+#    else
+            nlog::error("nserial2::begin: Serial2 not available on this platform.");
 #    endif
         }
 
@@ -170,6 +197,7 @@ namespace ncore
 #    if SOC_UART_NUM > 2
             return Serial2.available();
 #    else
+            nlog::error("nserial2::available: Serial2 not available on this platform.");
             return 0;
 #    endif
         }
@@ -180,6 +208,8 @@ namespace ncore
         {
 #    if SOC_UART_NUM > 2
             Serial2.print(val);
+#    else
+            nlog::error("nserial2::print: Serial2 not available on this platform.");
 #    endif
         }
 
@@ -190,6 +220,8 @@ namespace ncore
         {
 #    if SOC_UART_NUM > 2
             Serial2.println(val);
+#    else
+            nlog::error("nserial2::println: Serial2 not available on this platform.");
 #    endif
         }
 
@@ -199,6 +231,8 @@ namespace ncore
         {
 #    if SOC_UART_NUM > 2
             Serial2.write(data, length);
+#    else
+            nlog::error("nserial2::write: Serial2 not available on this platform.");
 #    endif
         }
 
@@ -208,6 +242,7 @@ namespace ncore
 #    if SOC_UART_NUM > 2
             return Serial2.readBytesUntil(terminator, outString, outMaxLength);
 #    else
+            nlog::error("nserial2::read_until: Serial2 not available on this platform.");
             return 0;
 #    endif
         }
@@ -217,6 +252,8 @@ namespace ncore
             s32 n = 0;
 #    if SOC_UART_NUM > 2
             n = (s32)Serial2.readBytes(outData, outMaxLength);
+#    else
+            nlog::error("nserial2::read_bytes: Serial2 not available on this platform.");
 #    endif
             return n;
         }
