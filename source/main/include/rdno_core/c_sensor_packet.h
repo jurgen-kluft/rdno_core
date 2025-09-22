@@ -47,15 +47,23 @@ namespace ncore
             const Value CO          = 0x0E;  // (u16, ppm/10)
             const Value Vibration   = 0x0F;  // (u8, 0=none, 1=low, 2=medium, 3=high)
             const Value State       = 0x10;  // (u16 (u8[2]), sensor model, sensor state)
+            const Value MacAddress  = 0x11;  // (u64 (u8[8]), MAC address)
         };  // namespace SensorType
 
         namespace SensorFieldType
         {
             typedef s8  Value;
             const Value TypeNone = 0x00;
+            const Value TypeBit  = 0x01;
             const Value TypeS8   = 0x08;
             const Value TypeS16  = 0x10;
             const Value TypeS32  = 0x20;
+            const Value TypeS64  = 0x40;
+            const Value TypeU8   = 0x88;
+            const Value TypeU16  = 0x90;
+            const Value TypeU32  = 0xA0;
+            const Value TypeU64  = 0xC0;
+
         }  // namespace SensorFieldType
 
         inline SensorFieldType::Value ToSensorFieldType(const SensorType::Value type)
@@ -78,6 +86,7 @@ namespace ncore
                 case SensorType::CO: return SensorFieldType::TypeS8;
                 case SensorType::Vibration: return SensorFieldType::TypeS8;
                 case SensorType::State: return SensorFieldType::TypeS32;
+                case SensorType::MacAddress: return SensorFieldType::TypeU64;
                 default: return SensorFieldType::TypeNone;
             }
         }
@@ -87,12 +96,13 @@ namespace ncore
         // {
         //     u8 length;       // Number of u32 in the packet
         //     u8 version;      // Packet version (currently 1)
+        //     u16 id;          // Fixed Id 0xA5C3
         //     u8 timesync[4];  // Time sync of the packet (bit 31 indicates if this packet is a time sync packet)
         //
         //     // sensor value 1
         //     u8 type;           // SensorType (also implies sensor field type)
         //     s8|s16|s32 value;  // Sensor value (size depends on sensor type)
-        //  
+        //
         //     // sensor value 2
         //     u8 type;           // SensorType (also implies sensor field type)
         //     s8|s16|s32 value;  // Sensor value (size depends on sensor type)
@@ -104,7 +114,7 @@ namespace ncore
 
         const u8 SensorPacket_Version = 1;
 
-        struct SensorPacket_t
+        struct sensorpacket_t
         {
             byte Data[512];
             s32  Size;
@@ -113,10 +123,11 @@ namespace ncore
             enum
             {
                 // Packet header
-                HeaderSize    = 1 + 1 + 4,  // length, version, time-sync
+                HeaderSize    = 1 + 1 + 2 + 4,  // length, version, id, time-sync
                 LengthOffset  = 0,
                 VersionOffset = 1,
-                TimeOffset    = 2,
+                IdOffset      = 2,
+                TimeOffset    = 4,
             };
 
             // Periodically it is recommended to send a packet with the time_sync flag set to true
@@ -125,7 +136,7 @@ namespace ncore
             void begin(u32 time_ms, bool time_sync = true);
             s32  finalize();  // returns the number of sensor values written
 
-            void write_sensor_value(SensorType::Value type, s32 value);
+            void write_sensor_value(SensorType::Value type, u64 value);
         };
 
     }  // namespace nsensor
