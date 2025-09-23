@@ -86,18 +86,45 @@ namespace ncore
                 esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
                 switch (cause)
                 {
-                    case ESP_SLEEP_WAKEUP_EXT0: return REASON_EXT0;
-                    case ESP_SLEEP_WAKEUP_EXT1: return REASON_EXT1;
-                    case ESP_SLEEP_WAKEUP_TIMER: return REASON_TIMER;
-                    case ESP_SLEEP_WAKEUP_TOUCHPAD: return REASON_TOUCHPAD;
-                    case ESP_SLEEP_WAKEUP_ULP: return REASON_ULP;
-                    case ESP_SLEEP_WAKEUP_GPIO: return REASON_GPIO;
-                    case ESP_SLEEP_WAKEUP_UNDEFINED: return REASON_UNDEFINED;
-                    default: return REASON_UNDEFINED;
+                    case ESP_SLEEP_WAKEUP_UNDEFINED: return REASON_WAKEUP_UNDEFINED;
+                    case ESP_SLEEP_WAKEUP_EXT0: return REASON_WAKEUP_EXT0;
+                    case ESP_SLEEP_WAKEUP_EXT1: return REASON_WAKEUP_EXT1;
+                    case ESP_SLEEP_WAKEUP_TIMER: return REASON_WAKEUP_TIMER;
+                    case ESP_SLEEP_WAKEUP_TOUCHPAD: return REASON_WAKEUP_TOUCHPAD;
+                    case ESP_SLEEP_WAKEUP_ULP: return REASON_WAKEUP_ULP;
+                    case ESP_SLEEP_WAKEUP_GPIO: return REASON_WAKEUP_GPIO;
+                    case ESP_SLEEP_WAKEUP_UART: return REASON_WAKEUP_UART;
+                    case ESP_SLEEP_WAKEUP_WIFI: return REASON_WAKEUP_WIFI;
+                    case ESP_SLEEP_WAKEUP_COCPU: return REASON_WAKEUP_COCPU;
+                    case ESP_SLEEP_WAKEUP_COCPU_TRAP_TRIG: return REASON_WAKEUP_COCPU_TRAP_TRIG;
+                    case ESP_SLEEP_WAKEUP_BT: return REASON_WAKEUP_BT;
+                    default: break;
                 }
 #endif
-                return REASON_UNDEFINED;  // For non-ESP32 platforms, we return undefined
+                return REASON_WAKEUP_UNDEFINED;
             }
+
+            const char* to_string(reason_t reason)
+            {
+                switch (reason)
+                {
+                    case REASON_WAKEUP_EXT0: return "Wakeup caused by external signal using RTC_IO";
+                    case REASON_WAKEUP_EXT1: return "Wakeup caused by external signal using RTC_CNTL";
+                    case REASON_WAKEUP_TIMER: return "Wakeup caused by timer";
+                    case REASON_WAKEUP_TOUCHPAD: return "Wakeup caused by touchpad";
+                    case REASON_WAKEUP_ULP: return "Wakeup caused by ULP program";
+                    case REASON_WAKEUP_GPIO: return "Wakeup caused by GPIO (light sleep only)";
+                    case REASON_WAKEUP_UART: return "Wakeup caused by UART (light sleep only)";
+                    case REASON_WAKEUP_WIFI: return "Wakeup caused by WIFI (light sleep only)";
+                    case REASON_WAKEUP_COCPU: return "Wakeup caused by COCPU int";
+                    case REASON_WAKEUP_COCPU_TRAP_TRIG: return "Wakeup caused by COCPU crash";
+                    case REASON_WAKEUP_BT: return "Wakeup caused by BT (light sleep only)";
+                    case REASON_WAKEUP_UNDEFINED:
+                    default:
+                }
+                return "Wakeup was not caused by deep sleep";
+            }
+
         }  // namespace nwakeup
 
         void start_deepsleep()  // start deep sleep (external wakeup only)
