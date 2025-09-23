@@ -11,7 +11,7 @@ namespace ncore
 {
     namespace nlog
     {
-        namespace nlog_level
+        namespace nlevel
         {
             typedef s8 value_t;
 
@@ -25,15 +25,15 @@ namespace ncore
             const value_t All   = Fatal | Error | Warn | Info | Debug | Trace;
         }
 
-        void set_level(nlog_level::value_t level);
+        void set_level(nlevel::value_t level);
         
-        void log_fatal(const char* msg);
-        void log_error(const char* msg);
-        void log_warn(const char* msg);
-        void log_info(const char* msg);
-        void log_debug(const char* msg);
-        void log_trace(const char* msg);
-        void log_flush();
+        void fatal(const char* msg);
+        void error(const char* msg);
+        void warn(const char* msg);
+        void info(const char* msg);
+        void debug(const char* msg);
+        void trace(const char* msg);
+        void flush();
 
     }  // namespace nserial
 

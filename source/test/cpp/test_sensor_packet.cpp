@@ -1,6 +1,6 @@
 #include "rdno_core/c_target.h"
 #include "rdno_core/c_allocator.h"
-#include "rdno_core/c_sensor_packet.h"
+#include "rdno_core/c_packet.h"
 
 #include "cunittest/cunittest.h"
 
@@ -20,8 +20,8 @@ UNITTEST_SUITE_BEGIN(sensor_packet)
 			packet.begin(1, 1, DeviceLocation::Bedroom | DeviceLocation::Location1);
 
 			// Write sensor values
-			packet.write_sensor_value(SensorType::Temperature,  (s8)25);
-			packet.write_sensor_value(SensorType::Humidity,  (s16)60);
+			packet.write_value(SensorType::Temperature,  (s8)25);
+			packet.write_value(SensorType::Humidity,  (s16)60);
 
 			// Finalize the packet
 			CHECK_EQUAL(2, packet.finalize());

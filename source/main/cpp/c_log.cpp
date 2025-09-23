@@ -11,67 +11,67 @@ namespace ncore
     namespace nlog
     {
         // Note disable all logging in final builds
-        nlog_level::value_t gLogLevel = nlog_level::All;
+        nlevel::value_t gLogLevel = nlevel::All;
 
-        char                gLogLineBuffer[256];
-        str_t               gLogLineStr   = {gLogLineBuffer, gLogLineBuffer, 0, 0, (s16)sizeof(gLogLineBuffer) - 1};
-        nlog_level::value_t gLogLineLevel = nlog_level::Info;
+        char            gLogLineBuffer[256];
+        str_t           gLogLineStr   = {gLogLineBuffer, gLogLineBuffer, 0, 0, (s16)sizeof(gLogLineBuffer) - 1};
+        nlevel::value_t gLogLineLevel = nlevel::Info;
 
-        void set_level(nlog_level::value_t level) { gLogLevel = level; }
+        void set_level(nlevel::value_t level) { gLogLevel = level; }
 
-        static inline bool is_level_active(nlog_level::value_t level) { return (gLogLevel & level) != 0; }
+        static inline bool is_level_active(nlevel::value_t level) { return (gLogLevel & level) != 0; }
 
-        void log_flush()
+        void flush()
         {
-            if (gLogLineLevel != nlog_level::Off)
+            if (gLogLineLevel != nlevel::Off)
             {
                 Serial.println(gLogLineBuffer);
                 gLogLineBuffer[0] = 0;
                 gLogLineStr.m_str = 0;
                 gLogLineStr.m_end = 0;
-                gLogLineLevel     = nlog_level::Off;
+                gLogLineLevel     = nlevel::Off;
             }
         }
 
-        void log_fatal(const char* msg) 
-        { 
-            log_flush(); 
-            gLogLineLevel = nlog_level::Fatal;
+        void fatal(const char* msg)
+        {
+            flush();
+            gLogLineLevel = nlevel::Fatal;
             str_append(gLogLineStr, "[FATAL] ");
             str_append(gLogLineStr, msg);
         }
-        void log_error(const char* msg)
+        void error(const char* msg)
         {
-            log_flush(); 
-            gLogLineLevel = nlog_level::Error;
+            flush();
+            gLogLineLevel = nlevel::Error;
             str_append(gLogLineStr, "[ERROR] ");
             str_append(gLogLineStr, msg);
         }
-        void log_warn(const char* msg)
+        void warn(const char* msg)
         {
-            log_flush();
-            gLogLineLevel = nlog_level::Warn;
+            flush();
+            gLogLineLevel = nlevel::Warn;
             str_append(gLogLineStr, "[WARN ] ");
             str_append(gLogLineStr, msg);
         }
-        void log_info(const char* msg)
+        void info(const char* msg)
         {
-            log_flush();
-            gLogLineLevel = nlog_level::Info;
+            flush();
+            gLogLineLevel = nlevel::Info;
             str_append(gLogLineStr, "[INFO ] ");
             str_append(gLogLineStr, msg);
         }
-        void log_debug(const char* msg)
+        void debug(const char* msg)
         {
-            log_flush();
-            gLogLineLevel = nlog_level::Debug;
+            flush();
+            gLogLineLevel = nlevel::Debug;
             str_append(gLogLineStr, "[DEBUG] ");
             str_append(gLogLineStr, msg);
         }
-        void log_trace(const char* msg)
+        void trace(const char* msg)
         {
-            log_flush();
-            gLogLineLevel = nlog_level::Trace;
+            flush();
+            gLogLineLevel = nlevel::Trace;
             str_append(gLogLineStr, "[TRACE] ");
             str_append(gLogLineStr, msg);
         }
