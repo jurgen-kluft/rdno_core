@@ -87,7 +87,7 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
         void begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
         {
-#    if SOC_UART_NUM > 1
+#    if SOC_UART_HP_NUM > 1
             uint32_t configValue = SERIAL_8N1;
             switch (config)
             {
@@ -104,7 +104,7 @@ namespace ncore
 
         s32 available()
         {
-#    if SOC_UART_NUM > 1
+#    if SOC_UART_HP_NUM > 1
             return Serial1.available();
 #    else
             nlog::error("nserial1::available: Serial1 not available on this platform.");
@@ -116,7 +116,7 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
         void print(const char* val)
         {
-#    if SOC_UART_NUM > 1
+#    if SOC_UART_HP_NUM > 1
             Serial1.print(val);
 #    else
             nlog::error("nserial1::print: Serial1 not available on this platform.");
@@ -128,7 +128,7 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
         void println(const char* val)
         {
-#    if SOC_UART_NUM > 1
+#    if SOC_UART_HP_NUM > 1
             Serial1.println(val);
 #    else
             nlog::error("nserial1::println: Serial1 not available on this platform.");
@@ -139,7 +139,7 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication
         void write(const byte* data, s32 length)
         {
-#    if SOC_UART_NUM > 1
+#    if SOC_UART_HP_NUM > 1
             Serial1.write(data, length);
 #    else
             nlog::error("nserial1::write: Serial1 not available on this platform.");
@@ -150,7 +150,7 @@ namespace ncore
         {
             // Read data from the specified serial port until the terminator character is found or the maximum length is reached
             s32 n = 0;
-#    if SOC_UART_NUM > 1
+#    if SOC_UART_HP_NUM > 1
             n = Serial1.readBytesUntil(terminator, outString, outMaxLength);
 #    else
             nlog::error("nserial1::read_until: Serial1 not available on this platform.");
@@ -161,7 +161,7 @@ namespace ncore
         s32 read_bytes(byte* outData, s32 outMaxLength)
         {
             s32 n = 0;
-#    if SOC_UART_NUM > 1
+#    if SOC_UART_HP_NUM > 1
             n = (s32)Serial1.readBytes(outData, outMaxLength);
 #    else
             nlog::error("nserial1::read_bytes: Serial1 not available on this platform.");
@@ -177,7 +177,7 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
         void begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
         {
-#    if SOC_UART_NUM > 2
+#    if SOC_UART_HP_NUM > 2
             uint32_t configValue = SERIAL_8N1;
             switch (config)
             {
@@ -194,7 +194,7 @@ namespace ncore
 
         s32 available()
         {
-#    if SOC_UART_NUM > 2
+#    if SOC_UART_HP_NUM > 2
             return Serial2.available();
 #    else
             nlog::error("nserial2::available: Serial2 not available on this platform.");
@@ -206,7 +206,7 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
         void print(const char* val)
         {
-#    if SOC_UART_NUM > 2
+#    if SOC_UART_HP_NUM > 2
             Serial2.print(val);
 #    else
             nlog::error("nserial2::print: Serial2 not available on this platform.");
@@ -218,7 +218,7 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
         void println(const char* val)
         {
-#    if SOC_UART_NUM > 2
+#    if SOC_UART_HP_NUM > 2
             Serial2.println(val);
 #    else
             nlog::error("nserial2::println: Serial2 not available on this platform.");
@@ -229,7 +229,7 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication
         void write(const byte* data, s32 length)
         {
-#    if SOC_UART_NUM > 2
+#    if SOC_UART_HP_NUM > 2
             Serial2.write(data, length);
 #    else
             nlog::error("nserial2::write: Serial2 not available on this platform.");
@@ -239,7 +239,7 @@ namespace ncore
         s32 read_until(char terminator, char* outString, s32 outMaxLength)
         {
             // Read data from the specified serial port until the terminator character is found or the maximum length is reached
-#    if SOC_UART_NUM > 2
+#    if SOC_UART_HP_NUM > 2
             return Serial2.readBytesUntil(terminator, outString, outMaxLength);
 #    else
             nlog::error("nserial2::read_until: Serial2 not available on this platform.");
@@ -250,7 +250,7 @@ namespace ncore
         s32 read_bytes(byte* outData, s32 outMaxLength)
         {
             s32 n = 0;
-#    if SOC_UART_NUM > 2
+#    if SOC_UART_HP_NUM > 2
             n = (s32)Serial2.readBytes(outData, outMaxLength);
 #    else
             nlog::error("nserial2::read_bytes: Serial2 not available on this platform.");

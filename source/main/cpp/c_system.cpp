@@ -1,5 +1,6 @@
 #include "rdno_core/c_str.h"
 #include "rdno_core/c_memory.h"
+#include "rdno_core/c_system.h"
 
 #ifdef TARGET_ESP32
 #    include "Arduino.h"
@@ -42,7 +43,7 @@ namespace ncore
 #endif
         }
 
-        s32   total_psram()
+        s32 total_psram()
         {
 #ifdef TARGET_ESP32
             return (s32)ESP.getPsramSize();
@@ -50,7 +51,7 @@ namespace ncore
             return 32 * 1024 * 1024;  // Assume 32MB for non-ESP32 platforms
 #endif
         }
-        s32   free_psram()
+        s32 free_psram()
         {
 #ifdef TARGET_ESP32
             return (s32)ESP.getFreePsram();
@@ -77,21 +78,42 @@ namespace ncore
 #endif
         }
 
+        namespace nwakeup
+        {
+            reason_t reason()
+            {
+#ifdef TARGET_ESP32
+                esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
+                switch (cause)
+                {
+                    case ESP_SLEEP_WAKEUP_EXT0: return REASON_EXT0;
+                    case ESP_SLEEP_WAKEUP_EXT1: return REASON_EXT1;
+                    case ESP_SLEEP_WAKEUP_TIMER: return REASON_TIMER;
+                    case ESP_SLEEP_WAKEUP_TOUCHPAD: return REASON_TOUCHPAD;
+                    case ESP_SLEEP_WAKEUP_ULP: return REASON_ULP;
+                    case ESP_SLEEP_WAKEUP_GPIO: return REASON_GPIO;
+                    case ESP_SLEEP_WAKEUP_UNDEFINED: return REASON_UNDEFINED;
+                    default: return REASON_UNDEFINED;
+                }
+#endif
+                return REASON_UNDEFINED;  // For non-ESP32 platforms, we return undefined
+            }
+        }  // namespace nwakeup
 
-        void start_deepsleep()            // start deep sleep (external wakeup only)
+        void start_deepsleep()  // start deep sleep (external wakeup only)
         {
 #ifdef TARGET_ESP32
-            //esp_deep_sleep_start(); 
+            esp_deep_sleep_start();
 #else
             // For non-ESP32 platforms, we can just simulate deep sleep by halting execution
 #endif
         }
 
-        void start_deepsleep(u32 seconds) // start deep sleep with a timer wakeup
+        void start_deepsleep(u32 seconds)  // start deep sleep with a timer wakeup
         {
 #ifdef TARGET_ESP32
-            //esp_sleep_enable_timer_wakeup((uint64_t)seconds * 1000000);
-            //esp_deep_sleep_start();
+            esp_sleep_enable_timer_wakeup((uint64_t)seconds * 1000000);
+            esp_deep_sleep_start();
 #else
             // For non-ESP32 platforms, we can just simulate deep sleep by halting execution
 #endif
