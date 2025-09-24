@@ -19,66 +19,51 @@ namespace ncore
 
         namespace ntype
         {
-            typedef u8    value_t;
-            const value_t Unknown     = 0x00;
-            const value_t Temperature = 0x01;  // (s8, °C)
-            const value_t Humidity    = 0x02;  // (u8, %)
-            const value_t Pressure    = 0x03;  // (u16, hPa)
-            const value_t Light       = 0x04;  // (u16, lux)
-            const value_t CO2         = 0x05;  // (u16, ppm)
-            const value_t VOC         = 0x06;  // (u16, ppm)
-            const value_t PM1_0       = 0x07;  // (u16, µg/m3)
-            const value_t PM2_5       = 0x08;  // (u16, µg/m3)
-            const value_t PM10        = 0x09;  // (u16, µg/m3)
-            const value_t Noise       = 0x0A;  // (u8, dB)
-            const value_t Presence    = 0x0B;  // (u8, 0=none, 1-8=target ID)
-            const value_t Distance    = 0x0C;  // (u16, cm)
-            const value_t UV          = 0x0D;  // (u8, index)
-            const value_t CO          = 0x0E;  // (u16, ppm/10)
-            const value_t Vibration   = 0x0F;  // (u8, 0=none, 1=low, 2=medium, 3=high)
-            const value_t State       = 0x10;  // (u16 (u8[2]), sensor model, sensor state)
-            const value_t MacAddress  = 0x11;  // (u64 (u8[8]), MAC address)
-        };  // namespace ntype
+            typedef u16 type_t;
+        }
 
         namespace nfieldtype
         {
-            typedef s8    value_t;
-            const value_t TypeNone = 0x00;
-            const value_t TypeBit  = 0x01;
-            const value_t TypeS8   = 0x08;
-            const value_t TypeS16  = 0x10;
-            const value_t TypeS32  = 0x20;
-            const value_t TypeS64  = 0x40;
-            const value_t TypeU8   = 0x88;
-            const value_t TypeU16  = 0x90;
-            const value_t TypeU32  = 0xA0;
-            const value_t TypeU64  = 0xC0;
+            typedef u8    field_t;
+            const field_t TypeNone = 0x00;
+            const field_t TypeBit  = 0x01;
+            const field_t TypeS8   = 0x08;
+            const field_t TypeS16  = 0x10;
+            const field_t TypeS32  = 0x20;
+            const field_t TypeS64  = 0x40;
+            const field_t TypeU8   = 0x88;
+            const field_t TypeU16  = 0x90;
+            const field_t TypeU32  = 0xA0;
+            const field_t TypeU64  = 0xC0;
 
-            inline value_t from_type(const ntype::value_t type)
-            {
-                switch (type)
-                {
-                    case ntype::Temperature: return TypeS8;
-                    case ntype::Humidity: return TypeS8;
-                    case ntype::Pressure: return TypeS16;
-                    case ntype::Light: return TypeS16;
-                    case ntype::CO2: return TypeS16;
-                    case ntype::VOC: return TypeS16;
-                    case ntype::PM1_0: return TypeS16;
-                    case ntype::PM2_5: return TypeS16;
-                    case ntype::PM10: return TypeS16;
-                    case ntype::Noise: return TypeS8;
-                    case ntype::Presence: return TypeS8;
-                    case ntype::Distance: return TypeS16;
-                    case ntype::UV: return TypeS8;
-                    case ntype::CO: return TypeS8;
-                    case ntype::Vibration: return TypeS8;
-                    case ntype::State: return TypeS32;
-                    case ntype::MacAddress: return TypeU64;
-                    default: return TypeNone;
-                }
-            }
+            inline field_t from_type(const ntype::type_t type) { return (type >> 8) & 0xFF; }
+            inline s32     size_in_bytes(field_t f) { return (f & 0x7F) >> 3; }
         }  // namespace nfieldtype
+
+        namespace ntype
+        {
+            const type_t Unknown     = 0x00;
+            const type_t Temperature = 0x01 | (nfieldtype::TypeS8 << 8);   // (s8, °C)
+            const type_t Humidity    = 0x02 | (nfieldtype::TypeU8 << 8);   // (u8, %)
+            const type_t Pressure    = 0x03 | (nfieldtype::TypeU16 << 8);  // (u16, hPa)
+            const type_t Light       = 0x04 | (nfieldtype::TypeU16 << 8);  // (u16, lux)
+            const type_t CO2         = 0x05 | (nfieldtype::TypeU16 << 8);  // (u16, ppm)
+            const type_t VOC         = 0x06 | (nfieldtype::TypeU16 << 8);  // (u16, ppm)
+            const type_t PM1_0       = 0x07 | (nfieldtype::TypeU16 << 8);  // (u16, µg/m3)
+            const type_t PM2_5       = 0x08 | (nfieldtype::TypeU16 << 8);  // (u16, µg/m3)
+            const type_t PM10        = 0x09 | (nfieldtype::TypeU16 << 8);  // (u16, µg/m3)
+            const type_t Noise       = 0x0A | (nfieldtype::TypeU8 << 8);   // (u8, dB)
+            const type_t Presence    = 0x0B | (nfieldtype::TypeU8 << 8);   // (u8, 0=none, 1-8=target ID)
+            const type_t Distance    = 0x0C | (nfieldtype::TypeU16 << 8);  // (u16, cm)
+            const type_t UV          = 0x0D | (nfieldtype::TypeU8 << 8);   // (u8, index)
+            const type_t CO          = 0x0E | (nfieldtype::TypeU8 << 8);   // (u16, ppm/10)
+            const type_t Vibration   = 0x0F | (nfieldtype::TypeU8 << 8);   // (u8, 0=none, 1=low, 2=medium, 3=high)
+            const type_t State       = 0x10 | (nfieldtype::TypeU16 << 8);  // (u16, state)
+            const type_t MacAddress  = 0x11 | (nfieldtype::TypeU64 << 8);  // (u64 (u8[8]), MAC address)
+
+            inline u8 type(const type_t type) { return type & 0xFF; }
+            inline u8 field(const type_t type) { return (type >> 8) & 0xFF; }
+        };  // namespace ntype
 
         // Note: Little Endian byte order
         // Packet
@@ -121,7 +106,7 @@ namespace ncore
             // This allows the receiver to resync its reference time with the sender.
             // Note: Upon connecting to the remote, the first packet should always have time_sync=true
             void begin(u32 time_ms, bool time_sync = true);
-            void write_value(ntype::value_t type, u64 value);
+            void write_value(ntype::type_t type, u64 value);
             s32  finalize();  // returns the number of sensor values written
         };
 

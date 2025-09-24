@@ -40,15 +40,13 @@ namespace ncore
                 Data[Size++] = 0xFE;
             }
             Data[LengthOffset] = (Size >> 1) & 0xFF;  // Set the length (number of words) of the packet
-
             return num_values;
         }
 
-        void packet_t::write_value(ntype::value_t type, u64 value)
+        void packet_t::write_value(ntype::type_t type, u64 value)
         {
             // Write the sensor value to the packet
-            nfieldtype::value_t field_type = nfieldtype::from_type(type);
-
+            nfieldtype::field_t field_type = nfieldtype::from_type(type);
             switch (field_type)
             {
                 case nfieldtype::TypeU8:
@@ -59,13 +57,13 @@ namespace ncore
                 case nfieldtype::TypeS32:
                 case nfieldtype::TypeU64:
                 case nfieldtype::TypeS64:
-                    Data[LengthOffset]++;  // Increment the sensor value count
-                    Data[Size++] = type;   // Write the sensor type
+                    Data[LengthOffset]++;              // Increment the sensor value count
+                    Data[Size++] = ntype::type(type);  // Write the sensor type
                     break;
                 default: return;
             }
 
-            const s32 n  = (field_type & 0x7F) >> 3;  // Number of bytes to write
+            const s32 n  = nfieldtype::size_in_bytes(field_type);  // Number of bytes to write
             Data[Size++] = value & 0xFF;
             for (s32 i = 1; i < n; i++)
             {
