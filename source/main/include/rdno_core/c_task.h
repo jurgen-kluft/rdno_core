@@ -32,7 +32,7 @@ namespace ncore
         struct program_info_t;
         typedef program_info_t* program_t;
 
-        struct scheduler_t
+        struct executor_t
         {
             byte* m_program_mem;
             byte* m_scope_open;
@@ -41,7 +41,8 @@ namespace ncore
 
             program_t m_currentProgram;
 
-            void initialize();
+            void init();
+            void boot(program_t program) { m_currentProgram = program; }
             void tick(state_t* state);
 
             program_t program();
@@ -55,14 +56,11 @@ namespace ncore
             void      xend();
         };
 
-        struct state_wifi_t;
-        struct state_remote_t;
         struct state_app_t;
         struct state_t
         {
             nconfig::config_t* config;
-            state_wifi_t*      wifi;
-            state_remote_t*    remote;
+            u64                time_ms;
             state_app_t*       app;
         };
 

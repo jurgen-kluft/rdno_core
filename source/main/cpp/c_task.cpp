@@ -19,7 +19,7 @@ namespace ncore
         s32            gMaxPrograms = sizeof(gProgramMemory) / sizeof(program_info_t);
         s32            gNumPrograms = 0;
 
-        program_t scheduler_t::program()
+        program_t executor_t::program()
         {
             gPrograms[gNumPrograms].begin = nullptr;
             gPrograms[gNumPrograms].end   = nullptr;
@@ -119,32 +119,32 @@ namespace ncore
             return outer_if;
         }
 
-        void scheduler_t::xbegin(program_t program)
+        void executor_t::xbegin(program_t program)
         {
             m_cursor                = &gProgramMemory[gProgramMemoryUsed];
             m_scope                 = 0;
             m_currentProgram->begin = m_cursor;
         }
 
-        void scheduler_t::xjump(program_t program)
+        void executor_t::xjump(program_t program)
         {
             jump_t j      = {program};
             m_program_mem = write(m_program_mem, j);
         }
 
-        void scheduler_t::xrun(program_t program)
+        void executor_t::xrun(program_t program)
         {
             run_t r       = {program};
             m_program_mem = write(m_program_mem, r);
         }
 
-        void scheduler_t::xonce(function_t fn)
+        void executor_t::xonce(function_t fn)
         {
             once_t op     = {0, fn};
             m_program_mem = write(m_program_mem, op);
         }
 
-        void scheduler_t::xif(function_t fn)
+        void executor_t::xif(function_t fn)
         {
             opcode_if_func_t op = {fn, m_scope_open};
             m_scope_open        = m_program_mem;
@@ -152,7 +152,7 @@ namespace ncore
             m_scope++;
         }
 
-        void scheduler_t::xif(timeout_t t)
+        void executor_t::xif(timeout_t t)
         {
             opcode_if_timeout_t op = {t.m_timeout_ms, 0, m_scope_open};
             m_scope_open           = m_program_mem;
@@ -160,9 +160,9 @@ namespace ncore
             m_scope++;
         }
 
-        void scheduler_t::xreturn() { m_program_mem = write(m_program_mem, OPCODE_RET); }
+        void executor_t::xreturn() { m_program_mem = write(m_program_mem, OPCODE_RET); }
 
-        void scheduler_t::xend()
+        void executor_t::xend()
         {
             // we only need to process scope management, there is no opcode
             if (m_scope > 1)
@@ -176,12 +176,6 @@ namespace ncore
                 m_currentProgram->end = m_program_mem;
                 gProgramMemoryUsed    = s32(m_program_mem - gProgramMemory);
             }
-        }
-
-        void scheduler_t::initialize()
-        {
-            m_program_mem    = gProgramMemory;
-            m_currentProgram = nullptr;
         }
 
         static void reset_program(program_t program)
@@ -309,7 +303,13 @@ namespace ncore
             // we reached the end of the program, so we exit
         }
 
-        void scheduler_t::tick(state_t* state)
+        void executor_t::init()
+        {
+            m_program_mem    = gProgramMemory;
+            m_currentProgram = nullptr;
+        }
+
+        void executor_t::tick(state_t* state)
         {
             if (m_currentProgram == nullptr)
                 return;
