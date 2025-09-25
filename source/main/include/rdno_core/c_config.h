@@ -54,6 +54,8 @@ namespace ncore
             char m_strings[PARAM_ID_STRING_MAX_COUNT * PARAM_ID_STRING_MAX_LENGTH];  // Maximum of 32 strings of max 32 characters each
         };
 
+        void reset(config_t* config);
+
         // Message example: "ssid=OBNOSIS8, password=MySecretPassword, remote_server=10.0.0.22, remote_port=1234, device_name=Bedroom.1."
         bool parse_keyvalue(str_t& msg, str_t& outKey, str_t& outValue);
         void parse_value(config_t* config, s16 id, str_t const& str);
