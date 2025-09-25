@@ -7,6 +7,12 @@ namespace ncore
 {
     namespace nconfig
     {
+        void reset(config_t* config) 
+        { 
+            g_memset(config, 0, sizeof(config_t)); 
+            config->m_version = CONFIG_VERSION;
+        }
+
         // Message example: "ssid=OBNOSIS8, password=MySecretPassword, remote_server=10.0.0.22, remote_port=1234"
         bool parse_keyvalue(str_t& msg, str_t& outKey, str_t& outValue)
         {

@@ -146,12 +146,6 @@ namespace ncore
             return s_valid;
         }
 
-        void reset(config_t* config) 
-        { 
-            g_memset(config, 0, sizeof(config_t)); 
-            config->m_version = NVSTORE_VERSION;
-        }
-
         void save(config_t* config)
         {
             if (!initialize())
