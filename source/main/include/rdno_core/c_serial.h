@@ -6,6 +6,7 @@
 #endif
 
 #include "rdno_core/c_network.h"
+#include "rdno_core/c_printf.h"
 
 namespace ncore
 {
@@ -40,11 +41,18 @@ namespace ncore
     {
         void begin(nbaud::Enum baud = nbaud::Rate115200);
         void print(const char* val);
-        void print(const s32 val);
-        void print(const u32 val, bool hex = false);
         void print(const IPAddress_t& address);
         void print(const MACAddress_t& address);
         void println(const char* val);
+
+        template<typename... Args>
+        void printf(const char* format, Args... args)
+        {
+            char buffer[256];
+            const va_t argv[] = {args...};
+            const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+            snprintf_(buffer, sizeof(buffer)-1, format, argv, argc);
+        }
     }  // namespace nserial
 
     namespace nserial1

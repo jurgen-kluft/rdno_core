@@ -27,47 +27,18 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
         void print(const char* val) { Serial.print(val); }
 
-        void print(const s32 val)
-        {
-            char  strBuffer[16];
-            str_t str = str_mutable(strBuffer, sizeof(strBuffer));
-            to_str(str, val, 10);
-            Serial.print(str.m_const);
-        }
-
-        void print(const u32 val, bool hex)
-        {
-            if (hex)
-            {
-                char  strBuffer[11];  // "0x" + 8 hex digits + null terminator
-                str_t str = str_mutable(strBuffer, sizeof(strBuffer));
-                str_append(str, "0x");
-                to_str(str, val, 16);
-                Serial.print(str.m_const);
-            }
-            else
-            {
-                char  strBuffer[12];  // Max 10 digits for u32 + null terminator
-                str_t str = str_mutable(strBuffer, sizeof(strBuffer));
-                to_str(str, val, 10);
-                Serial.print(str.m_const);
-            }
-        }
-
         void print(const IPAddress_t& address)
         {
-            char  strBuffer[20];
-            str_t str = str_mutable(strBuffer, sizeof(strBuffer));
-            to_str(str, address);
-            Serial.print(str.m_const);
+            char  strBuffer[32];
+            snprintf(strBuffer, sizeof(strBuffer), "%u.%u.%u.%u", va_t(address.m_address[0]), va_t(address.m_address[1]), va_t(address.m_address[2]), va_t(address.m_address[3]));
+            Serial.print(strBuffer);
         }
 
         void print(const MACAddress_t& mac)
         {
-            char  strBuffer[20];
-            str_t str = str_mutable(strBuffer, sizeof(strBuffer));
-            to_str(str, mac);
-            Serial.print(str.m_const);
+            char  strBuffer[32];
+            snprintf(strBuffer, sizeof(strBuffer), "%02X:%02X:%02X:%02X:%02X:%02X", va_t(mac.m_address[0]), va_t(mac.m_address[1]), va_t(mac.m_address[2]), va_t(mac.m_address[3]), va_t(mac.m_address[4]), va_t(mac.m_address[5]));
+            Serial.print(strBuffer);
         }
 
         // Println prints data to the serial port as human-readable ASCII text followed by a

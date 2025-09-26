@@ -8,34 +8,35 @@
 
 namespace ncore
 {
-    ntask::executor_t* gAppExec;
-    ntask::state_t    gAppState;
-    nconfig::config_t gAppConfig;
+    ntask::executor_t* gExec;
+    ntask::state_t     gState;
+    nconfig::config_t  gConfig;
+
+};  // namespace ncore
 
 #ifdef TARGET_ESP32
 
-    void setup()
-    {
-        nserial::begin();                            // Initialize serial communication at 115200 baud
-        if (!nvstore::load(&gAppConfig))             // Load configuration from non-volatile storage
-        {                                            // If loading fails (e.g., first run or corrupted data)
-            napp::config_init_default(&gAppConfig);  // Set up default configuration values
-            nvstore::save(&gAppConfig);              // Save the default configuration to non-volatile storage
-        }
-
-        gAppExec = ntask::init(4, 2048);
-
-        gAppState.config  = &gAppConfig;
-        gAppState.time_ms = ntimer::millis();
-        gAppState.app     = nullptr;
-        napp::setup(gAppExec, &gAppState);
+void setup()
+{
+    ncore::nserial::begin();                                // Initialize serial communication at 115200 baud
+    if (!ncore::nvstore::load(&ncore::gConfig))             // Load configuration from non-volatile storage
+    {                                                       // If loading fails (e.g., first run or corrupted data)
+        ncore::napp::config_init_default(&ncore::gConfig);  // Set up default configuration values
+        ncore::nvstore::save(&ncore::gConfig);              // Save the default configuration to non-volatile storage
     }
 
-    void loop()
-    {
-        gAppState.time_ms = ntimer::millis();
-        ntask::tick(gAppExec, &gAppState);
-    }
+    ncore::gExec = ncore::ntask::init(4, 2048);
+
+    ncore::gState.config  = &ncore::gConfig;
+    ncore::gState.time_ms = ncore::ntimer::millis();
+    ncore::gState.app     = nullptr;
+    ncore::napp::setup(ncore::gExec, &ncore::gState);
+}
+
+void loop()
+{
+    ncore::gState.time_ms = ncore::ntimer::millis();
+    ncore::ntask::tick(ncore::gExec, &ncore::gState);
+}
 
 #endif
-};  // namespace ncore

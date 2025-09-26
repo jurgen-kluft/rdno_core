@@ -17,15 +17,14 @@ namespace ncore
      */
     void putchar(char character);
 
-    int printf(const char* format, const va_t* argv, s32 argc);
+    s32 printf_(const char* format, const va_t* argv, s32 argc);
     
     template<typename... Args>
-    int printf(const char* format, Args&&... _args)
+    s32 printf(const char* format, Args... _args)
     {
-        // convert args into an array of va_t
         const va_t argv[] = {_args...};
         const s32  argc   = sizeof(argv) / sizeof(argv[0]);
-        return printf(format, argv, argc);
+        return printf_(format, argv, argc);
     }
 
     /**
@@ -35,7 +34,14 @@ namespace ncore
      * \param format A string that specifies the format of the output
      * \return The number of characters that are WRITTEN into the buffer, not counting the terminating null character
      */
-    int sprintf(char* buffer, const char* format, const va_t* argv, s32 argc);
+    s32 sprintf_(char* buffer, const char* format, const va_t* argv, s32 argc);
+    template<typename... Args>
+    s32 sprintf(char* buffer, const char* format, Args... _args)
+    {
+        const va_t argv[] = {_args...};
+        const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+        return sprintf_(buffer, format, argv, argc);
+    }
 
     /**
      * Tiny snprintf/vsnprintf implementation
@@ -47,8 +53,23 @@ namespace ncore
      *         null character. A value equal or larger than count indicates truncation. Only when the returned value
      *         is non-negative and less than count, the string has been completely written.
      */
-    int snprintf(char* buffer, size_t count, const char* format, const va_t* argv, s32 argc);
-    int vsnprintf(char* buffer, size_t count, const char* format, const va_t* argv, s32 argc);
+    s32 snprintf_(char* buffer, size_t count, const char* format, const va_t* argv, s32 argc);
+    template<typename... Args>
+    s32 snprintf(char* buffer, size_t count, const char* format, Args... _args)
+    {
+        const va_t argv[] = {_args...};
+        const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+        return snprintf_(buffer, count, format, argv, argc);
+    }
+
+    s32 vsnprintf_(char* buffer, size_t count, const char* format, const va_t* argv, s32 argc);
+    template<typename... Args>
+    s32 vsnprintf(char* buffer, size_t count, const char* format, Args... _args)
+    {
+        const va_t argv[] = {_args...};
+        const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+        return vsnprintf_(buffer, count, format, argv, argc);
+    }
 
     /**
      * Tiny vprintf implementation
@@ -56,7 +77,14 @@ namespace ncore
      * \param va A value identifying a variable arguments list
      * \return The number of characters that are WRITTEN into the buffer, not counting the terminating null character
      */
-    int vprintf(const char* format, const va_t* argv, s32 argc);
+    s32 vprintf_(const char* format, const va_t* argv, s32 argc);
+    template<typename... Args>
+    s32 vprintf(const char* format, Args... _args)
+    {
+        const va_t argv[] = {_args...};
+        const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+        return vprintf_(format, argv, argc);
+    }
 
     /**
      * printf with output function
@@ -66,7 +94,14 @@ namespace ncore
      * \param format A string that specifies the format of the output
      * \return The number of characters that are sent to the output function, not counting the terminating null character
      */
-    int fctprintf(void (*out)(char character, void* arg), void* arg, const char* format, const va_t* argv, s32 argc);
+    s32 fctprintf_(void (*out)(char character, void* arg), void* arg, const char* format, const va_t* argv, s32 argc);
+    template<typename... Args>
+    s32 fctprintf(void (*out)(char character, void* arg), void* arg, const char* format, Args... _args)
+    {
+        const va_t argv[] = {_args...};
+        const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+        return fctprintf_(out, arg, format, argv, argc);
+    }
 
 }  // namespace ncore
 

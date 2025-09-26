@@ -55,6 +55,7 @@ namespace ncore
         {
             nconfig::config_t* config;
             u64                time_ms;
+            u64                time_sync;
             state_app_t*       app;
         };
 

@@ -283,7 +283,6 @@ namespace ncore
                     case OPCODE_JUMP:
                     {
                         jump_t* j    = (jump_t*)pc;
-                        pc           = pc + size;
                         *new_program = j->m_program;
                         return;
                     }
