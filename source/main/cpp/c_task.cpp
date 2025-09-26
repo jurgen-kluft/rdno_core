@@ -13,6 +13,7 @@ namespace ncore
     {
         struct program_info_t
         {
+            const char* name;
             const byte* begin;
             const byte* end;
         };
@@ -53,13 +54,31 @@ namespace ncore
             return exec;
         }
 
+        void print_info(executor_t* exec)
+        {
+            // Print number of programs and list their names and size
+            // Lastly print the total program memory size
+
+            nserial::println("Task Executor Info:");
+            nserial::printf("  Current Programs: %d/%d\n", va_t(exec->m_num_programs), va_t(exec->m_max_programs));
+            nserial::printf("  Program Memory Used: %d bytes (Total: %d bytes)\n", va_t((s32)(exec->m_program_memory_end - exec->m_program_memory)), va_t((s32)(exec->m_program_memory_end - exec->m_program_memory)));
+            nserial::println("  Programs:");
+            for (s32 i = 0; i < exec->m_num_programs; i++)
+            {
+                program_info_t* program = &exec->m_programs[i];
+                const s32       size    = (s32)(program->end - program->begin);
+                nserial::printf("    %d: %s (Size: %d bytes)\n", va_t(i), va_t(program->name ? program->name : "(unnamed)"), va_t(size));
+            }
+        }
+
         void boot(executor_t* exec, program_t program) { exec->m_running_program = program; }
 
-        program_t program(executor_t* exec)
+        program_t program(executor_t* exec, const char* name)
         {
             if (exec->m_num_programs >= exec->m_max_programs)
                 return nullptr;
 
+            exec->m_programs[exec->m_num_programs].name  = name;
             exec->m_programs[exec->m_num_programs].begin = exec->m_programming_cursor;
             exec->m_programs[exec->m_num_programs].end   = nullptr;
             return &exec->m_programs[exec->m_num_programs++];
@@ -270,16 +289,13 @@ namespace ncore
             }  // while
         }
 
-        static s32 program_pc(program_info_t* program, const byte* pc)
-        {
-            return (s32)(pc - program->begin);
-        }
+        static s32 program_pc(program_info_t* program, const byte* pc) { return (s32)(pc - program->begin); }
 
-//#define PROGRAM_PRINT(a) nserial::println(a)
-//#define PROGRAM_PRINTF(a, b) nserial::printf(a, b)
+        // #define PROGRAM_PRINT(a) nserial::println(a)
+        // #define PROGRAM_PRINTF(a, b) nserial::printf(a, b)
 
-#define PROGRAM_PRINT(a) 
-#define PROGRAM_PRINTF(a, b) 
+#define PROGRAM_PRINT(a)
+#define PROGRAM_PRINTF(a, b)
 
         static void execute_program(program_info_t* program, state_t* state, program_info_t** new_program)
         {

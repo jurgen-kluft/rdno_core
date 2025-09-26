@@ -37,10 +37,11 @@ namespace ncore
         struct executor_t;
 
         executor_t* init(s32 max_programs, s32 program_mem_size = 2048);
+        void        print_info(executor_t* exec);
         void        boot(executor_t* exec, program_t program);
         void        tick(executor_t* exec, state_t* state);
 
-        program_t program(executor_t* exec);
+        program_t program(executor_t* exec, const char* name);
         void      xbegin(executor_t* exec, program_t program);
         void      xjump(executor_t* exec, program_t program);
         void      xrun(executor_t* exec, program_t program);

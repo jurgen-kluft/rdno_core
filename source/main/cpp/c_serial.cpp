@@ -16,8 +16,9 @@ namespace ncore
         void begin(nbaud::Enum baud)
         {
             Serial.begin(baud);
+            
             const u64 startAttemptTime = ntimer::millis();
-            while (!Serial && (ntimer::millis() - startAttemptTime) < 2000)
+            while (!Serial && (ntimer::millis() - startAttemptTime) < 5000)
             {
                 ntimer::delay(100);
             }

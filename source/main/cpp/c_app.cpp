@@ -26,12 +26,16 @@ void setup()
         ncore::nvstore::save(&ncore::gConfig);              // Save the default configuration to non-volatile storage
     }
 
-    ncore::gExec = ncore::ntask::init(6, 1024);
+    ncore::gExec = ncore::ntask::init(5, 512);
 
     ncore::gState.config  = &ncore::gConfig;
     ncore::gState.time_ms = ncore::ntimer::millis();
     ncore::gState.app     = nullptr;
     ncore::napp::setup(ncore::gExec, &ncore::gState);
+
+    ncore::ntask::print_info(ncore::gExec);
+
+    ncore::nserial::println("Setup done...");
 }
 
 void loop()
