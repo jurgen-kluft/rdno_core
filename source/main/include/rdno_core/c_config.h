@@ -35,8 +35,8 @@ namespace ncore
             PARAM_ID_SENSOR_READ_INTERVAL = 10,  // Interval in milli-seconds to read sensors
             PARAM_ID_SENSOR_SEND_INTERVAL = 11,  // Interval in milli-seconds to send sensor data to server
 
-            PARAM_ID_MAX_COUNT         = 32,
-            PARAM_ID_STRING_MAX_COUNT  = 16,
+            PARAM_ID_MAX_COUNT         = 16,
+            PARAM_ID_STRING_MAX_COUNT  = 10,
             PARAM_ID_STRING_MAX_LENGTH = 32,
         };
 
@@ -45,7 +45,7 @@ namespace ncore
             CONFIG_VERSION = 0x00010000,
         };
 
-        // 1.3 KB fixed size configuration structure
+        // 4 + 16 + (16 * 4) + (10 * 32) = 4 + 16 + 64 + 320 = 404 bytes
         struct config_t
         {
             u32  m_version;

@@ -52,6 +52,7 @@ namespace ncore
             const va_t argv[] = {args...};
             const s32  argc   = sizeof(argv) / sizeof(argv[0]);
             snprintf_(buffer, sizeof(buffer)-1, format, argv, argc);
+            print(buffer);
         }
     }  // namespace nserial
 

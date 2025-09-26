@@ -41,7 +41,7 @@ namespace ncore
         template <typename T>
         inline T* ptr_align(T* ptr, u32 alignment)
         {
-            return (T*)(((ptr_t)ptr + (ptr_t)(alignment - 1)) & ~((ptr_t)(alignment - 1)));
+            return (T*)(((uptr_t)ptr + (uptr_t)(alignment - 1)) & ~((uptr_t)(alignment - 1)));
         }
 
         template <typename T>

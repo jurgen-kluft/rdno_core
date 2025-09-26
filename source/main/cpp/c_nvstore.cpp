@@ -146,6 +146,9 @@ namespace ncore
             return s_valid;
         }
 
+        #define NVS_NODE_KEY "node"
+        #define NVS_BLOB_KEY "config"
+
         void save(nconfig::config_t* config)
         {
             if (!initialize())
@@ -154,12 +157,12 @@ namespace ncore
             // write to non-volatile storage
             nserial::println("NVS open to save");
             nvs_handle_t storage_handle;
-            esp_err_t    err = nvs_open("node_config", NVS_READWRITE, &storage_handle);
+            esp_err_t    err = nvs_open(NVS_NODE_KEY, NVS_READWRITE, &storage_handle);
             print_nvs_error("nvs_open, error = ", err);
             if (err == ESP_OK)
             {
                 nserial::println("NVS save config");
-                err = nvs_set_blob(storage_handle, "nconfig::config_t", (const void*)config, sizeof(nconfig::config_t));
+                err = nvs_set_blob(storage_handle, NVS_BLOB_KEY, (const void*)config, sizeof(nconfig::config_t));
                 print_nvs_error("nvs_set_blob, error = ", err);
                 err = nvs_commit(storage_handle);
                 print_nvs_error("nvs_commit, error = ", err);
@@ -173,16 +176,16 @@ namespace ncore
                 return false;
 
             nvs_handle_t storage_handle;
-            esp_err_t    err = nvs_open("node_config", NVS_READONLY, &storage_handle);
+            esp_err_t    err = nvs_open(NVS_NODE_KEY, NVS_READONLY, &storage_handle);
             print_nvs_error("nvs_open, error = ", err);
             if (err == ESP_OK)
             {
                 size_t required_size;
-                err = nvs_get_blob(storage_handle, "nconfig::config_t", nullptr, &required_size);
+                err = nvs_get_blob(storage_handle, NVS_BLOB_KEY, nullptr, &required_size);
                 print_nvs_error("nvs_get_blob1, error = ", err);
                 if (err == ESP_OK && required_size == sizeof(nconfig::config_t))
                 {
-                    err = nvs_get_blob(storage_handle, "nconfig::config_t", (void*)config, &required_size);
+                    err = nvs_get_blob(storage_handle, NVS_BLOB_KEY, (void*)config, &required_size);
                     print_nvs_error("nvs_get_blob2, error = ", err);
                 }
                 else
