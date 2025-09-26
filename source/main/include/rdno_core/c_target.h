@@ -141,6 +141,7 @@ namespace ncore
 
 #if (CC_PLATFORM_PTR_SIZE == 4)
     typedef s32 ptr_t;
+    typedef s32 ptrdiff_t;
     typedef u32 uptr_t;
     typedef s32 int_t;
     typedef u32 uint_t;
@@ -148,6 +149,7 @@ namespace ncore
     typedef s32 ssize_t;
 #elif (CC_PLATFORM_PTR_SIZE == 8)
     typedef s64 ptr_t;
+    typedef s64 ptrdiff_t;
     typedef u64 uptr_t;
     typedef s64 int_t;
     typedef u64 uint_t;

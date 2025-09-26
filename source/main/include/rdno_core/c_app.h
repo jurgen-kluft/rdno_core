@@ -11,9 +11,11 @@ namespace ncore
 {
     namespace napp
     {
-        ntask::program_t setup(ntask::executor_t* exec, ntask::state_t* state);
-        
-    }  // namespace nsystem
+        void config_init_default(nconfig::config_t* config);
+        s16  config_key_to_index(str_t const& str);
+        void setup(ntask::executor_t* exec, ntask::state_t* state);
+
+    }  // namespace napp
 }  // namespace ncore
 
 #endif  // __RDNO_CORE_ALLOCATOR_H__

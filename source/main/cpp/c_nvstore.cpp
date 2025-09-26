@@ -146,7 +146,7 @@ namespace ncore
             return s_valid;
         }
 
-        void save(config_t* config)
+        void save(nconfig::config_t* config)
         {
             if (!initialize())
                 return;
@@ -159,7 +159,7 @@ namespace ncore
             if (err == ESP_OK)
             {
                 nserial::println("NVS save config");
-                err = nvs_set_blob(storage_handle, "config_t", (const void*)config, sizeof(config_t));
+                err = nvs_set_blob(storage_handle, "nconfig::config_t", (const void*)config, sizeof(nconfig::config_t));
                 print_nvs_error("nvs_set_blob, error = ", err);
                 err = nvs_commit(storage_handle);
                 print_nvs_error("nvs_commit, error = ", err);
@@ -167,7 +167,7 @@ namespace ncore
             }
         }
 
-        bool load(config_t* config)
+        bool load(nconfig::config_t* config)
         {
             if (!initialize())
                 return false;
@@ -178,11 +178,11 @@ namespace ncore
             if (err == ESP_OK)
             {
                 size_t required_size;
-                err = nvs_get_blob(storage_handle, "config_t", nullptr, &required_size);
+                err = nvs_get_blob(storage_handle, "nconfig::config_t", nullptr, &required_size);
                 print_nvs_error("nvs_get_blob1, error = ", err);
-                if (err == ESP_OK && required_size == sizeof(config_t))
+                if (err == ESP_OK && required_size == sizeof(nconfig::config_t))
                 {
-                    err = nvs_get_blob(storage_handle, "config_t", (void*)config, &required_size);
+                    err = nvs_get_blob(storage_handle, "nconfig::config_t", (void*)config, &required_size);
                     print_nvs_error("nvs_get_blob2, error = ", err);
                 }
                 else
@@ -204,9 +204,9 @@ namespace ncore
 {
     namespace nvstore
     {
-        void reset(config_t* config) { g_memset(config, 0, sizeof(config_t)); }
-        void save(config_t* config) {}
-        bool load(config_t* config) { return true; }
+        void reset(nconfig::config_t* config) { g_memset(config, 0, sizeof(nconfig::config_t)); }
+        void save(nconfig::config_t* config) {}
+        bool load(nconfig::config_t* config) { return true; }
 
     }  // namespace nvstore
 }  // namespace ncore

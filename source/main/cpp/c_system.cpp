@@ -1,10 +1,14 @@
 #include "rdno_core/c_str.h"
 #include "rdno_core/c_memory.h"
 #include "rdno_core/c_system.h"
+#include "rdno_core/c_malloc.h"
 
 #ifdef TARGET_ESP32
 #    include "Arduino.h"
 #    include "esp32-hal-psram.h"
+#else
+#    include <unistd.h>
+#    include <sys/mman.h>
 #endif
 
 namespace ncore
@@ -56,7 +60,7 @@ namespace ncore
 #ifdef TARGET_ESP32
             return (s32)ESP.getFreePsram();
 #else
-            return (s32)(32 * 1024 * 1024 - malloc_used());  // Assume 32MB for non-ESP32 platforms
+            return (s32)(32 * 1024 * 1024);  // Assume 32MB for non-ESP32 platforms
 #endif
         }
 
@@ -119,8 +123,8 @@ namespace ncore
                     case REASON_WAKEUP_COCPU: return "Wakeup caused by COCPU int";
                     case REASON_WAKEUP_COCPU_TRAP_TRIG: return "Wakeup caused by COCPU crash";
                     case REASON_WAKEUP_BT: return "Wakeup caused by BT (light sleep only)";
-                    case REASON_WAKEUP_UNDEFINED:
-                    default:
+                    case REASON_WAKEUP_UNDEFINED: break;
+                    default: break;
                 }
                 return "Wakeup was not caused by deep sleep";
             }

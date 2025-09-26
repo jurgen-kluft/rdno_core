@@ -1,43 +1,40 @@
 #include "rdno_core/c_target.h"
 #include "rdno_core/c_malloc.h"
+#include "rdno_core/c_nvstore.h"
+#include "rdno_core/c_serial.h"
 #include "rdno_core/c_task.h"
+#include "rdno_core/c_timer.h"
 #include "rdno_core/c_app.h"
 
 namespace ncore
 {
-    // TODO
-    // Here we implement setup() and loop() functions for Arduino.
-    // We provide namespace napplication to the user which contains
-    // one function:
-    //
-    //    ntask::program_t setup(ntask::executor_t* exec, ntask::state_t* state)
-    //
-    // The user must implement this function to initialize the application and 
-    // return the main program to run.
-    // 
-
-    ntask::executor_t gAppScheduler;
+    ntask::executor_t* gAppExec;
     ntask::state_t    gAppState;
+    nconfig::config_t gAppConfig;
 
 #ifdef TARGET_ESP32
 
     void setup()
     {
-        // serial begin
+        nserial::begin();                            // Initialize serial communication at 115200 baud
+        if (!nvstore::load(&gAppConfig))             // Load configuration from non-volatile storage
+        {                                            // If loading fails (e.g., first run or corrupted data)
+            napp::config_init_default(&gAppConfig);  // Set up default configuration values
+            nvstore::save(&gAppConfig);              // Save the default configuration to non-volatile storage
+        }
 
-        // load config from non-volatile storage
+        gAppExec = ntask::init(4, 2048);
 
-        // call napplication::setup to return the main program
-        ntask::program_t main = napp::setup(&gAppScheduler, &gAppState);
-
-        // initialize gAppScheduler
-        // initialize gAppState
+        gAppState.config  = &gAppConfig;
+        gAppState.time_ms = ntimer::millis();
+        gAppState.app     = nullptr;
+        napp::setup(gAppExec, &gAppState);
     }
 
     void loop()
     {
-        // just call the application scheduler tick method
-        gAppScheduler.tick(&gAppState);
+        gAppState.time_ms = ntimer::millis();
+        ntask::tick(gAppExec, &gAppState);
     }
 
 #endif

@@ -7,10 +7,15 @@
 
 namespace ncore
 {
+    namespace nconfig
+    {
+        struct config_t;
+    }
+
     namespace nvstore
     {
-        bool load(config_t* config);
-        void save(config_t* config);
+        bool load(nconfig::config_t* config);
+        void save(nconfig::config_t* config);
     }  // namespace nvstore
 }  // namespace ncore
 

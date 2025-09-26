@@ -9,6 +9,8 @@
 
 namespace ncore
 {
+    struct state_app_t;
+
     namespace ntask
     {
         struct state_t;
@@ -32,31 +34,23 @@ namespace ncore
         struct program_info_t;
         typedef program_info_t* program_t;
 
-        struct executor_t
-        {
-            byte* m_program_mem;
-            byte* m_scope_open;
-            byte* m_cursor;
-            s32   m_scope;
+        struct executor_t;
 
-            program_t m_currentProgram;
+        executor_t* init(s32 max_programs, s32 program_mem_size = 2048);
+        void        boot(executor_t* exec, program_t program);
+        void        tick(executor_t* exec, state_t* state);
 
-            void init();
-            void boot(program_t program) { m_currentProgram = program; }
-            void tick(state_t* state);
+        program_t program(executor_t* exec);
+        void      xbegin(executor_t* exec, program_t program);
+        void      xjump(executor_t* exec, program_t program);
+        void      xrun(executor_t* exec, program_t program);
+        void      xrun_periodic(executor_t* exec, function_t fn, u32 period_ms);
+        void      xonce(executor_t* exec, function_t fn);
+        void      xif(executor_t* exec, function_t fn);
+        void      xif(executor_t* exec, timeout_t timeout);
+        void      xreturn(executor_t* exec);
+        void      xend(executor_t* exec);
 
-            program_t program();
-            void      xbegin(program_t program);
-            void      xjump(program_t program);
-            void      xrun(program_t program);
-            void      xonce(function_t fn);
-            void      xif(function_t fn);
-            void      xif(timeout_t timeout);
-            void      xreturn();
-            void      xend();
-        };
-
-        struct state_app_t;
         struct state_t
         {
             nconfig::config_t* config;

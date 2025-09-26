@@ -1,29 +1,66 @@
 #include "rdno_core/c_target.h"
 #include "rdno_core/c_task.h"
 #include "rdno_core/c_timer.h"
+#include "rdno_core/c_malloc.h"
+#include "rdno_core/c_memory.h"
+#include "rdno_core/c_system.h"
+#include "rdno_core/c_allocator.h"
 
 namespace ncore
 {
     namespace ntask
     {
-        byte gProgramMemory[1024];
-        s32  gProgramMemoryUsed = 0;
-
         struct program_info_t
         {
             const byte* begin;
             const byte* end;
         };
 
-        program_info_t gPrograms[8];
-        s32            gMaxPrograms = sizeof(gProgramMemory) / sizeof(program_info_t);
-        s32            gNumPrograms = 0;
-
-        program_t executor_t::program()
+        struct executor_t
         {
-            gPrograms[gNumPrograms].begin = nullptr;
-            gPrograms[gNumPrograms].end   = nullptr;
-            return &gPrograms[gNumPrograms++];
+            program_info_t* m_programs;
+            s32             m_max_programs;
+            s32             m_num_programs;
+            byte*           m_program_mem;
+            u32             m_program_mem_size;
+            u32             m_program_mem_used;
+            byte*           m_program_mem_cursor;
+            byte*           m_scope_open;
+            s32             m_scope;
+            program_t       m_currentProgram;
+
+            DCORE_CLASS_PLACEMENT_NEW_DELETE
+        };
+
+        executor_t* init(s32 max_programs, s32 program_mem_size)
+        {
+            executor_t* exec = nsystem::construct<executor_t>();
+
+            exec->m_programs     = nsystem::construct_array<program_info_t>(max_programs);
+            exec->m_max_programs = max_programs;
+            exec->m_num_programs = 0;
+
+            exec->m_program_mem        = nsystem::malloc(program_mem_size);
+            exec->m_program_mem_size   = program_mem_size;
+            exec->m_program_mem_used   = 0;
+            exec->m_program_mem_cursor = exec->m_program_mem;
+            exec->m_scope_open         = nullptr;
+            exec->m_scope              = 0;
+            exec->m_currentProgram     = nullptr;
+
+            return exec;
+        }
+
+        void boot(executor_t* exec, program_t program) { exec->m_currentProgram = program; }
+
+        program_t program(executor_t* exec)
+        {
+            if (exec->m_num_programs >= exec->m_max_programs)
+                return nullptr;
+
+            exec->m_programs[exec->m_num_programs].begin = nullptr;
+            exec->m_programs[exec->m_num_programs].end   = nullptr;
+            return &exec->m_programs[exec->m_num_programs++];
         }
 
         struct jump_t
@@ -34,6 +71,13 @@ namespace ncore
         struct run_t
         {
             program_t m_program;
+        };
+
+        struct run_periodic_t
+        {
+            u64        m_lastTime;
+            u32        m_period_ms;
+            function_t m_function;
         };
 
         struct once_t
@@ -55,136 +99,149 @@ namespace ncore
             byte* m_end;
         };
 
-        typedef u16    opcode_t;
-        const opcode_t OPCODE_JUMP       = 5 + ((sizeof(jump_t) & 0xFF) << 8);
-        const opcode_t OPCODE_RUN        = 10 + ((sizeof(run_t) & 0xFF) << 8);
-        const opcode_t OPCODE_ONCE       = 15 + ((sizeof(once_t) & 0xFF) << 8);
-        const opcode_t OPCODE_IF_FUNC    = 20 + ((sizeof(opcode_if_func_t) & 0xFF) << 8);
-        const opcode_t OPCODE_IF_TIMEOUT = 25 + ((sizeof(opcode_if_timeout_t) & 0xFF) << 8);
-        const opcode_t OPCODE_RET        = 30 + (0 << 8);
+        typedef u8     opcode_t;
+        const opcode_t OPCODE_JUMP         = 5;
+        const opcode_t OPCODE_RUN          = 10;
+        const opcode_t OPCODE_RUN_PERIODIC = 12;
+        const opcode_t OPCODE_ONCE         = 15;
+        const opcode_t OPCODE_IF_FUNC      = 20;
+        const opcode_t OPCODE_IF_TIMEOUT   = 25;
+        const opcode_t OPCODE_RET          = 30;
 
-        static byte* write(byte* program_mem, byte const* data, s32 size)
+        // opcode
+        // argument size
+        //   ... alignment ...
+        //   argument data[size]
+
+        static byte* write_opcode_and_arg(byte* program_mem, opcode_t opcode, byte const* arg_data, s32 arg_size)
         {
-            for (s32 i = 0; i < size; i++)
-                *program_mem++ = *data++;
-            return program_mem;
+            if (arg_data == nullptr)
+            {
+                *program_mem++ = opcode;
+                *program_mem++ = 0;
+                return program_mem;
+            }
+
+            byte* aligned_program_mem = nmem::ptr_align(program_mem + 2, sizeof(void*));
+            program_mem[0]            = opcode;
+            program_mem[1]            = (u8)(arg_size);
+            for (s32 i = 0; i < arg_size; i++)
+                *aligned_program_mem++ = *arg_data++;
+            return aligned_program_mem;
         }
-        inline static byte* write(byte* program_mem, opcode_t opcode)
+
+        static const byte* read_opcode_and_arg_size(const byte* pc, opcode_t& opcode, s32& arg_size)
         {
-            *program_mem++ = opcode;
-            return program_mem;
+            opcode   = (opcode_t)(pc[0]);
+            arg_size = (s32)pc[1];
+            pc       = pc + 2;
+            return arg_size > 0 ? nmem::ptr_align(pc, sizeof(void*)) : pc;
         }
-        static byte* write(byte* program_mem, jump_t const& j)
-        {
-            program_mem = write(program_mem, OPCODE_JUMP);
-            return write(program_mem, (const byte*)&j, sizeof(j));
-        }
-        static byte* write(byte* program_mem, run_t const& r)
-        {
-            program_mem = write(program_mem, OPCODE_RUN);
-            return write(program_mem, (const byte*)&r, sizeof(r));
-        }
-        static byte* write(byte* program_mem, once_t const& op)
-        {
-            program_mem = write(program_mem, OPCODE_ONCE);
-            return write(program_mem, (const byte*)&op, sizeof(op));
-        }
-        static byte* write(byte* program_mem, opcode_if_func_t const& op)
-        {
-            program_mem = write(program_mem, OPCODE_IF_FUNC);
-            return write(program_mem, (const byte*)&op, sizeof(op));
-        }
-        static byte* write(byte* program_mem, opcode_if_timeout_t const& op)
-        {
-            program_mem = write(program_mem, OPCODE_IF_TIMEOUT);
-            return write(program_mem, (const byte*)&op, sizeof(op));
-        }
+
+        static byte* write(byte* program_mem, jump_t const& j) { return write_opcode_and_arg(program_mem, OPCODE_JUMP, (const byte*)&j, sizeof(j)); }
+        static byte* write(byte* program_mem, run_t const& r) { return write_opcode_and_arg(program_mem, OPCODE_RUN, (const byte*)&r, sizeof(r)); }
+        static byte* write(byte* program_mem, run_periodic_t const& pp) { return write_opcode_and_arg(program_mem, OPCODE_RUN_PERIODIC, (const byte*)&pp, sizeof(pp)); }
+        static byte* write(byte* program_mem, once_t const& op) { return write_opcode_and_arg(program_mem, OPCODE_ONCE, (const byte*)&op, sizeof(op)); }
+        static byte* write(byte* program_mem, opcode_if_func_t const& op) { return write_opcode_and_arg(program_mem, OPCODE_IF_FUNC, (const byte*)&op, sizeof(op)); }
+        static byte* write(byte* program_mem, opcode_if_timeout_t const& op) { return write_opcode_and_arg(program_mem, OPCODE_IF_TIMEOUT, (const byte*)&op, sizeof(op)); }
 
         static byte* set_if_end(byte* if_start, byte* if_end)
         {
-            opcode_t opcode   = *(opcode_t*)if_start;
+            opcode_t opcode;
+            s32 arg_size;
+            const byte* if_arg_start = read_opcode_and_arg_size(if_start, opcode, arg_size);
+
             byte*    outer_if = nullptr;
             if (opcode == OPCODE_IF_FUNC)
             {
-                opcode_if_func_t* op = (opcode_if_func_t*)(if_start + sizeof(opcode_t));
+                opcode_if_func_t* op = (opcode_if_func_t*)if_arg_start;
                 outer_if             = op->m_end;
                 op->m_end            = if_end;
             }
             else if (opcode == OPCODE_IF_TIMEOUT)
             {
-                opcode_if_timeout_t* op = (opcode_if_timeout_t*)(if_start + sizeof(opcode_t));
+                opcode_if_timeout_t* op = (opcode_if_timeout_t*)if_arg_start;
                 outer_if                = op->m_end;
                 op->m_end               = if_end;
             }
             return outer_if;
         }
 
-        void executor_t::xbegin(program_t program)
+        void xbegin(executor_t* exec, program_t program)
         {
-            m_cursor                = &gProgramMemory[gProgramMemoryUsed];
-            m_scope                 = 0;
-            m_currentProgram->begin = m_cursor;
+            exec->m_currentProgram = program;
+
+            exec->m_program_mem_cursor    = &exec->m_program_mem[exec->m_program_mem_used];
+            exec->m_scope                 = 1;
+            exec->m_currentProgram->begin = exec->m_program_mem_cursor;
         }
 
-        void executor_t::xjump(program_t program)
+        void xjump(executor_t* exec, program_t program)
         {
-            jump_t j      = {program};
-            m_program_mem = write(m_program_mem, j);
+            jump_t j            = {program};
+            exec->m_program_mem = write(exec->m_program_mem, j);
         }
 
-        void executor_t::xrun(program_t program)
+        void xrun(executor_t* exec, program_t program)
         {
-            run_t r       = {program};
-            m_program_mem = write(m_program_mem, r);
+            run_t r             = {program};
+            exec->m_program_mem = write(exec->m_program_mem, r);
         }
 
-        void executor_t::xonce(function_t fn)
+        void xrun_periodic(executor_t* exec, function_t func, u32 period_ms)
         {
-            once_t op     = {0, fn};
-            m_program_mem = write(m_program_mem, op);
+            run_periodic_t pp   = {0, period_ms, func};
+            exec->m_program_mem = write(exec->m_program_mem, pp);
         }
 
-        void executor_t::xif(function_t fn)
+        void xonce(executor_t* exec, function_t fn)
         {
-            opcode_if_func_t op = {fn, m_scope_open};
-            m_scope_open        = m_program_mem;
-            m_program_mem       = write(m_program_mem, op);
-            m_scope++;
+            once_t op           = {0, fn};
+            exec->m_program_mem = write(exec->m_program_mem, op);
         }
 
-        void executor_t::xif(timeout_t t)
+        void xif(executor_t* exec, function_t fn)
         {
-            opcode_if_timeout_t op = {t.m_timeout_ms, 0, m_scope_open};
-            m_scope_open           = m_program_mem;
-            m_program_mem          = write(m_program_mem, op);
-            m_scope++;
+            opcode_if_func_t op = {fn, exec->m_scope_open};
+            exec->m_scope_open  = exec->m_program_mem;
+            exec->m_program_mem = write(exec->m_program_mem, op);
+            exec->m_scope++;
         }
 
-        void executor_t::xreturn() { m_program_mem = write(m_program_mem, OPCODE_RET); }
+        void xif(executor_t* exec, timeout_t t)
+        {
+            opcode_if_timeout_t op = {t.m_timeout_ms, 0, exec->m_scope_open};
+            exec->m_scope_open     = exec->m_program_mem;
+            exec->m_program_mem    = write(exec->m_program_mem, op);
+            exec->m_scope++;
+        }
 
-        void executor_t::xend()
+        void xreturn(executor_t* exec) { exec->m_program_mem = write_opcode_and_arg(exec->m_program_mem, OPCODE_RET, nullptr, 0); }
+
+        void xend(executor_t* exec)
         {
             // we only need to process scope management, there is no opcode
-            if (m_scope > 1)
+            if (exec->m_scope > 1)
             {
-                m_scope--;
-                m_scope_open = set_if_end(m_scope_open, m_program_mem);
+                exec->m_scope--;
+                exec->m_scope_open = set_if_end(exec->m_scope_open, exec->m_program_mem);
             }
-            else if (m_scope == 1)
+            else if (exec->m_scope == 1)
             {
-                m_scope               = 0;
-                m_currentProgram->end = m_program_mem;
-                gProgramMemoryUsed    = s32(m_program_mem - gProgramMemory);
+                exec->m_scope               = 0;
+                exec->m_currentProgram->end = exec->m_program_mem;
+                exec->m_program_mem_used    = exec->m_program_mem_cursor - exec->m_program_mem;
             }
         }
 
         static void reset_program(program_t program)
         {
-            byte* pc = (byte*)program->begin;
+            const byte* pc = (const byte*)program->begin;
             while (pc < program->end)
             {
-                const opcode_t opcode = *(opcode_t*)pc;
-                pc += sizeof(opcode_t);
+                opcode_t opcode;
+                s32      size;
+                pc = read_opcode_and_arg_size(pc, opcode, size);
 
                 switch (opcode)
                 {
@@ -200,9 +257,15 @@ namespace ncore
                         op->m_startTime         = 0;
                     }
                     break;
+                    case OPCODE_RUN_PERIODIC:
+                    {
+                        run_periodic_t* pp = (run_periodic_t*)pc;
+                        pp->m_lastTime     = 0;
+                    }
+                    break;
                 }  // switch
 
-                pc += (opcode >> 8) & 0xFF;
+                pc += size;
             }  // while
         }
 
@@ -211,46 +274,68 @@ namespace ncore
             const byte* pc = program->begin;
             while (pc < program->end)
             {
-                const opcode_t opcode = *(opcode_t*)pc;
-                pc += sizeof(opcode_t);
+                opcode_t opcode;
+                s32      size;
+                pc = read_opcode_and_arg_size(pc, opcode, size);
 
                 switch (opcode)
                 {
                     case OPCODE_JUMP:
                     {
                         jump_t* j    = (jump_t*)pc;
+                        pc           = pc + size;
                         *new_program = j->m_program;
+                        return;
                     }
                     break;
 
                     case OPCODE_RUN:
                     {
                         run_t* r = (run_t*)pc;
+                        pc       = pc + size;
                         execute_program(r->m_program, state, new_program);
-                        return;
                     }
+                    break;
+
+                    case OPCODE_RUN_PERIODIC:
+                    {
+                        run_periodic_t* pp    = (run_periodic_t*)pc;
+                        pc                    = pc + size;
+                        const u64 currentTime = ntimer::millis();
+                        if (pp->m_lastTime == 0 || (currentTime - pp->m_lastTime) >= pp->m_period_ms)
+                        {
+                            if (pp->m_lastTime == 0)
+                            {
+                                pp->m_lastTime = currentTime;  // first run, we just set the last time
+                            }
+                            else
+                            {
+                                pp->m_lastTime += pp->m_period_ms;  // next run, we set the last time to the next period
+                            }
+
+                            pp->m_function(state);
+                            // TODO do we need to handle the result?
+                        }
+                    }
+                    break;
 
                     case OPCODE_ONCE:
                     {
                         once_t* op = (once_t*)pc;
-                        pc += sizeof(once_t);
-
+                        pc         = pc + size;
                         if (op->m_executed == 0)
                         {
                             const result_t result = op->m_function(state);
                             op->m_executed        = 1;
-
                             // TODO do we need to handle the result?
                         }
                     }
-
                     break;
 
                     case OPCODE_IF_FUNC:
                     {
-                        opcode_if_func_t* op = (opcode_if_func_t*)pc;
-                        pc += sizeof(opcode_if_func_t);
-
+                        opcode_if_func_t* op  = (opcode_if_func_t*)pc;
+                        pc                    = pc + size;
                         const result_t result = op->m_function(state);
                         if (result == RESULT_OK)
                         {
@@ -266,13 +351,12 @@ namespace ncore
                             // error ??
                         }
                     }
-
                     break;
 
                     case OPCODE_IF_TIMEOUT:
                     {
                         opcode_if_timeout_t* op = (opcode_if_timeout_t*)pc;
-                        pc += sizeof(opcode_if_timeout_t);
+                        pc                      = pc + size;
 
                         const u64 currentTime = ntimer::millis();
                         if (op->m_startTime == 0)
@@ -289,7 +373,6 @@ namespace ncore
                             pc = op->m_end;
                         }
                     }
-
                     break;
 
                     case OPCODE_RET:
@@ -303,24 +386,18 @@ namespace ncore
             // we reached the end of the program, so we exit
         }
 
-        void executor_t::init()
+        void tick(executor_t* exec, state_t* state)
         {
-            m_program_mem    = gProgramMemory;
-            m_currentProgram = nullptr;
-        }
-
-        void executor_t::tick(state_t* state)
-        {
-            if (m_currentProgram == nullptr)
+            if (exec->m_currentProgram == nullptr)
                 return;
 
             program_info_t* nextProgram = nullptr;
-            execute_program(m_currentProgram, state, &nextProgram);
+            execute_program(exec->m_currentProgram, state, &nextProgram);
 
             if (nextProgram != nullptr)
             {
                 reset_program(nextProgram);
-                m_currentProgram = nextProgram;
+                exec->m_currentProgram = nextProgram;
             }
         }
 

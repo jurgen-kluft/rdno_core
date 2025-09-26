@@ -7,9 +7,9 @@ namespace ncore
 {
     namespace nconfig
     {
-        void reset(config_t* config) 
-        { 
-            g_memset(config, 0, sizeof(config_t)); 
+        void reset(config_t* config)
+        {
+            g_memset(config, 0, sizeof(config_t));
             config->m_version = CONFIG_VERSION;
         }
 
@@ -86,18 +86,17 @@ namespace ncore
                 if (config->m_param_values[PARAM_ID_STRING_COUNT] >= PARAM_ID_STRING_MAX_COUNT)
                     return false;  // No more space for strings
 
-                str_index                  = config->m_param_values[PARAM_ID_STRING_COUNT];
-                config->m_param_types[id]  = PARAM_TYPE_STRING;
-                config->m_param_values[id] = (str_index << 8) | str_len(str);
+                str_index                 = (config->m_param_values[PARAM_ID_STRING_COUNT] << 16);
+                config->m_param_types[id] = PARAM_TYPE_STRING;
                 config->m_param_values[PARAM_ID_STRING_COUNT] += 1;
             }
             else
             {
-                str_index                  = config->m_param_values[id] >> 5;
-                config->m_param_values[id] = (str_index * PARAM_ID_STRING_MAX_LENGTH) + str_len(str);
+                str_index = config->m_param_values[id];
             }
 
-            str_t dst = str_mutable(&config->m_strings[str_index * PARAM_ID_STRING_MAX_LENGTH], PARAM_ID_STRING_MAX_LENGTH);
+            config->m_param_values[id] = (str_index & 0xFFFF0000) | str_len(str);
+            str_t dst                  = str_mutable(&config->m_strings[(str_index >> 16) * PARAM_ID_STRING_MAX_LENGTH], PARAM_ID_STRING_MAX_LENGTH);
             str_append(dst, str);
             return true;
         }
@@ -110,8 +109,8 @@ namespace ncore
             if (config->m_param_types[id] != PARAM_TYPE_STRING)
                 return false;
             s32 const str_value  = config->m_param_values[id];
-            s32 const str_index  = str_value >> 8;
-            s32 const str_length = str_value & 0xFF;
+            s32 const str_index  = (str_value >> 16);
+            s32 const str_length = str_value & 0xFFFF;
             if (str_index < 0 || str_index >= config->m_param_values[PARAM_ID_STRING_COUNT])
                 return false;
             outStr = str_const_n(&config->m_strings[str_index * PARAM_ID_STRING_MAX_LENGTH], str_length);

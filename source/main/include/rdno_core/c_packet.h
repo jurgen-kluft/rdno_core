@@ -88,7 +88,7 @@ namespace ncore
 
         struct packet_t
         {
-            byte Data[512];
+            byte Data[64];
             s32  Size;
             s32  Capacity;
 
