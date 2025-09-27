@@ -14,60 +14,111 @@ namespace ncore
         enum param_type_t
         {
             PARAM_TYPE_NONE   = 0,
-            PARAM_TYPE_S32    = 15,
-            PARAM_TYPE_BOOL   = 17,
-            PARAM_TYPE_STRING = 18,
+            PARAM_TYPE_U8     = 15,
+            PARAM_TYPE_U16    = 25,
+            PARAM_TYPE_U64    = 45,
+            PARAM_TYPE_STRING = 50,
         };
 
         typedef s16 (*ParamNameToId)(const char* str, s32 len);
 
-        enum params_t
+        enum param_id_t
         {
             // WiFi parameters
-            PARAM_ID_STRING_COUNT  = 0,
-            PARAM_ID_WIFI_SSID     = 1,
-            PARAM_ID_WIFI_PASSWORD = 2,
-            PARAM_ID_AP_SSID       = 3,
-            PARAM_ID_AP_PASSWORD   = 4,
-            PARAM_ID_REMOTE_SERVER = 5,
-            PARAM_ID_REMOTE_PORT   = 6,
+            PARAM_ID_STRING_COUNT = 0,  // u8
+            PARAM_ID_U8_COUNT     = 1,  // u8
+            PARAM_ID_U16_COUNT    = 2,  // u8
+            PARAM_ID_U32_COUNT    = 4,  // u8
+            PARAM_ID_U64_COUNT    = 5,  // u8
 
-            PARAM_ID_SENSOR_READ_INTERVAL = 10,  // Interval in milli-seconds to read sensors
-            PARAM_ID_SENSOR_SEND_INTERVAL = 11,  // Interval in milli-seconds to send sensor data to server
+            PARAM_ID_WIFI_SSID     = 6,   // string
+            PARAM_ID_WIFI_PASSWORD = 7,   // string
+            PARAM_ID_AP_SSID       = 8,   // string
+            PARAM_ID_AP_PASSWORD   = 9,   // string
+            PARAM_ID_REMOTE_SERVER = 10,  // string
+            PARAM_ID_REMOTE_PORT   = 11,  // u16
 
-            PARAM_ID_MAX_COUNT         = 16,
-            PARAM_ID_STRING_MAX_COUNT  = 10,
-            PARAM_ID_STRING_MAX_LENGTH = 32,
+            PARAM_ID_T   = 12,  // u8, Temperature
+            PARAM_ID_H   = 13,  // u8, Humidity
+            PARAM_ID_HPA = 14,  // u8, Pressure
+            PARAM_ID_LUX = 15,  // u8, Light
+            PARAM_ID_CO2 = 16,  // u8, CO2
+            PARAM_ID_VOC = 17,  // u8, VOC
+            PARAM_ID_PM1 = 18,  // u8, PM1_0
+            PARAM_ID_PM2 = 19,  // u8, PM2_5
+            PARAM_ID_PMA = 20,  // u8, PM10
+            PARAM_ID_DB  = 21,  // u8, Noise
+            PARAM_ID_UV  = 22,  // u8, UV
+            PARAM_ID_CO  = 23,  // u8, CO
+            PARAM_ID_V   = 24,  // u8, Vibration
+            PARAM_ID_S   = 25,  // u8, State
+            PARAM_ID_P1  = 26,  // u8, Presence1
+            PARAM_ID_P2  = 27,  // u8, Presence2
+            PARAM_ID_P3  = 28,  // u8, Presence3
+            PARAM_ID_D1  = 29,  // u8, Distance1
+            PARAM_ID_D2  = 30,  // u8, Distance2
+            PARAM_ID_D3  = 31,  // u8, Distance3
+
+            // All values are in unit of millimeter and are signed values
+            // Position of the device (for motion detection)
+            PARAM_ID_POS = 32,  // u64: X,Y,Z (z=height)
+            PARAM_ID_LAP = 33,  // u64: LookAtPoint X,Y,Z
+
+            // Rectangular areas (for motion detection)
+            PARAM_ID_RA1 = 34,  // u64: Left,Right,Front,Back
+            PARAM_ID_RA2 = 35,  // u64: Left,Right,Front,Back
+            PARAM_ID_RA3 = 36,  // u64: Left,Right,Front,Back
+        };
+
+        enum esettings
+        {
+            SETTING_PARAM_MAX_COUNT   = 40,
+            SETTING_U8_MAX_COUNT      = 25,
+            SETTING_U16_MAX_COUNT     = 2,
+            SETTING_U64_MAX_COUNT     = 5,
+            SETTING_STRING_MAX_COUNT  = 8,
+            SETTING_STRING_MAX_LENGTH = 32,
         };
 
         enum
         {
-            CONFIG_VERSION = 0x00010000,
+            CONFIG_VERSION = 0x0003,
         };
 
-        // 4 + 16 + (16 * 4) + (10 * 32) = 4 + 16 + 64 + 320 = 404 bytes
+        // Size in bytes: 2 + 40 + 2*40 + 10*32 = 442 bytes
         struct config_t
         {
-            u32  m_version;
-            s8   m_param_types[PARAM_ID_MAX_COUNT];
-            s32  m_param_values[PARAM_ID_MAX_COUNT];                                 // For strings: (index * 32) + length
-            char m_strings[PARAM_ID_STRING_MAX_COUNT * PARAM_ID_STRING_MAX_LENGTH];  // Maximum of 32 strings of max 32 characters each
+            u16  m_version;
+            u8   m_param_types[SETTING_PARAM_MAX_COUNT];                           // parameter type
+            u8   m_param_value_idx[SETTING_PARAM_MAX_COUNT];                       // parameter value index (into the respective value array)
+            u8   m_param_values_u8[SETTING_U16_MAX_COUNT];                         // u8 values
+            u16  m_param_values_u16[SETTING_U16_MAX_COUNT];                        // u16 values
+            u64  m_param_values_u64[SETTING_U64_MAX_COUNT];                        // u64 values
+            u8   m_strlen[SETTING_STRING_MAX_COUNT];                              // string length values
+            char m_strings[SETTING_STRING_MAX_COUNT * SETTING_STRING_MAX_LENGTH];  // string values
         };
 
         void reset(config_t* config);
 
-        // Message example: "ssid=OBNOSIS8, password=MySecretPassword, remote_server=10.0.0.22, remote_port=1234, device_name=Bedroom.1."
+        // Message example:
+        // ssid=OBNOSIS8,pw=MySecretPassword,server=192.168.8.88,port=31339,T=7,HPA=8,CO2=9
         bool parse_keyvalue(str_t& msg, str_t& outKey, str_t& outValue);
         void parse_value(config_t* config, s16 id, str_t const& str);
-        void parse_int(config_t* config, s16 id, str_t const& str);
-        void parse_bool(config_t* config, s16 id, str_t const& str);
+        void parse_uint8(config_t* config, s16 id, str_t const& str);
+        void parse_uint16(config_t* config, s16 id, str_t const& str);
+        void parse_uint64(config_t* config, s16 id, str_t const& str);
 
         bool set_string(config_t* config, s16 id, str_t const& str);
         bool get_string(const config_t* config, s16 id, str_t& outStr);
-        void set_int(config_t* config, s16 id, s32 value);
-        bool get_int(const config_t* config, s16 id, s32& outValue);
-        void set_bool(config_t* config, s16 id, bool value);
-        bool get_bool(const config_t* config, s16 id, bool& outValue);
+
+        bool set_uint8(config_t* config, s16 id, u8 value);
+        bool get_uint8(const config_t* config, s16 id, u8& outValue);
+
+        bool set_uint16(config_t* config, s16 id, u16 value);
+        bool get_uint16(const config_t* config, s16 id, u16& outValue);
+
+        bool set_uint64(config_t* config, s16 id, u64 value);
+        bool get_uint64(const config_t* config, s16 id, u64& outValue);
     }  // namespace nconfig
 }  // namespace ncore
 

@@ -411,7 +411,54 @@ namespace ncore
         return false;
     }
 
-    bool str_to_integer(const char* str, const char* end, s16 base, s32* outValue)
+    bool str_to_int32(const char* str, const char* end, s16 base, s32* outValue)
+    {
+        *outValue = 0;
+
+        if (str == nullptr || str == end || base < 2 || base > 36)
+            return false;
+
+        bool        isNegative = false;
+        s32         value      = 0;
+        const char* ptr        = str;
+
+        // Handle optional sign
+        if (ptr < end)
+        {
+            if (*ptr == '-')
+            {
+                isNegative = true;
+                ptr++;
+            }
+            else if (*ptr == '+')
+            {
+                ptr++;
+            }
+
+            // If base == 16, we can have an optional "0x" or "0X" prefix
+            if (base == 16 && (end - ptr) >= 2 && ptr[0] == '0' && (ptr[1] == 'x' || ptr[1] == 'X'))
+            {
+                ptr += 2;
+            }
+
+            // Convert characters to integer
+            while (ptr < end)
+            {
+                const char c     = *ptr;
+                const s32  digit = from_char(c);
+                if (digit >= base)
+                    return false;
+                value = value * base + digit;
+                ptr++;
+            }
+
+            *outValue = isNegative ? -value : value;
+            return true;
+        }
+        return false;
+    }
+
+    bool str_to_int64(const char* str, const char* end, s16 base, s64* outValue)
     {
         *outValue = 0;
 
@@ -534,7 +581,7 @@ namespace ncore
 
         const char* start = trimmed.m_const + trimmed.m_str;
         const char* end   = trimmed.m_const + trimmed.m_end;
-        return str_to_integer(start, end, base, outValue);
+        return str_to_int32(start, end, base, outValue);
     }
 
     bool from_str(const str_t& s, u32* outValue, s16 base)
@@ -543,6 +590,35 @@ namespace ncore
             return false;
 
         s32  intValue = 0;
+        bool success  = from_str(s, &intValue, base);
+        if (success && intValue >= 0)
+        {
+            *outValue = (u32)intValue;
+            return true;
+        }
+        return false;
+    }
+
+    bool from_str(const str_t& s, s64* outValue, s16 base)
+    {
+        if (outValue == nullptr)
+            return false;
+
+        str_t trimmed = str_trim(s);
+        if (str_is_empty(trimmed))
+            return false;
+
+        const char* start = trimmed.m_const + trimmed.m_str;
+        const char* end   = trimmed.m_const + trimmed.m_end;
+        return str_to_int64(start, end, base, outValue);
+    }
+
+    bool from_str(const str_t& s, u64* outValue, s16 base)
+    {
+        if (outValue == nullptr)
+            return false;
+
+        s64  intValue = 0;
         bool success  = from_str(s, &intValue, base);
         if (success && intValue >= 0)
         {

@@ -13,7 +13,8 @@ namespace ncore
             config->m_version = CONFIG_VERSION;
         }
 
-        // Message example: "ssid=OBNOSIS8, password=MySecretPassword, remote_server=10.0.0.22, remote_port=1234"
+        // Message example :
+        // ssid=OBNOSIS8,pw=MySecretPassword,server=10.0.0.22,port=1234
         bool parse_keyvalue(str_t& msg, str_t& outKey, str_t& outValue)
         {
             if (str_is_empty(msg))
@@ -43,60 +44,80 @@ namespace ncore
 
         void parse_value(config_t* config, s16 id, str_t const& str)
         {
-            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
                 return;
             switch (config->m_param_types[id])
             {
                 case nconfig::PARAM_TYPE_NONE: break;
                 case nconfig::PARAM_TYPE_STRING: nconfig::set_string(config, id, str); break;
-                case nconfig::PARAM_TYPE_S32: nconfig::parse_int(config, id, str); break;
-                case nconfig::PARAM_TYPE_BOOL: nconfig::parse_bool(config, id, str); break;
+                case nconfig::PARAM_TYPE_U8: nconfig::parse_uint8(config, id, str); break;
+                case nconfig::PARAM_TYPE_U16: nconfig::parse_uint16(config, id, str); break;
+                case nconfig::PARAM_TYPE_U64: nconfig::parse_uint64(config, id, str); break;
             }
         }
 
-        void parse_int(config_t* config, s16 id, const str_t& str)
+        void parse_uint8(config_t* config, s16 id, const str_t& str)
         {
-            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
                 return;
 
-            s32 value = 0;
+            u32 value = 0;
             if (from_str(str, &value, 10))
             {
-                set_int(config, id, value);
+                set_uint8(config, id, (u8)value);
             }
         }
 
-        void parse_bool(config_t* config, s16 id, const str_t& str)
+        void parse_uint16(config_t* config, s16 id, const str_t& str)
         {
-            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
                 return;
-            bool boolean = false;
-            if (from_str(str, &boolean))
-                set_bool(config, id, boolean);
+
+            u32 value = 0;
+            if (from_str(str, &value, 10))
+            {
+                set_uint16(config, id, value);
+            }
+        }
+
+        void parse_uint64(config_t* config, s16 id, const str_t& str)
+        {
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
+                return;
+
+            u64 value = 0;
+            if (from_str(str, &value, 10))
+            {
+                set_uint64(config, id, value);
+            }
+        }
+
+        bool init_param(config_t* config, s16 param_id, param_type_t param_type, s16 count_id, u8 count_max)
+        {
+            if (config->m_param_values_u8[count_id] >= count_max)
+                return false;  
+            config->m_param_types[param_id]     = param_type;
+            config->m_param_value_idx[param_id] = config->m_param_values_u8[count_id];
+            config->m_param_values_u8[count_id] += 1;
+            return true;
         }
 
         bool set_string(config_t* config, s16 id, const str_t& str)
         {
-            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT) || str_len(str) >= PARAM_ID_STRING_MAX_LENGTH)
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT) || str_len(str) >= SETTING_STRING_MAX_LENGTH)
                 return false;
 
-            s32 str_index;
             if (config->m_param_types[id] == PARAM_TYPE_NONE)
             {
-                if (config->m_param_values[PARAM_ID_STRING_COUNT] >= PARAM_ID_STRING_MAX_COUNT)
-                    return false;  // No more space for strings
-
-                str_index                 = (config->m_param_values[PARAM_ID_STRING_COUNT] << 16);
-                config->m_param_types[id] = PARAM_TYPE_STRING;
-                config->m_param_values[PARAM_ID_STRING_COUNT] += 1;
+                if (init_param(config, id, PARAM_TYPE_STRING, PARAM_ID_STRING_COUNT, SETTING_STRING_MAX_COUNT) == false)
+                    return false;  
             }
-            else
-            {
-                str_index = config->m_param_values[id];
-            }
-
-            config->m_param_values[id] = (str_index & 0xFFFF0000) | str_len(str);
-            str_t dst                  = str_mutable(&config->m_strings[(str_index >> 16) * PARAM_ID_STRING_MAX_LENGTH], PARAM_ID_STRING_MAX_LENGTH);
+            if (config->m_param_types[id] != PARAM_TYPE_NONE)
+                return false;
+            const u8 str_index          = config->m_param_value_idx[id];
+            config->m_strlen[str_index] = (u8)str_len(str);
+            str_t dst                   = str_mutable(&config->m_strings[str_index * SETTING_STRING_MAX_LENGTH], SETTING_STRING_MAX_LENGTH - 1);
+            dst.m_ascii[0]              = 0;
             str_append(dst, str);
             return true;
         }
@@ -104,50 +125,93 @@ namespace ncore
         bool get_string(const config_t* config, s16 id, str_t& outStr)
         {
             outStr = str_empty();
-            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
                 return false;
             if (config->m_param_types[id] != PARAM_TYPE_STRING)
                 return false;
-            s32 const str_value  = config->m_param_values[id];
-            s32 const str_index  = (str_value >> 16);
-            s32 const str_length = str_value & 0xFFFF;
-            if (str_index < 0 || str_index >= config->m_param_values[PARAM_ID_STRING_COUNT])
+            s32 const index = config->m_param_value_idx[id];
+            if (index < 0 || index >= config->m_param_values_u8[PARAM_ID_STRING_COUNT])
                 return false;
-            outStr = str_const_n(&config->m_strings[str_index * PARAM_ID_STRING_MAX_LENGTH], str_length);
+            s32 const   str_length = config->m_strlen[index];
+            const char* str_data   = &config->m_strings[index * SETTING_STRING_MAX_LENGTH];
+            outStr                 = str_const_full(str_data, 0, str_length, str_length);
             return true;
         }
 
-        void set_int(config_t* config, s16 id, s32 value)
+        bool set_uint8(config_t* config, s16 id, u8 value)
         {
-            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
-                return;
-            config->m_param_types[id]  = PARAM_TYPE_S32;
-            config->m_param_values[id] = value;
-        }
-
-        bool get_int(const config_t* config, s16 id, s32& outValue)
-        {
-            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_S32)
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
                 return false;
-            outValue = config->m_param_values[id];
+            if (config->m_param_types[id] == PARAM_TYPE_NONE) 
+            {
+                if (init_param(config, id, PARAM_TYPE_U8, PARAM_ID_U8_COUNT, SETTING_U8_MAX_COUNT) == false)
+                    return false;  // No more space for u8 values
+            }
+            if (config->m_param_types[id] != PARAM_TYPE_U8)
+                return false;
+            const u8 index                   = config->m_param_value_idx[id];
+            config->m_param_values_u8[index] = (u8)value;
             return true;
         }
 
-        void set_bool(config_t* config, s16 id, bool value)
+        bool get_uint8(const config_t* config, s16 id, u8& outValue)
         {
-            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT))
-                return;
-            config->m_param_types[id]  = PARAM_TYPE_BOOL;
-            config->m_param_values[id] = value ? 1 : 0;
-        }
-
-        bool get_bool(const config_t* config, s16 id, bool& outValue)
-        {
-            if (config == nullptr || (id < 0 || id >= PARAM_ID_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_BOOL)
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_U8)
                 return false;
-            outValue = config->m_param_values[id] == 1;
+            const u8 index = config->m_param_value_idx[id];
+            outValue       = config->m_param_values_u8[index];
             return true;
         }
 
+        bool set_uint16(config_t* config, s16 id, u16 value)
+        {
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
+                return false;
+            if (config->m_param_types[id] == PARAM_TYPE_NONE)
+            {
+                if (init_param(config, id, PARAM_TYPE_U16, PARAM_ID_U16_COUNT, SETTING_U16_MAX_COUNT) == false)
+                    return false;  
+            }
+            if (config->m_param_types[id] != PARAM_TYPE_U16)
+                return false;
+            const u8 index                    = config->m_param_value_idx[id];
+            config->m_param_values_u16[index] = value;
+            return true;
+        }
+
+        bool get_uint16(const config_t* config, s16 id, u16& outValue)
+        {
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_U16)
+                return false;
+            const u8 index = config->m_param_value_idx[id];
+            outValue       = config->m_param_values_u16[index];
+            return true;
+        }
+
+
+        bool set_uint64(config_t* config, s16 id, u64 value)
+        {
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
+                return false;
+            if (config->m_param_types[id] == PARAM_TYPE_NONE)
+            {
+                if (init_param(config, id, PARAM_TYPE_U64, PARAM_ID_U64_COUNT, SETTING_U64_MAX_COUNT) == false)
+                    return false;  
+            }
+            if (config->m_param_types[id] != PARAM_TYPE_U64)
+                return false;
+            const u8 index                    = config->m_param_value_idx[id];
+            config->m_param_values_u64[index] = value;
+            return true;
+        }
+
+        bool get_uint64(const config_t* config, s16 id, u64& outValue)
+        {
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_U64)
+                return false;
+            const u8 index = config->m_param_value_idx[id];
+            outValue       = config->m_param_values_u64[index];
+            return true;
+        }
     }  // namespace nconfig
 }  // namespace ncore

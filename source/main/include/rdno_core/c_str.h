@@ -105,6 +105,8 @@ namespace ncore
     bool from_str(const str_t& s, bool* outValue);
     bool from_str(const str_t& s, s32* outValue, s16 base = 10);
     bool from_str(const str_t& s, u32* outValue, s16 base = 10);
+    bool from_str(const str_t& s, s64* outValue, s16 base = 10);
+    bool from_str(const str_t& s, u64* outValue, s16 base = 10);
     bool from_str(const str_t& s, f32* outValue);
 
     void to_str(str_t& dest, bool value);

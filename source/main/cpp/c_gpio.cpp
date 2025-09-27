@@ -1,7 +1,9 @@
 #include "rdno_core/c_gpio.h"
+#include "rdno_core/c_timer.h"
+#include "rdno_core/c_debounce.h"
 
 #ifdef TARGET_ESP32
-#include "Arduino.h"
+#    include "Arduino.h"
 
 namespace ncore
 {
@@ -16,20 +18,27 @@ namespace ncore
             }
         }
 
-        s8 read_digital(s8 pin)
+        s8 read_digital(s8 pin) { return ::digitalRead(pin); }
+
+        s8 read_digital_debounced(s8 pin, u16 debounce_low_high_ms, u16 debounce_high_low_ms)
         {
-            return ::digitalRead(pin);
+            ndebounce::filter_t filter;
+            filter.m_low_to_high_debounce_interval_ms  = debounce_low_high_ms;
+            filter.m_high_to_low_debounce_interval_ms  = debounce_high_low_ms;
+            ndebounce::value_t   value;
+
+            filter.init(value);
+            s8 poll = read_digital(pin);
+            while (filter.update(value, poll) == false)
+            {
+                poll = read_digital(pin);
+                ntimer::delay(5);
+            }
         }
 
-        s32 read_analog(s8 pin)
-        {
-            return ::analogRead(pin);
-        }
+        s32 read_analog(s8 pin) { return ::analogRead(pin); }
 
-        void write_pin(s8 pin, s8 value)
-        {
-            ::digitalWrite(pin, value);
-        }
+        void write_digital(s8 pin, s8 value) { ::digitalWrite(pin, value); }
 
         void set_wakeup_pin(s8 pin, s8 trigger)
         {
@@ -50,7 +59,7 @@ namespace ncore
     namespace ngpio
     {
         // GPIO simulation
-        static u8 GPIOModes[PinsMax]  = {0};
+        static u8  GPIOModes[PinsMax]  = {0};
         static s32 GPIOValues[PinsMax] = {0};
 
         void set_pinmode(s8 pin, s8 mode)
@@ -91,7 +100,7 @@ namespace ncore
         {
             // Not supported in simulation
         }
-        
+
     }  // namespace ngpio
 }  // namespace ncore
 
