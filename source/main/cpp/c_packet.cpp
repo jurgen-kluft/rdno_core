@@ -15,21 +15,12 @@ namespace ncore
     {
         const u8 c_packet_version = 1;
 
-        void packet_t::begin(u32 time_ms, bool time_sync)
+        void packet_t::begin()
         {
-            Size         = 0;                                             //
-            Capacity     = sizeof(Data);                                  // Maximum size of the packet
-            Data[Size++] = 0;                                             // Placeholder for length (will be set in finalize), will count sensor values
-            Data[Size++] = c_packet_version;                              // Packet version
-            Data[Size++] = 0xC3;                                          // Fixed Id 0xA5C3 (little endian)
-            Data[Size++] = 0xA5;                                          //
-            Data[Size++] = time_ms & 0xFF;                                // Time sync (4 bytes)
-            time_ms      = time_ms >> 8;                                  //
-            Data[Size++] = time_ms & 0xFF;                                //
-            time_ms      = time_ms >> 8;                                  //
-            Data[Size++] = time_ms & 0xFF;                                //
-            time_ms      = time_ms >> 8;                                  //
-            Data[Size++] = (time_ms & 0x7F) | (time_sync ? 0x80 : 0x00);  // Bit 31 indicates if this packet is a time sync packet
+            Size         = 0;                 //
+            Capacity     = sizeof(Data);      // Maximum size of the packet
+            Data[Size++] = 0;                 // Placeholder for length (will be set in finalize), will count sensor values
+            Data[Size++] = c_packet_version;  // Packet version
         }
 
         s32 packet_t::finalize()
@@ -43,27 +34,12 @@ namespace ncore
             return num_values;
         }
 
-        void packet_t::write_value(ntype::type_t type, u64 value)
+        void packet_t::write_sensor(u8 id, nfieldtype::field_t field, u64 value)
         {
-            // Write the sensor value to the packet
-            nfieldtype::field_t field_type = nfieldtype::from_type(type);
-            switch (field_type)
-            {
-                case nfieldtype::TypeU8:
-                case nfieldtype::TypeS8:
-                case nfieldtype::TypeU16:
-                case nfieldtype::TypeS16:
-                case nfieldtype::TypeU32:
-                case nfieldtype::TypeS32:
-                case nfieldtype::TypeU64:
-                case nfieldtype::TypeS64:
-                    Data[LengthOffset]++;              // Increment the sensor value count
-                    Data[Size++] = ntype::type(type);  // Write the sensor type
-                    break;
-                default: return;
-            }
+            Data[LengthOffset]++;  // Increment the sensor value count
+            Data[Size++] = id;     // Write the sensor stream id
 
-            const s32 n  = nfieldtype::size_in_bytes(field_type);  // Number of bytes to write
+            const s32 n  = nfieldtype::size_in_bytes(field);  // Number of bytes to write
             Data[Size++] = value & 0xFF;
             for (s32 i = 1; i < n; i++)
             {

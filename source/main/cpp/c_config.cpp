@@ -50,9 +50,23 @@ namespace ncore
             {
                 case nconfig::PARAM_TYPE_NONE: break;
                 case nconfig::PARAM_TYPE_STRING: nconfig::set_string(config, id, str); break;
+                case nconfig::PARAM_TYPE_S8: nconfig::parse_int8(config, id, str); break;
                 case nconfig::PARAM_TYPE_U8: nconfig::parse_uint8(config, id, str); break;
+                case nconfig::PARAM_TYPE_S16: nconfig::parse_int16(config, id, str); break;
                 case nconfig::PARAM_TYPE_U16: nconfig::parse_uint16(config, id, str); break;
                 case nconfig::PARAM_TYPE_U64: nconfig::parse_uint64(config, id, str); break;
+            }
+        }
+
+        void parse_int8(config_t* config, s16 id, const str_t& str)
+        {
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
+                return;
+
+            s32 value = 0;
+            if (from_str(str, &value, 10))
+            {
+                set_int8(config, id, (s8)value);
             }
         }
 
@@ -65,6 +79,18 @@ namespace ncore
             if (from_str(str, &value, 10))
             {
                 set_uint8(config, id, (u8)value);
+            }
+        }
+
+        void parse_int16(config_t* config, s16 id, const str_t& str)
+        {
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
+                return;
+
+            s32 value = 0;
+            if (from_str(str, &value, 10))
+            {
+                set_int16(config, id, (s16)value);
             }
         }
 
@@ -138,6 +164,31 @@ namespace ncore
             return true;
         }
 
+        bool set_int8(config_t* config, s16 id, s8 value)
+        {
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
+                return false;
+            if (config->m_param_types[id] == PARAM_TYPE_NONE) 
+            {
+                if (init_param(config, id, PARAM_TYPE_S8, PARAM_ID_U8_COUNT, SETTING_U8_MAX_COUNT) == false)
+                    return false;  // No more space for u8 values
+            }
+            if (config->m_param_types[id] != PARAM_TYPE_S8)
+                return false;
+            const u8 index                   = config->m_param_value_idx[id];
+            config->m_param_values_u8[index] = (u8)value;
+            return true;
+        }
+
+        bool get_int8(const config_t* config, s16 id, s8& outValue)
+        {
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_S8)
+                return false;
+            const u8 index = config->m_param_value_idx[id];
+            outValue       = (s8)config->m_param_values_u8[index];
+            return true;
+        }
+
         bool set_uint8(config_t* config, s16 id, u8 value)
         {
             if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
@@ -163,6 +214,31 @@ namespace ncore
             return true;
         }
 
+        bool set_int16(config_t* config, s16 id, s16 value)
+        {
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
+                return false;
+            if (config->m_param_types[id] == PARAM_TYPE_NONE)
+            {
+                if (init_param(config, id, PARAM_TYPE_S16, PARAM_ID_U16_COUNT, SETTING_U16_MAX_COUNT) == false)
+                    return false;  
+            }
+            if (config->m_param_types[id] != PARAM_TYPE_S16)
+                return false;
+            const u8 index                    = config->m_param_value_idx[id];
+            config->m_param_values_u16[index] = (u16)value;
+            return true;
+        }
+
+        bool get_int16(const config_t* config, s16 id, s16& outValue)
+        {
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_S16)
+                return false;
+            const u8 index = config->m_param_value_idx[id];
+            outValue       = (s16)config->m_param_values_u16[index];
+            return true;
+        }
+        
         bool set_uint16(config_t* config, s16 id, u16 value)
         {
             if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
@@ -187,7 +263,6 @@ namespace ncore
             outValue       = config->m_param_values_u16[index];
             return true;
         }
-
 
         bool set_uint64(config_t* config, s16 id, u64 value)
         {

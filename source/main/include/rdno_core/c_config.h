@@ -15,7 +15,9 @@ namespace ncore
         {
             PARAM_TYPE_NONE   = 0,
             PARAM_TYPE_U8     = 15,
+            PARAM_TYPE_S8     = 16,
             PARAM_TYPE_U16    = 25,
+            PARAM_TYPE_S16    = 26,
             PARAM_TYPE_U64    = 45,
             PARAM_TYPE_STRING = 50,
         };
@@ -40,34 +42,36 @@ namespace ncore
 
             PARAM_ID_T   = 12,  // u8, Temperature
             PARAM_ID_H   = 13,  // u8, Humidity
-            PARAM_ID_HPA = 14,  // u8, Pressure
-            PARAM_ID_LUX = 15,  // u8, Light
-            PARAM_ID_CO2 = 16,  // u8, CO2
-            PARAM_ID_VOC = 17,  // u8, VOC
-            PARAM_ID_PM1 = 18,  // u8, PM1_0
-            PARAM_ID_PM2 = 19,  // u8, PM2_5
-            PARAM_ID_PMA = 20,  // u8, PM10
-            PARAM_ID_DB  = 21,  // u8, Noise
+            PARAM_ID_P   = 14,  // u16, Pressure
+            PARAM_ID_LUX = 15,  // u16, Light
+            PARAM_ID_CO2 = 16,  // u16, CO2
+            PARAM_ID_VOC = 17,  // u16, VOC
+            PARAM_ID_PM1 = 18,  // u16, PM1_0
+            PARAM_ID_PM2 = 19,  // u16, PM2_5
+            PARAM_ID_PMA = 20,  // u16, PM10
+            PARAM_ID_N   = 21,  // u8, Noise
             PARAM_ID_UV  = 22,  // u8, UV
             PARAM_ID_CO  = 23,  // u8, CO
             PARAM_ID_V   = 24,  // u8, Vibration
-            PARAM_ID_S   = 25,  // u8, State
-            PARAM_ID_P1  = 26,  // u8, Presence1
-            PARAM_ID_P2  = 27,  // u8, Presence2
-            PARAM_ID_P3  = 28,  // u8, Presence3
-            PARAM_ID_D1  = 29,  // u8, Distance1
-            PARAM_ID_D2  = 30,  // u8, Distance2
-            PARAM_ID_D3  = 31,  // u8, Distance3
+            PARAM_ID_S   = 25,  // u16, State
+            PARAM_ID_B   = 26,  // u8, Battery
+            PARAM_ID_OC  = 27,  // u8, Open/Close
+            PARAM_ID_P1  = 30,  // u8, Presence1
+            PARAM_ID_P2  = 31,  // u8, Presence2
+            PARAM_ID_P3  = 32,  // u8, Presence3
+            PARAM_ID_D1  = 33,  // u16, Distance1
+            PARAM_ID_D2  = 34,  // u16, Distance2
+            PARAM_ID_D3  = 35,  // u16, Distance3
 
             // All values are in unit of millimeter and are signed values
             // Position of the device (for motion detection)
-            PARAM_ID_POS = 32,  // u64: X,Y,Z (z=height)
-            PARAM_ID_LAP = 33,  // u64: LookAtPoint X,Y,Z
+            PARAM_ID_POS = 36,  // u64: X,Y,Z (z=height)
+            PARAM_ID_LAP = 37,  // u64: LookAtPoint X,Y,Z
 
             // Rectangular areas (for motion detection)
-            PARAM_ID_RA1 = 34,  // u64: Left,Right,Front,Back
-            PARAM_ID_RA2 = 35,  // u64: Left,Right,Front,Back
-            PARAM_ID_RA3 = 36,  // u64: Left,Right,Front,Back
+            PARAM_ID_RA1 = 38,  // u64: Left,Right,Front,Back
+            PARAM_ID_RA2 = 39,  // u64: Left,Right,Front,Back
+            PARAM_ID_RA3 = 40,  // u64: Left,Right,Front,Back
         };
 
         enum esettings
@@ -104,15 +108,23 @@ namespace ncore
         // ssid=OBNOSIS8,pw=MySecretPassword,server=192.168.8.88,port=31339,T=7,HPA=8,CO2=9
         bool parse_keyvalue(str_t& msg, str_t& outKey, str_t& outValue);
         void parse_value(config_t* config, s16 id, str_t const& str);
+        void parse_int8(config_t* config, s16 id, str_t const& str);
         void parse_uint8(config_t* config, s16 id, str_t const& str);
+        void parse_int16(config_t* config, s16 id, str_t const& str);
         void parse_uint16(config_t* config, s16 id, str_t const& str);
         void parse_uint64(config_t* config, s16 id, str_t const& str);
 
         bool set_string(config_t* config, s16 id, str_t const& str);
         bool get_string(const config_t* config, s16 id, str_t& outStr);
 
+        bool set_int8(config_t* config, s16 id, s8 value);
+        bool get_int8(const config_t* config, s16 id, s8& outValue);
+
         bool set_uint8(config_t* config, s16 id, u8 value);
         bool get_uint8(const config_t* config, s16 id, u8& outValue);
+
+        bool set_int16(config_t* config, s16 id, s16 value);
+        bool get_int16(const config_t* config, s16 id, s16& outValue);
 
         bool set_uint16(config_t* config, s16 id, u16 value);
         bool get_uint16(const config_t* config, s16 id, u16& outValue);

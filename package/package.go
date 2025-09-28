@@ -5,7 +5,7 @@ import (
 	cunittest "github.com/jurgen-kluft/cunittest/package"
 )
 
-// rdno_core is the core package for Arduino projects.
+// Core package for Arduino projects, both for ESP32 and ESP8266.
 //
 // It can compile for Desktop (Windows, Mac, Linux) but it mocks many of the
 // systems that are available on the Arduino platform.
@@ -33,18 +33,29 @@ func GetPackage() *denv.Package {
 	mainpkg.AddPackage(cunittestpkg)
 
 	// esp32 core library
-	esp32corelib := denv.SetupCppLibProjectForArduino(mainpkg, "esp32-core")
+	esp32corelib := denv.SetupCppLibProjectForArduinoEsp32(mainpkg, "esp32-core")
 	esp32corelib.ClearIncludes()
 	esp32corelib.ClearSourcePaths()
-	esp32corelib.AddEnvironmentVariable("ESP_SDK")
-	esp32corelib.AddInclude("{ESP_SDK}", "cores/esp32", "")
-	esp32corelib.SourceFilesFrom("{ESP_SDK}", "cores/esp32", "")
-	esp32corelib.AddInclude("{ESP_SDK}", "libraries/Wire", "src")
-	esp32corelib.SourceFilesFrom("{ESP_SDK}", "libraries/Wire", "src")
+	esp32corelib.AddEnvironmentVariable("ESP32_SDK")
+	esp32corelib.AddInclude("{ESP32_SDK}", "cores/esp32", "")
+	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "cores/esp32", "")
+	esp32corelib.AddInclude("{ESP32_SDK}", "libraries/Wire", "src")
+	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "libraries/Wire", "src")
+
+	// esp8266 core library
+	esp8266corelib := denv.SetupCppLibProjectForArduinoEsp8266(mainpkg, "esp8266-core")
+	esp8266corelib.ClearIncludes()
+	esp8266corelib.ClearSourcePaths()
+	esp8266corelib.AddEnvironmentVariable("ESP8266_SDK")
+	esp8266corelib.AddInclude("{ESP8266_SDK}", "cores/esp8266", "")
+	esp8266corelib.SourceFilesFrom("{ESP8266_SDK}", "cores/esp8266", "")
+	esp8266corelib.AddInclude("{ESP8266_SDK}", "libraries/Wire", "src")
+	esp8266corelib.SourceFilesFrom("{ESP8266_SDK}", "libraries/Wire", "src")
 
 	// main library
 	mainlib := denv.SetupCppLibProject(mainpkg, name)
 	mainlib.AddDependencies(esp32corelib)
+	mainlib.AddDependencies(esp8266corelib)
 
 	// test library
 	testlib := denv.SetupCppTestLibProject(mainpkg, name)
@@ -56,6 +67,7 @@ func GetPackage() *denv.Package {
 
 	mainpkg.AddMainLib(mainlib)
 	mainpkg.AddMainLib(esp32corelib)
+	mainpkg.AddMainLib(esp8266corelib)
 	mainpkg.AddTestLib(testlib)
 	mainpkg.AddUnittest(maintest)
 	return mainpkg
