@@ -54,15 +54,15 @@ func GetPackage() *denv.Package {
 
 	// main library
 	mainlib := denv.SetupCppLibProject(mainpkg, name)
-	mainlib.AddDependencies(esp32corelib)
-	mainlib.AddDependencies(esp8266corelib)
+	mainlib.AddDependency(esp32corelib)
+	mainlib.AddDependency(esp8266corelib)
 
 	// test library
 	testlib := denv.SetupCppTestLibProject(mainpkg, name)
 
 	// unittest project
 	maintest := denv.SetupCppTestProject(mainpkg, name)
-	maintest.AddDependencies(cunittestpkg.GetMainLib()...)
+	maintest.AddDependencies(cunittestpkg.GetMainLib())
 	maintest.AddDependency(testlib)
 
 	mainpkg.AddMainLib(mainlib)
