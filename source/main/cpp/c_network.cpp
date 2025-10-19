@@ -139,6 +139,6 @@ namespace ncore
         return from_string(str, addr);
     }
 
-    bool is_valid_port(s32 port) { return port > 1023 && port <= 65535; }
+    bool is_valid_port(u16 port) { return port > 1023 && port <= 65535; }
 
 }  // namespace ncore

@@ -28,7 +28,7 @@ namespace ncore
     bool is_valid_SSID(str_t const&);
     bool is_valid_password(str_t const&);
     bool is_valid_IPAddress(str_t const&);
-    bool is_valid_port(s32 port);
+    bool is_valid_port(u16 port);
 
 }  // namespace ncore
 

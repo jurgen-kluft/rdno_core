@@ -118,13 +118,46 @@ namespace ncore
             }
         }
 
-        bool init_param(config_t* config, s16 param_id, param_type_t param_type, s16 count_id, u8 count_max)
+        static inline u8   read_u8(u8 const* data, u8 offset) { return data[offset]; }
+        static inline void write_u8(u8* data, u8 offset, u8 value) { data[offset] = value; }
+
+        static inline u16  read_u16(u8 const* data, u8 offset) { return data[offset] | (data[offset + 1] << 8); }
+        static inline void write_u16(u8* data, u8 offset, u16 value)
         {
-            if (config->m_param_values_u8[count_id] >= count_max)
-                return false;  
-            config->m_param_types[param_id]     = param_type;
-            config->m_param_value_idx[param_id] = config->m_param_values_u8[count_id];
-            config->m_param_values_u8[count_id] += 1;
+            data[offset]     = (u8)(value & 0xFF);
+            data[offset + 1] = (u8)((value >> 8) & 0xFF);
+        }
+
+        static inline u64 read_u64(u8 const* data, u8 offset)
+        {
+            u64 value = 0;
+            for (s32 i = 0; i < 8; i++)
+            {
+                value |= ((u64)data[offset + i]) << (i * 8);
+            }
+            return value;
+        }
+        static inline void write_u64(u8* data, u8 offset, u64 value)
+        {
+            for (s32 i = 0; i < 8; i++)
+            {
+                data[offset + i] = (u8)((value >> (i * 8)) & 0xFF);
+            }
+        }
+
+        bool init_param(config_t* config, s16 param_id, param_type_t param_type)
+        {
+            config->m_param_types[param_id] = param_type;
+            if (param_type == PARAM_TYPE_STRING)
+            {
+                config->m_param_value_offset[param_id] = config->m_string_count;
+                config->m_string_count += 1;
+            }
+            else
+            {
+                config->m_param_value_offset[param_id] = config->m_data_offset;
+                config->m_data_offset += param_type & 0x0F;
+            }
             return true;
         }
 
@@ -135,12 +168,12 @@ namespace ncore
 
             if (config->m_param_types[id] == PARAM_TYPE_NONE)
             {
-                if (init_param(config, id, PARAM_TYPE_STRING, PARAM_ID_STRING_COUNT, SETTING_STRING_MAX_COUNT) == false)
-                    return false;  
+                if (init_param(config, id, PARAM_TYPE_STRING) == false)
+                    return false;
             }
             if (config->m_param_types[id] != PARAM_TYPE_NONE)
                 return false;
-            const u8 str_index          = config->m_param_value_idx[id];
+            const u8 str_index          = config->m_param_value_offset[id];
             config->m_strlen[str_index] = (u8)str_len(str);
             str_t dst                   = str_mutable(&config->m_strings[str_index * SETTING_STRING_MAX_LENGTH], SETTING_STRING_MAX_LENGTH - 1);
             dst.m_ascii[0]              = 0;
@@ -155,8 +188,8 @@ namespace ncore
                 return false;
             if (config->m_param_types[id] != PARAM_TYPE_STRING)
                 return false;
-            s32 const index = config->m_param_value_idx[id];
-            if (index < 0 || index >= config->m_param_values_u8[PARAM_ID_STRING_COUNT])
+            s32 const index = config->m_param_value_offset[id];
+            if (index < 0 || index >= config->m_string_count)
                 return false;
             s32 const   str_length = config->m_strlen[index];
             const char* str_data   = &config->m_strings[index * SETTING_STRING_MAX_LENGTH];
@@ -168,15 +201,15 @@ namespace ncore
         {
             if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
                 return false;
-            if (config->m_param_types[id] == PARAM_TYPE_NONE) 
+            if (config->m_param_types[id] == PARAM_TYPE_NONE)
             {
-                if (init_param(config, id, PARAM_TYPE_S8, PARAM_ID_U8_COUNT, SETTING_U8_MAX_COUNT) == false)
+                if (init_param(config, id, PARAM_TYPE_S8) == false)
                     return false;  // No more space for u8 values
             }
             if (config->m_param_types[id] != PARAM_TYPE_S8)
                 return false;
-            const u8 index                   = config->m_param_value_idx[id];
-            config->m_param_values_u8[index] = (u8)value;
+            const u8 offset = config->m_param_value_offset[id];
+            write_u8(config->m_param_value_data, offset, (u8)value);
             return true;
         }
 
@@ -184,8 +217,8 @@ namespace ncore
         {
             if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_S8)
                 return false;
-            const u8 index = config->m_param_value_idx[id];
-            outValue       = (s8)config->m_param_values_u8[index];
+            const u8 offset = config->m_param_value_offset[id];
+            outValue        = (s8)read_u8(config->m_param_value_data, offset);
             return true;
         }
 
@@ -193,15 +226,15 @@ namespace ncore
         {
             if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
                 return false;
-            if (config->m_param_types[id] == PARAM_TYPE_NONE) 
+            if (config->m_param_types[id] == PARAM_TYPE_NONE)
             {
-                if (init_param(config, id, PARAM_TYPE_U8, PARAM_ID_U8_COUNT, SETTING_U8_MAX_COUNT) == false)
+                if (init_param(config, id, PARAM_TYPE_U8) == false)
                     return false;  // No more space for u8 values
             }
             if (config->m_param_types[id] != PARAM_TYPE_U8)
                 return false;
-            const u8 index                   = config->m_param_value_idx[id];
-            config->m_param_values_u8[index] = (u8)value;
+            const u8 offset = config->m_param_value_offset[id];
+            write_u8(config->m_param_value_data, offset, value);
             return true;
         }
 
@@ -209,8 +242,8 @@ namespace ncore
         {
             if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_U8)
                 return false;
-            const u8 index = config->m_param_value_idx[id];
-            outValue       = config->m_param_values_u8[index];
+            const u8 offset = config->m_param_value_offset[id];
+            outValue        = read_u8(config->m_param_value_data, offset);
             return true;
         }
 
@@ -220,13 +253,13 @@ namespace ncore
                 return false;
             if (config->m_param_types[id] == PARAM_TYPE_NONE)
             {
-                if (init_param(config, id, PARAM_TYPE_S16, PARAM_ID_U16_COUNT, SETTING_U16_MAX_COUNT) == false)
-                    return false;  
+                if (init_param(config, id, PARAM_TYPE_S16) == false)
+                    return false;
             }
             if (config->m_param_types[id] != PARAM_TYPE_S16)
                 return false;
-            const u8 index                    = config->m_param_value_idx[id];
-            config->m_param_values_u16[index] = (u16)value;
+            const u8 offset = config->m_param_value_offset[id];
+            write_u16(config->m_param_value_data, offset, (u16)value);
             return true;
         }
 
@@ -234,24 +267,24 @@ namespace ncore
         {
             if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_S16)
                 return false;
-            const u8 index = config->m_param_value_idx[id];
-            outValue       = (s16)config->m_param_values_u16[index];
+            const u8 offset = config->m_param_value_offset[id];
+            outValue        = (s16)read_u16(config->m_param_value_data, offset);
             return true;
         }
-        
+
         bool set_uint16(config_t* config, s16 id, u16 value)
         {
             if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
                 return false;
             if (config->m_param_types[id] == PARAM_TYPE_NONE)
             {
-                if (init_param(config, id, PARAM_TYPE_U16, PARAM_ID_U16_COUNT, SETTING_U16_MAX_COUNT) == false)
-                    return false;  
+                if (init_param(config, id, PARAM_TYPE_U16) == false)
+                    return false;
             }
             if (config->m_param_types[id] != PARAM_TYPE_U16)
                 return false;
-            const u8 index                    = config->m_param_value_idx[id];
-            config->m_param_values_u16[index] = value;
+            const u8 offset = config->m_param_value_offset[id];
+            write_u16(config->m_param_value_data, offset, value);
             return true;
         }
 
@@ -259,8 +292,8 @@ namespace ncore
         {
             if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_U16)
                 return false;
-            const u8 index = config->m_param_value_idx[id];
-            outValue       = config->m_param_values_u16[index];
+            const u8 offset = config->m_param_value_offset[id];
+            outValue        = read_u16(config->m_param_value_data, offset);
             return true;
         }
 
@@ -270,13 +303,13 @@ namespace ncore
                 return false;
             if (config->m_param_types[id] == PARAM_TYPE_NONE)
             {
-                if (init_param(config, id, PARAM_TYPE_U64, PARAM_ID_U64_COUNT, SETTING_U64_MAX_COUNT) == false)
-                    return false;  
+                if (init_param(config, id, PARAM_TYPE_U64) == false)
+                    return false;
             }
             if (config->m_param_types[id] != PARAM_TYPE_U64)
                 return false;
-            const u8 index                    = config->m_param_value_idx[id];
-            config->m_param_values_u64[index] = value;
+            const u8 offset = config->m_param_value_offset[id];
+            write_u64(config->m_param_value_data, offset, value);
             return true;
         }
 
@@ -284,8 +317,8 @@ namespace ncore
         {
             if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_U64)
                 return false;
-            const u8 index = config->m_param_value_idx[id];
-            outValue       = config->m_param_values_u64[index];
+            const u8 offset = config->m_param_value_offset[id];
+            outValue        = read_u64(config->m_param_value_data, offset);
             return true;
         }
     }  // namespace nconfig

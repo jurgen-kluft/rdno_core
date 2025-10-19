@@ -4,10 +4,12 @@
 #include "rdno_core/c_serial.h"
 #include "rdno_core/c_str.h"
 
-#ifdef TARGET_ESP32
+#ifdef TARGET_ARDUINO
 
-#    include "nvs_flash.h"
-#    include "nvs.h"
+#    ifdef TARGET_ESP32
+
+#        include "nvs_flash.h"
+#        include "nvs.h"
 
 namespace ncore
 {
@@ -146,8 +148,8 @@ namespace ncore
             return s_valid;
         }
 
-        #define NVS_NODE_KEY "node"
-        #define NVS_BLOB_KEY "config"
+#        define NVS_NODE_KEY "node"
+#        define NVS_BLOB_KEY "config"
 
         void save(nconfig::config_t* config)
         {
@@ -200,6 +202,45 @@ namespace ncore
 
     }  // namespace nvstore
 }  // namespace ncore
+
+#    endif  // #ifdef TARGET_ESP32
+
+#    ifdef TARGET_ESP8266
+
+namespace ncore
+{
+    namespace nvstore
+    {
+        #define RTC_BLOCK_SIZE 4
+        #define MAX_TOTAL_RTC_MEMORY_SIZE 512
+
+        // Offset from the first block in RTC memory. This offset is used to shift data toward the
+        // highest RTC memory addresses.
+        #define RTC_MEMORY_OFFSET (MAX_TOTAL_RTC_MEMORY_SIZE - sizeof(nconfig::config_t)) / RTC_BLOCK_SIZE
+
+        void save(nconfig::config_t* config) 
+        {
+            config->m_crc = 0;
+            config->m_crc = crc32(config, sizeof(nconfig::config_t));
+
+            ESP.rtcUserMemoryWrite(RTC_MEMORY_OFFSET, config, sizeof(nconfig::config_t));
+        }
+
+        bool load(nconfig::config_t* config) 
+        { 
+            ESP.rtcUserMemoryRead(RTC_MEMORY_OFFSET, config, sizeof(nconfig::config_t));
+            const u32 crc = config->m_crc;
+            
+            config->m_crc = 0;
+            const u32 calculated_crc = crc32(config, sizeof(nconfig::config_t));
+
+            return (crc == calculated_crc)
+        }
+
+    }  // namespace nvstore
+}  // namespace ncore
+
+#    endif  // #ifdef TARGET_ESP8266
 
 #else
 

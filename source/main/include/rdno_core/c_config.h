@@ -14,92 +14,77 @@ namespace ncore
         enum param_type_t
         {
             PARAM_TYPE_NONE   = 0,
-            PARAM_TYPE_U8     = 15,
-            PARAM_TYPE_S8     = 16,
-            PARAM_TYPE_U16    = 25,
-            PARAM_TYPE_S16    = 26,
-            PARAM_TYPE_U64    = 45,
-            PARAM_TYPE_STRING = 50,
+            PARAM_TYPE_U8     = (0x10) | 1,
+            PARAM_TYPE_S8     = (0x20) | 1,
+            PARAM_TYPE_U16    = (0x30) | 2,
+            PARAM_TYPE_S16    = (0x40) | 2,
+            PARAM_TYPE_U64    = (0x50) | 8,
+            PARAM_TYPE_STRING = 0x60,
         };
 
         typedef s16 (*ParamNameToId)(const char* str, s32 len);
 
         enum param_id_t
         {
-            // WiFi parameters
-            PARAM_ID_STRING_COUNT = 0,  // u8
-            PARAM_ID_U8_COUNT     = 1,  // u8
-            PARAM_ID_U16_COUNT    = 2,  // u8
-            PARAM_ID_U32_COUNT    = 4,  // u8
-            PARAM_ID_U64_COUNT    = 5,  // u8
-
-            PARAM_ID_WIFI_SSID     = 6,   // string
-            PARAM_ID_WIFI_PASSWORD = 7,   // string
-            PARAM_ID_AP_SSID       = 8,   // string
-            PARAM_ID_AP_PASSWORD   = 9,   // string
-            PARAM_ID_REMOTE_SERVER = 10,  // string
-            PARAM_ID_REMOTE_PORT   = 11,  // u16
-
-            PARAM_ID_T   = 12,  // u8, Temperature
-            PARAM_ID_H   = 13,  // u8, Humidity
-            PARAM_ID_P   = 14,  // u16, Pressure
-            PARAM_ID_LUX = 15,  // u16, Light
-            PARAM_ID_CO2 = 16,  // u16, CO2
-            PARAM_ID_VOC = 17,  // u16, VOC
-            PARAM_ID_PM1 = 18,  // u16, PM1_0
-            PARAM_ID_PM2 = 19,  // u16, PM2_5
-            PARAM_ID_PMA = 20,  // u16, PM10
-            PARAM_ID_N   = 21,  // u8, Noise
-            PARAM_ID_UV  = 22,  // u8, UV
-            PARAM_ID_CO  = 23,  // u8, CO
-            PARAM_ID_V   = 24,  // u8, Vibration
-            PARAM_ID_S   = 25,  // u16, State
-            PARAM_ID_B   = 26,  // u8, Battery
-            PARAM_ID_OC  = 27,  // u8, Open/Close
-            PARAM_ID_P1  = 30,  // u8, Presence1
-            PARAM_ID_P2  = 31,  // u8, Presence2
-            PARAM_ID_P3  = 32,  // u8, Presence3
-            PARAM_ID_D1  = 33,  // u16, Distance1
-            PARAM_ID_D2  = 34,  // u16, Distance2
-            PARAM_ID_D3  = 35,  // u16, Distance3
-
-            // All values are in unit of millimeter and are signed values
-            // Position of the device (for motion detection)
-            PARAM_ID_POS = 36,  // u64: X,Y,Z (z=height)
-            PARAM_ID_LAP = 37,  // u64: LookAtPoint X,Y,Z
-
-            // Rectangular areas (for motion detection)
-            PARAM_ID_RA1 = 38,  // u64: Left,Right,Front,Back
-            PARAM_ID_RA2 = 39,  // u64: Left,Right,Front,Back
-            PARAM_ID_RA3 = 40,  // u64: Left,Right,Front,Back
+            PARAM_ID_WIFI_SSID = 0,  // string
+            PARAM_ID_WIFI_PASSWORD,  // string
+            PARAM_ID_AP_SSID,        // string
+            PARAM_ID_AP_PASSWORD,    // string
+            PARAM_ID_REMOTE_SERVER,  // string
+            PARAM_ID_REMOTE_PORT,    // u16
+            PARAM_ID_T,              // u8, Temperature
+            PARAM_ID_H,              // u8, Humidity
+            PARAM_ID_P,              // u16, Pressure
+            PARAM_ID_LUX,            // u16, Light
+            PARAM_ID_CO2,            // u16, CO2
+            PARAM_ID_VOC,            // u16, VOC
+            PARAM_ID_PM1,            // u16, PM1_0
+            PARAM_ID_PM2,            // u16, PM2_5
+            PARAM_ID_PMA,            // u16, PM10
+            PARAM_ID_N,              // u8, Noise
+            PARAM_ID_UV,             // u8, UV
+            PARAM_ID_CO,             // u8, CO
+            PARAM_ID_V,              // u8, Vibration
+            PARAM_ID_S,              // u16, State
+            PARAM_ID_B,              // u8, Battery
+            PARAM_ID_OC,             // u8, Open/Close
+            PARAM_ID_P1,             // u8, Presence1
+            PARAM_ID_P2,             // u8, Presence2
+            PARAM_ID_P3,             // u8, Presence3
+            PARAM_ID_D1,             // u16, Distance1
+            PARAM_ID_D2,             // u16, Distance2
+            PARAM_ID_D3,             // u16, Distance3
+            PARAM_ID_PX,             // s16: X
+            PARAM_ID_PY,             // s16: Y
+            PARAM_ID_PZ,             // s16: Z
+            PARAM_ID_MAX_COUNT,
         };
 
         enum esettings
         {
-            SETTING_PARAM_MAX_COUNT   = 40,
-            SETTING_U8_MAX_COUNT      = 25,
-            SETTING_U16_MAX_COUNT     = 2,
-            SETTING_U64_MAX_COUNT     = 5,
-            SETTING_STRING_MAX_COUNT  = 8,
-            SETTING_STRING_MAX_LENGTH = 32,
+            SETTING_PARAM_MAX_COUNT   = PARAM_ID_MAX_COUNT,
+            SETTING_DATA_MAX_SIZE     = 128,
+            SETTING_STRING_MAX_COUNT  = 6,
+            SETTING_STRING_MAX_LENGTH = 24,
         };
 
         enum
         {
-            CONFIG_VERSION = 0x0003,
+            CONFIG_VERSION = 0x0103,
         };
 
-        // Size in bytes: 2 + 40 + 2*40 + 10*32 = 442 bytes
+        // Size in bytes: 2*3 + (1+1)*36 + 128 + 6*1 + 6*24 = 356
         struct config_t
         {
-            u16  m_version;
+            u32  m_crc;                                                            // CRC of config_t
+            u16  m_version;                                                        //
+            u16  m_string_count;                                                   //
+            u16  m_data_offset;                                                    //
             u8   m_param_types[SETTING_PARAM_MAX_COUNT];                           // parameter type
-            u8   m_param_value_idx[SETTING_PARAM_MAX_COUNT];                       // parameter value index (into the respective value array)
-            u8   m_param_values_u8[SETTING_U16_MAX_COUNT];                         // u8 values
-            u16  m_param_values_u16[SETTING_U16_MAX_COUNT];                        // u16 values
-            u64  m_param_values_u64[SETTING_U64_MAX_COUNT];                        // u64 values
-            u8   m_strlen[SETTING_STRING_MAX_COUNT];                              // string length values
-            char m_strings[SETTING_STRING_MAX_COUNT * SETTING_STRING_MAX_LENGTH];  // string values
+            u8   m_param_value_offset[SETTING_PARAM_MAX_COUNT];                    // parameter value offset (into m_param_value_data)
+            u8   m_param_value_data[SETTING_DATA_MAX_SIZE];                        // array value data
+            u8   m_strlen[SETTING_STRING_MAX_COUNT];                               // str lengths
+            char m_strings[SETTING_STRING_MAX_COUNT * SETTING_STRING_MAX_LENGTH];  // str data
         };
 
         void reset(config_t* config);
