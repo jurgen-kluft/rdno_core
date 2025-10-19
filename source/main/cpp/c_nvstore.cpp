@@ -207,6 +207,8 @@ namespace ncore
 
 #    ifdef TARGET_ESP8266
 
+#include "Arduino.h"
+
 namespace ncore
 {
     namespace nvstore
@@ -223,18 +225,18 @@ namespace ncore
             config->m_crc = 0;
             config->m_crc = crc32(config, sizeof(nconfig::config_t));
 
-            ESP.rtcUserMemoryWrite(RTC_MEMORY_OFFSET, config, sizeof(nconfig::config_t));
+            ESP.rtcUserMemoryWrite(RTC_MEMORY_OFFSET, (uint32_t*)config, sizeof(nconfig::config_t));
         }
 
         bool load(nconfig::config_t* config) 
         { 
-            ESP.rtcUserMemoryRead(RTC_MEMORY_OFFSET, config, sizeof(nconfig::config_t));
+            ESP.rtcUserMemoryRead(RTC_MEMORY_OFFSET, (uint32_t*)config, sizeof(nconfig::config_t));
             const u32 crc = config->m_crc;
             
             config->m_crc = 0;
             const u32 calculated_crc = crc32(config, sizeof(nconfig::config_t));
 
-            return (crc == calculated_crc)
+            return (crc == calculated_crc);
         }
 
     }  // namespace nvstore

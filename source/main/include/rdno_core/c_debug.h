@@ -79,7 +79,7 @@ namespace ncore
         }
 #endif
 
-#if defined(TARGET_ESP32) && defined(COMPILER_DEFAULT)
+#if defined(TARGET_ARDUINO) && defined(COMPILER_DEFAULT)
 #    define D_BREAK           \
         {                     \
         }
@@ -119,7 +119,7 @@ namespace ncore
 #    define D_NOP {__asm nop}
 #endif
 
-#if defined(TARGET_ESP32) && defined(COMPILER_DEFAULT)
+#if defined(TARGET_ARDUINO) && defined(COMPILER_DEFAULT)
 #    define D_NOP {__asm nop}
 #endif
 

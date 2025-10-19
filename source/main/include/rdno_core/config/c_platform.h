@@ -5,7 +5,7 @@
 namespace ncore
 {
     // Platform define emanations from this file:
-    // #define CC_PLATFORM_ESP32
+    // #define CC_PLATFORM_ARDUINO
     // #define CC_PLATFORM_ANDROID
     // #define CC_PLATFORM_APPLE
     // #define CC_PLATFORM_IPHONE
@@ -279,8 +279,8 @@ namespace ncore
 #    define CC_PLATFORM_BSD         0
 #    define CC_PLATFORM_UNIX        0
 #    define CC_PLATFORM_POSIX       0
-#    define CC_PLATFORM_NAME        "riscv"  // riscv esp32
-#    define CC_PLATFORM_DESCRIPTION "riscv on esp32"
+#    define CC_PLATFORM_NAME        "riscv"  
+#    define CC_PLATFORM_DESCRIPTION "riscv"
 #    if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #        define CC_SYSTEM_LITTLE_ENDIAN 1
 #    else
@@ -324,8 +324,8 @@ namespace ncore
 #    define CC_PLATFORM_BSD         0
 #    define CC_PLATFORM_UNIX        0
 #    define CC_PLATFORM_POSIX       0
-#    define CC_PLATFORM_NAME        "xtensa"  // xtensa esp32
-#    define CC_PLATFORM_DESCRIPTION "xtensa on esp32"
+#    define CC_PLATFORM_NAME        "xtensa"  
+#    define CC_PLATFORM_DESCRIPTION "xtensa (esp32 or esp8266)"
 #    if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #        define CC_SYSTEM_LITTLE_ENDIAN 1
 #    else

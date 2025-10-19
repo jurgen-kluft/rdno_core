@@ -1,6 +1,6 @@
 #include "rdno_core/c_timer.h"
 
-#ifdef TARGET_ESP32
+#ifdef TARGET_ARDUINO
 
 #include "Arduino.h"
 

@@ -3,9 +3,11 @@
 #include "rdno_core/c_system.h"
 #include "rdno_core/c_malloc.h"
 
-#ifdef TARGET_ESP32
+#ifdef TARGET_ARDUINO
 #    include "Arduino.h"
-#    include "esp32-hal-psram.h"
+#    ifdef TARGET_ESP32
+#        include "esp32-hal-psram.h"
+#    endif
 #else
 #    include <unistd.h>
 #    include <sys/mman.h>
