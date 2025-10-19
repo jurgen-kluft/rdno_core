@@ -2,6 +2,7 @@ package rdno_core
 
 import (
 	denv "github.com/jurgen-kluft/ccode/denv"
+	csdk "github.com/jurgen-kluft/csdk/package"
 	cunittest "github.com/jurgen-kluft/cunittest/package"
 )
 
@@ -26,10 +27,12 @@ func GetPackage() *denv.Package {
 	name := repo_name
 
 	// dependencies
+	csdkpkg := csdk.GetPackage()
 	cunittestpkg := cunittest.GetPackage()
 
 	// main package
 	mainpkg := denv.NewPackage(repo_path, repo_name)
+	mainpkg.AddPackage(csdkpkg)
 	mainpkg.AddPackage(cunittestpkg)
 
 	// esp32 core library
@@ -38,8 +41,8 @@ func GetPackage() *denv.Package {
 	esp32corelib.ClearSourcePaths()
 	esp32corelib.AddEnvironmentVariable("ESP32_SDK")
 	esp32corelib.AddInclude("{ESP32_SDK}", "cores/esp32", "")
-	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "cores/esp32", "")
 	esp32corelib.AddInclude("{ESP32_SDK}", "libraries/Wire", "src")
+	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "cores/esp32", "")
 	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "libraries/Wire", "src")
 
 	// esp8266 core library
@@ -48,8 +51,8 @@ func GetPackage() *denv.Package {
 	esp8266corelib.ClearSourcePaths()
 	esp8266corelib.AddEnvironmentVariable("ESP8266_SDK")
 	esp8266corelib.AddInclude("{ESP8266_SDK}", "cores/esp8266", "")
-	esp8266corelib.SourceFilesFrom("{ESP8266_SDK}", "cores/esp8266", "")
 	esp8266corelib.AddInclude("{ESP8266_SDK}", "libraries/Wire", "src")
+	esp8266corelib.SourceFilesFrom("{ESP8266_SDK}", "cores/esp8266", "")
 	esp8266corelib.SourceFilesFrom("{ESP8266_SDK}", "libraries/Wire", "src")
 
 	// main library
