@@ -2,7 +2,7 @@
 #include "rdno_core/c_timer.h"
 #include "rdno_core/c_debounce.h"
 
-#ifdef TARGET_ESP32
+#ifdef TARGET_ARDUINO
 #    include "Arduino.h"
 
 namespace ncore
@@ -34,6 +34,7 @@ namespace ncore
                 poll = read_digital(pin);
                 ntimer::delay(5);
             }
+            return poll;
         }
 
         s32 read_analog(s8 pin) { return ::analogRead(pin); }

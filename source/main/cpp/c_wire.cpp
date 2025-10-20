@@ -1,6 +1,6 @@
 #include "rdno_core/c_wire.h"
 
-#ifdef TARGET_ESP32
+#ifdef TARGET_ARDUINO
 #    include "Arduino.h"
 #    include "Wire.h"
 #endif
@@ -11,7 +11,7 @@ namespace ncore
     {
         void begin(s32 sdaPin, s32 sclPin)
         {
-#ifdef TARGET_ESP32
+#ifdef TARGET_ARDUINO
             Wire.begin(sdaPin, sclPin);
 #else
             (void)sdaPin;

@@ -36,24 +36,20 @@ func GetPackage() *denv.Package {
 	mainpkg.AddPackage(cunittestpkg)
 
 	// esp32 core library
-	esp32corelib := denv.SetupCppLibProjectForArduinoEsp32(mainpkg, "esp32-core")
-	esp32corelib.ClearIncludes()
-	esp32corelib.ClearSourcePaths()
+	esp32corelib := denv.SetupCppLibProjectForArduinoEsp32(mainpkg, name+"-esp32")
 	esp32corelib.AddEnvironmentVariable("ESP32_SDK")
 	esp32corelib.AddInclude("{ESP32_SDK}", "cores/esp32", "")
 	esp32corelib.AddInclude("{ESP32_SDK}", "libraries/Wire", "src")
-	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "cores/esp32", "")
-	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "libraries/Wire", "src")
+	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "cores/esp32", "", ".c", ".cpp", ".S")
+	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "libraries/Wire", "src", ".c", ".cpp")
 
 	// esp8266 core library
-	esp8266corelib := denv.SetupCppLibProjectForArduinoEsp8266(mainpkg, "esp8266-core")
-	esp8266corelib.ClearIncludes()
-	esp8266corelib.ClearSourcePaths()
+	esp8266corelib := denv.SetupCppLibProjectForArduinoEsp8266(mainpkg, name+"-esp8266")
 	esp8266corelib.AddEnvironmentVariable("ESP8266_SDK")
 	esp8266corelib.AddInclude("{ESP8266_SDK}", "cores/esp8266", "")
-	esp8266corelib.AddInclude("{ESP8266_SDK}", "libraries/Wire", "src")
-	esp8266corelib.SourceFilesFrom("{ESP8266_SDK}", "cores/esp8266", "")
-	esp8266corelib.SourceFilesFrom("{ESP8266_SDK}", "libraries/Wire", "src")
+	esp8266corelib.AddInclude("{ESP8266_SDK}", "libraries/Wire", "")
+	esp8266corelib.SourceFilesFrom("{ESP8266_SDK}", "cores/esp8266", "", ".c", ".cpp", ".S")
+	esp8266corelib.SourceFilesFrom("{ESP8266_SDK}", "libraries/Wire", "", ".c", ".cpp")
 
 	// main library
 	mainlib := denv.SetupCppLibProject(mainpkg, name)

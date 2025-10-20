@@ -14,7 +14,7 @@ namespace ncore
 
 };  // namespace ncore
 
-#ifdef TARGET_ESP32
+#ifdef TARGET_ARDUINO
 
 void setup()
 {
