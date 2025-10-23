@@ -12,6 +12,7 @@ namespace ncore
     struct IPAddress_t
     {
         byte m_address[4];
+        void from(u32 ip);
     };
 
     struct MACAddress_t
@@ -22,11 +23,12 @@ namespace ncore
     bool from_string(str_t const& str, IPAddress_t& outAddr);
     bool from_string(str_t const& str, MACAddress_t& outAddr);
 
-    void to_str(str_t& str, const IPAddress_t& address);
+    void to_str(str_t& str, IPAddress_t address);
     void to_str(str_t& str, const MACAddress_t& address);
 
     bool is_valid_SSID(str_t const&);
     bool is_valid_password(str_t const&);
+    bool is_valid_IPAddress(u32 ip);
     bool is_valid_IPAddress(str_t const&);
     bool is_valid_port(u16 port);
 

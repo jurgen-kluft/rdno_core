@@ -16,10 +16,11 @@ namespace ncore
             PARAM_TYPE_NONE   = 0,
             PARAM_TYPE_U8     = (0x10) | 1,
             PARAM_TYPE_S8     = (0x20) | 1,
-            PARAM_TYPE_U16    = (0x30) | 2,
-            PARAM_TYPE_S16    = (0x40) | 2,
-            PARAM_TYPE_U64    = (0x50) | 8,
-            PARAM_TYPE_STRING = 0x60,
+            PARAM_TYPE_S16    = (0x30) | 2,
+            PARAM_TYPE_U16    = (0x40) | 2,
+            PARAM_TYPE_U32    = (0x50) | 4,
+            PARAM_TYPE_U64    = (0x60) | 8,
+            PARAM_TYPE_STRING = 0x70,
         };
 
         typedef s16 (*ParamNameToId)(const char* str, s32 len);
@@ -28,9 +29,7 @@ namespace ncore
         {
             PARAM_ID_WIFI_SSID = 0,  // string
             PARAM_ID_WIFI_PASSWORD,  // string
-            PARAM_ID_AP_SSID,        // string
-            PARAM_ID_AP_PASSWORD,    // string
-            PARAM_ID_REMOTE_SERVER,  // string
+            PARAM_ID_REMOTE_IP,      // u32
             PARAM_ID_REMOTE_PORT,    // u16
             PARAM_ID_T,              // u8, Temperature
             PARAM_ID_H,              // u8, Humidity
@@ -57,14 +56,15 @@ namespace ncore
             PARAM_ID_PX,             // s16: X
             PARAM_ID_PY,             // s16: Y
             PARAM_ID_PZ,             // s16: Z
+            PARAM_ID_RSSI,           // s16: RSSI
             PARAM_ID_MAX_COUNT,
         };
 
         enum esettings
         {
             SETTING_PARAM_MAX_COUNT   = PARAM_ID_MAX_COUNT,
-            SETTING_DATA_MAX_SIZE     = 128,
-            SETTING_STRING_MAX_COUNT  = 6,
+            SETTING_DATA_MAX_SIZE     = 100,
+            SETTING_STRING_MAX_COUNT  = 2,
             SETTING_STRING_MAX_LENGTH = 24,
         };
 
@@ -73,18 +73,30 @@ namespace ncore
             CONFIG_VERSION = 0x0103,
         };
 
-        // Size in bytes: 2*3 + (1+1)*36 + 128 + 6*1 + 6*24 = 356
+        struct wifi_t
+        {
+            u32 ip_address;
+            u32 ip_gateway;
+            u32 ip_mask;
+            u32 ip_dns1;
+            u32 ip_dns2;
+            u16 wifi_channel;
+            u8  wifi_bssid[6];
+        };
+
+        // Size in bytes: 4 + 2 + 2 + 2 + 30 + (1+1)*30 + 100 + 6*1 + 2*24 = 254
         struct config_t
         {
-            u32  m_crc;                                                            // CRC of config_t
-            u16  m_version;                                                        //
-            u16  m_string_count;                                                   //
-            u16  m_data_offset;                                                    //
-            u8   m_param_types[SETTING_PARAM_MAX_COUNT];                           // parameter type
-            u8   m_param_value_offset[SETTING_PARAM_MAX_COUNT];                    // parameter value offset (into m_param_value_data)
-            u8   m_param_value_data[SETTING_DATA_MAX_SIZE];                        // array value data
-            u8   m_strlen[SETTING_STRING_MAX_COUNT];                               // str lengths
-            char m_strings[SETTING_STRING_MAX_COUNT * SETTING_STRING_MAX_LENGTH];  // str data
+            u32    m_crc;                                                            // CRC of config_t
+            u16    m_version;                                                        //
+            u16    m_string_count;                                                   //
+            u16    m_data_offset;                                                    //
+            wifi_t m_wifi;                                                           // 30 bytes
+            u8     m_param_types[SETTING_PARAM_MAX_COUNT];                           // parameter type
+            u8     m_param_value_offset[SETTING_PARAM_MAX_COUNT];                    // parameter value offset (into m_param_value_data)
+            u8     m_param_value_data[SETTING_DATA_MAX_SIZE];                        // array value data
+            u8     m_strlen[SETTING_STRING_MAX_COUNT];                               // str lengths
+            char   m_strings[SETTING_STRING_MAX_COUNT * SETTING_STRING_MAX_LENGTH];  // str data
         };
 
         void reset(config_t* config);
@@ -113,6 +125,9 @@ namespace ncore
 
         bool set_uint16(config_t* config, s16 id, u16 value);
         bool get_uint16(const config_t* config, s16 id, u16& outValue);
+
+        bool set_uint32(config_t* config, s16 id, u32 value);
+        bool get_uint32(const config_t* config, s16 id, u32& outValue);
 
         bool set_uint64(config_t* config, s16 id, u64 value);
         bool get_uint64(const config_t* config, s16 id, u64& outValue);

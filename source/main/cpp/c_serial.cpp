@@ -11,12 +11,13 @@ namespace ncore
 {
     namespace nserial
     {
+#    ifdef TARGET_DEBUG
         // Begin sets the data rate in bits per second (baud) for serial data transmission.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
         void begin(nbaud::Enum baud)
         {
             Serial.begin(baud);
-            
+
             const u64 startAttemptTime = ntimer::millis();
             while (!Serial && (ntimer::millis() - startAttemptTime) < 5000)
             {
@@ -30,14 +31,14 @@ namespace ncore
 
         void print(const IPAddress_t& address)
         {
-            char  strBuffer[32];
+            char strBuffer[32];
             snprintf(strBuffer, sizeof(strBuffer), "%u.%u.%u.%u", va_t(address.m_address[0]), va_t(address.m_address[1]), va_t(address.m_address[2]), va_t(address.m_address[3]));
             Serial.print(strBuffer);
         }
 
         void print(const MACAddress_t& mac)
         {
-            char  strBuffer[32];
+            char strBuffer[32];
             snprintf(strBuffer, sizeof(strBuffer), "%02X:%02X:%02X:%02X:%02X:%02X", va_t(mac.m_address[0]), va_t(mac.m_address[1]), va_t(mac.m_address[2]), va_t(mac.m_address[3]), va_t(mac.m_address[4]), va_t(mac.m_address[5]));
             Serial.print(strBuffer);
         }
@@ -50,7 +51,13 @@ namespace ncore
             // Prints the string followed by a newline
             Serial.println(val);
         }
-
+#    else
+        void begin(nbaud::Enum baud) { CC_UNUSED(baud); }
+        void print(const char* val) { CC_UNUSED(val); }
+        void print(const IPAddress_t& address) { CC_UNUSED(address); }
+        void print(const MACAddress_t& mac) { CC_UNUSED(mac); }
+        void println(const char* val) { CC_UNUSED(val); }
+#    endif
     }  // namespace nserial
 
     namespace nserial1

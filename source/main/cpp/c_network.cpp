@@ -3,6 +3,14 @@
 
 namespace ncore
 {
+    void IPAddress_t::from(u32 ip)
+    {
+        m_address[0] = (byte)((ip >> 24) & 0xFF);
+        m_address[1] = (byte)((ip >> 16) & 0xFF);
+        m_address[2] = (byte)((ip >> 8) & 0xFF);
+        m_address[3] = (byte)(ip & 0xFF);
+    }
+
     // examples of valid IP string addresses:
     // "10.0.0.1"
     // "192.168.4.1"
@@ -79,7 +87,7 @@ namespace ncore
         return (partIndex == 6);
     }
 
-    void to_str(str_t& str, const IPAddress_t& address)
+    void to_str(str_t& str, IPAddress_t address)
     {
         to_str(str, (u32)address.m_address[0], 10);
         str_append(str, ".");
@@ -131,6 +139,13 @@ namespace ncore
         }
         const s16 length = (s16)(iter.m_str - str.m_str);
         return length >= 8 && length <= 64;
+    }
+
+    bool is_valid_IPAddress(u32 ip)
+    {
+        // Exclude special ranges: 0.x.x.x, 127.x.x.x, 224.x.x.x - 255.x.x.x
+        byte firstOctet = (ip >> 24) & 0xFF;
+        return firstOctet != 0 && firstOctet != 127 && (firstOctet < 224);
     }
 
     bool is_valid_IPAddress(str_t const& str)

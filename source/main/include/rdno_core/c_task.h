@@ -10,6 +10,9 @@
 namespace ncore
 {
     struct state_app_t;
+    struct state_wifi_t;
+    struct state_tcp_t;
+    struct state_udp_t;
 
     namespace ntask
     {
@@ -42,22 +45,28 @@ namespace ncore
         void        tick(executor_t* exec, state_t* state);
 
         program_t program(executor_t* exec, const char* name);
-        void      xbegin(executor_t* exec, program_t program);
-        void      xjump(executor_t* exec, program_t program);
-        void      xrun(executor_t* exec, program_t program);
-        void      xrun_periodic(executor_t* exec, function_t fn, u32 period_ms);
-        void      xonce(executor_t* exec, function_t fn);
-        void      xif(executor_t* exec, function_t fn);
-        void      xif(executor_t* exec, timeout_t timeout);
-        void      xreturn(executor_t* exec);
-        void      xend(executor_t* exec);
+        void      op_begin(executor_t* exec, program_t program);
+        void      op_jump(executor_t* exec, program_t program);
+        void      op_run(executor_t* exec, program_t program);
+        void      op_run_periodic(executor_t* exec, function_t fn, u32 period_ms);
+        void      op_once(executor_t* exec, function_t fn);
+        void      op_if(executor_t* exec, function_t fn);
+        void      op_if(executor_t* exec, timeout_t timeout);
+        void      op_return(executor_t* exec);
+        void      op_end(executor_t* exec);
 
         struct state_t
         {
             nconfig::config_t* config;
             u64                time_ms;
-            u64                time_sync;
+            state_wifi_t*      wifi;
+            state_tcp_t*       tcp;
+            state_udp_t*       udp;
             state_app_t*       app;
+            u32                flags;
+
+            void set_config(bool valid) { flags = (flags & ~0x1) | (valid ? 1 : 0); }
+            bool has_config() const { return (flags & 0x1) != 0; }
         };
 
     }  // namespace ntask

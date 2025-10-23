@@ -188,7 +188,7 @@ namespace ncore
             return outer_if;
         }
 
-        void xbegin(executor_t* exec, program_t program)
+        void op_begin(executor_t* exec, program_t program)
         {
             exec->m_programming_program        = program;
             exec->m_programming_program->begin = exec->m_programming_cursor;
@@ -196,31 +196,31 @@ namespace ncore
             exec->m_scope_open                 = nullptr;
         }
 
-        void xjump(executor_t* exec, program_t program)
+        void op_jump(executor_t* exec, program_t program)
         {
             jump_t j                   = {program};
             exec->m_programming_cursor = write(exec->m_programming_cursor, j);
         }
 
-        void xrun(executor_t* exec, program_t program)
+        void op_run(executor_t* exec, program_t program)
         {
             run_t r                    = {program};
             exec->m_programming_cursor = write(exec->m_programming_cursor, r);
         }
 
-        void xrun_periodic(executor_t* exec, function_t fn, u32 period_ms)
+        void op_run_periodic(executor_t* exec, function_t fn, u32 period_ms)
         {
             run_periodic_t pp          = {0, period_ms, fn};
             exec->m_programming_cursor = write(exec->m_programming_cursor, pp);
         }
 
-        void xonce(executor_t* exec, function_t fn)
+        void op_once(executor_t* exec, function_t fn)
         {
             once_t op                  = {0, fn};
             exec->m_programming_cursor = write(exec->m_programming_cursor, op);
         }
 
-        void xif(executor_t* exec, function_t fn)
+        void op_if(executor_t* exec, function_t fn)
         {
             opcode_if_func_t op        = {fn, exec->m_scope_open};
             exec->m_scope_open         = exec->m_programming_cursor;
@@ -228,7 +228,7 @@ namespace ncore
             exec->m_scope++;
         }
 
-        void xif(executor_t* exec, timeout_t t)
+        void op_if(executor_t* exec, timeout_t t)
         {
             opcode_if_timeout_t op     = {t.m_timeout_ms, 0, exec->m_scope_open};
             exec->m_scope_open         = exec->m_programming_cursor;
@@ -236,9 +236,9 @@ namespace ncore
             exec->m_scope++;
         }
 
-        void xreturn(executor_t* exec) { exec->m_programming_cursor = write_opcode_and_arg(exec->m_programming_cursor, OPCODE_RET, nullptr, 0); }
+        void op_return(executor_t* exec) { exec->m_programming_cursor = write_opcode_and_arg(exec->m_programming_cursor, OPCODE_RET, nullptr, 0); }
 
-        void xend(executor_t* exec)
+        void op_end(executor_t* exec)
         {
             // we only need to process scope management, there is no opcode
             if (exec->m_scope > 1)
@@ -397,7 +397,7 @@ namespace ncore
                             PROGRAM_PRINTF("IF TIMEOUT - SKIP %d\n", va_t(program_pc(program, pc)));
                             pc = op->m_end;
                         }
-                        else if (currentTime - op->m_startTime >= op->m_timeout)
+                        else if (op->m_timeout>0 && (currentTime - op->m_startTime) >= op->m_timeout)
                         {
                             // timeout reached, we continue execution of the scope
                             PROGRAM_PRINTF("IF TIMEOUT - CONTINUE %d\n", va_t(program_pc(program, pc)));
@@ -416,11 +416,8 @@ namespace ncore
                         PROGRAM_PRINTF("RETURN %d\n", va_t(program_pc(program, pc)));
                         return;
                     }
-
                 }  // switch
             }  // while
-
-            // we reached the end of the program, so we exit
         }
 
         void tick(executor_t* exec, state_t* state)

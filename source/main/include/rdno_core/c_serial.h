@@ -54,6 +54,16 @@ namespace ncore
             snprintf_(buffer, sizeof(buffer)-1, format, argv, argc);
             print(buffer);
         }
+
+        template<typename... Args>
+        void printfln(const char* format, Args... args)
+        {
+            char buffer[256];
+            const va_t argv[] = {args...};
+            const s32  argc   = sizeof(argv) / sizeof(argv[0]);
+            snprintf_(buffer, sizeof(buffer)-1, format, argv, argc);
+            println(buffer);
+        }
     }  // namespace nserial
 
     namespace nserial1

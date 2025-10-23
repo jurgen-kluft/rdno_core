@@ -24,8 +24,14 @@ namespace ncore
             // For ESP32, we can use the MAC address as a unique ID
             uint64_t chipid = ESP.getEfuseMac();
 #else
+#    ifdef TARGET_ESP8266
+            uint64_t chipid = ESP.getChipId();
+            chipid <<= 24;
+            chipid |= ESP.getFlashChipId();
+#    else
             // For non-ESP32 platforms, we can use a placeholder unique ID
             u64 chipid = 0x123456789ABC;  // Placeholder unique ID
+#    endif
 #endif
             to_str(str, (u32)(chipid >> 16), 16);
             to_str(str, (u32)(chipid & 0xFFFF), 16);
@@ -77,7 +83,7 @@ namespace ncore
 
         void dealloc_psram(byte* ptr)
         {
-#ifdef TARGET_ESP32
+#ifdef TARGET_ARDUINO
             free(ptr);  // ps_free does not exist, use free instead
 #else
             free(ptr);

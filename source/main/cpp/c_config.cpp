@@ -17,9 +17,6 @@ namespace ncore
         // ssid=OBNOSIS8,pw=MySecretPassword,server=10.0.0.22,port=1234
         bool parse_keyvalue(str_t& msg, str_t& outKey, str_t& outValue)
         {
-            if (str_is_empty(msg))
-                return false;
-
             str_t key = str_trim_left(msg);
             if (str_is_empty(key))
                 return false;  // No more key-value pairs
@@ -60,9 +57,6 @@ namespace ncore
 
         void parse_int8(config_t* config, s16 id, const str_t& str)
         {
-            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
-                return;
-
             s32 value = 0;
             if (from_str(str, &value, 10))
             {
@@ -72,9 +66,6 @@ namespace ncore
 
         void parse_uint8(config_t* config, s16 id, const str_t& str)
         {
-            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
-                return;
-
             u32 value = 0;
             if (from_str(str, &value, 10))
             {
@@ -84,9 +75,6 @@ namespace ncore
 
         void parse_int16(config_t* config, s16 id, const str_t& str)
         {
-            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
-                return;
-
             s32 value = 0;
             if (from_str(str, &value, 10))
             {
@@ -96,9 +84,6 @@ namespace ncore
 
         void parse_uint16(config_t* config, s16 id, const str_t& str)
         {
-            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
-                return;
-
             u32 value = 0;
             if (from_str(str, &value, 10))
             {
@@ -108,9 +93,6 @@ namespace ncore
 
         void parse_uint64(config_t* config, s16 id, const str_t& str)
         {
-            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
-                return;
-
             u64 value = 0;
             if (from_str(str, &value, 10))
             {
@@ -128,21 +110,32 @@ namespace ncore
             data[offset + 1] = (u8)((value >> 8) & 0xFF);
         }
 
+        static inline u32 read_u32(u8 const* data, u8 offset)
+        {
+            const u16 lo = read_u16(data, offset);
+            const u16 hi = read_u16(data, offset + 2);
+            return ((u32)hi << 16) | (u32)lo;
+        }
+        static inline void write_u32(u8* data, u8 offset, u32 value)
+        {
+            const u16 lo = (u16)(value & 0xFFFF);
+            const u16 hi = (u16)((value >> 16) & 0xFFFF);
+            write_u16(data, offset, lo);
+            write_u16(data, offset + 2, hi);
+        }
+
         static inline u64 read_u64(u8 const* data, u8 offset)
         {
-            u64 value = 0;
-            for (s32 i = 0; i < 8; i++)
-            {
-                value |= ((u64)data[offset + i]) << (i * 8);
-            }
-            return value;
+            const u32 lo = read_u32(data, offset);
+            const u32 hi = read_u32(data, offset + 4);
+            return ((u64)hi << 32) | (u64)lo;
         }
         static inline void write_u64(u8* data, u8 offset, u64 value)
         {
-            for (s32 i = 0; i < 8; i++)
-            {
-                data[offset + i] = (u8)((value >> (i * 8)) & 0xFF);
-            }
+            const u32 lo = (u32)(value & 0xFFFFFFFF);
+            const u32 hi = (u32)((value >> 32) & 0xFFFFFFFF);
+            write_u32(data, offset, lo);
+            write_u32(data, offset + 4, hi);
         }
 
         bool init_param(config_t* config, s16 param_id, param_type_t param_type)
@@ -171,7 +164,7 @@ namespace ncore
                 if (init_param(config, id, PARAM_TYPE_STRING) == false)
                     return false;
             }
-            if (config->m_param_types[id] != PARAM_TYPE_NONE)
+            if (config->m_param_types[id] != PARAM_TYPE_STRING)
                 return false;
             const u8 str_index          = config->m_param_value_offset[id];
             config->m_strlen[str_index] = (u8)str_len(str);
@@ -297,6 +290,30 @@ namespace ncore
             return true;
         }
 
+        bool set_uint32(config_t* config, s16 id, u32 value)
+        {
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
+                return false;
+            if (config->m_param_types[id] == PARAM_TYPE_NONE)
+            {
+                if (init_param(config, id, PARAM_TYPE_U32) == false)
+                    return false;
+            }
+            if (config->m_param_types[id] != PARAM_TYPE_U32)
+                return false;
+            const u8 offset = config->m_param_value_offset[id];
+            write_u32(config->m_param_value_data, offset, value);
+            return true;
+        }
+
+        bool get_uint32(const config_t* config, s16 id, u32& outValue)
+        {
+            if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT) || config->m_param_types[id] != PARAM_TYPE_U32)
+                return false;
+            const u8 offset = config->m_param_value_offset[id];
+            outValue        = read_u32(config->m_param_value_data, offset);
+            return true;
+        }
         bool set_uint64(config_t* config, s16 id, u64 value)
         {
             if (config == nullptr || (id < 0 || id >= SETTING_PARAM_MAX_COUNT))
