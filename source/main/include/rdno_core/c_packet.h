@@ -51,7 +51,7 @@ namespace ncore
             };
 
             void begin();
-            void write_sensor(u8 id, u16 value);
+            void write_sensor(u16 id, u16 value);
             s32  finalize();  // returns the number of sensor values written
         };
 

@@ -26,20 +26,16 @@ namespace ncore
         s32 packet_t::finalize()
         {
             const s32 num_values = Data[LengthOffset];
-            while ((Size & 0x01) != 0)  // Align size to 2 bytes
-            {
-                Data[Size++] = 0xFE;
-            }
             Data[LengthOffset] = (Size >> 1) & 0xFF;  // Set the length (number of words) of the packet
             return num_values;
         }
 
-        void packet_t::write_sensor(u8 id, u16 value)
+        void packet_t::write_sensor(u16 id, u16 value)
         {
-            Data[LengthOffset]++;  // Increment the sensor value count
-            Data[Size++] = id;     // Write the sensor stream id
-            Data[Size++] = value & 0xFF;
-            value        = value >> 8;
+            Data[LengthOffset]++;    // Increment the sensor value count
+            Data[Size++] = id >> 8;  // Write the sensor stream id
+            Data[Size++] = id;       // Write the sensor stream id
+            Data[Size++] = value >> 8;
             Data[Size++] = value & 0xFF;
         }
 
