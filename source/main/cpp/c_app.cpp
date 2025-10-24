@@ -22,9 +22,7 @@ void setup()
     ncore::gState.config  = &ncore::gConfig;
     ncore::gState.time_ms = 0;
     ncore::gState.wifi    = nullptr;
-    ncore::gState.tcp     = nullptr;
     ncore::gState.node    = nullptr;
-    ncore::gState.app     = nullptr;
     ncore::gState.flags   = 0;
 
     ncore::nserial::begin();                     // Initialize serial communication at 115200 baud

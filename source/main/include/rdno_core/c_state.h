@@ -24,7 +24,6 @@ namespace ncore
         state_wifi_t*      wifi;
         state_tcp_t*       tcp;
         state_node_t*      node;
-        state_app_t*       app;
         u32                flags;
 
         void set_config(bool valid) { flags = (flags & ~0x1) | (valid ? 1 : 0); }
