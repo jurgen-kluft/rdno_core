@@ -834,7 +834,7 @@ namespace ncore
     template <typename T, size_t N>
     char (&CCArraySizeHelper(T (&&x)[N]))[N];
 
-#    define DArrayCount(x) (sizeof(CCArraySizeHelper(x)))
+#    define DARRAYSIZE(x) (sizeof(CCArraySizeHelper(x)))
 #endif
 
 // ------------------------------------------------------------------------

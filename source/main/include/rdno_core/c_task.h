@@ -6,18 +6,14 @@
 #endif
 
 #include "rdno_core/c_config.h"
+#include "rdno_core/c_state.h"
 
 namespace ncore
 {
-    struct state_app_t;
-    struct state_wifi_t;
-    struct state_tcp_t;
-    struct state_udp_t;
+    struct state_task_t;
 
     namespace ntask
     {
-        struct state_t;
-
         typedef s16 result_t;
         typedef result_t (*function_t)(state_t*);
 
@@ -32,44 +28,61 @@ namespace ncore
             {
             }
             u32 m_timeout_ms;
+            u64 m_start_time_ms = 0;
         };
 
-        struct program_info_t;
-        typedef program_info_t* program_t;
-
-        struct executor_t;
-
-        executor_t* init(s32 max_programs, s32 program_mem_size = 2048);
-        void        print_info(executor_t* exec);
-        void        boot(executor_t* exec, program_t program);
-        void        tick(executor_t* exec, state_t* state);
-
-        program_t program(executor_t* exec, const char* name);
-        void      op_begin(executor_t* exec, program_t program);
-        void      op_jump(executor_t* exec, program_t program);
-        void      op_run(executor_t* exec, program_t program);
-        void      op_run_periodic(executor_t* exec, function_t fn, u32 period_ms);
-        void      op_once(executor_t* exec, function_t fn);
-        void      op_if(executor_t* exec, function_t fn);
-        void      op_if(executor_t* exec, timeout_t timeout);
-        void      op_return(executor_t* exec);
-        void      op_end(executor_t* exec);
-
-        struct state_t
+        struct periodic_t
         {
-            nconfig::config_t* config;
-            u64                time_ms;
-            state_wifi_t*      wifi;
-            state_tcp_t*       tcp;
-            state_udp_t*       udp;
-            state_app_t*       app;
-            u32                flags;
-
-            void set_config(bool valid) { flags = (flags & ~0x1) | (valid ? 1 : 0); }
-            bool has_config() const { return (flags & 0x1) != 0; }
+            periodic_t(u32 period_ms)
+                : m_period_ms(period_ms)
+            {
+            }
+            u32 m_period_ms;
+            u64 m_start_time_ms = 0;
         };
 
+        struct scheduler_t
+        {
+            s32           m_counter;
+            state_t*      m_state;
+            state_task_t* m_state_task;
+            void          reset();
+        };
+
+        typedef void (*program_entry_t)(scheduler_t*, state_t*);
+
+        struct program_t
+        {
+            program_t(program_entry_t entry)
+                : m_program(entry)
+            {
+            }
+            program_entry_t m_program;
+            scheduler_t     m_scheduler;
+        };
+
+        bool is_first_call(scheduler_t* scheduler);
+        void init_timeout(scheduler_t* scheduler, timeout_t& timeout);
+        bool timeout(scheduler_t* scheduler, timeout_t& timeout);
+        void init_periodic(scheduler_t* scheduler, periodic_t& periodic);
+        bool periodic(scheduler_t* scheduler, periodic_t& periodic);
+        bool call(scheduler_t* scheduler, function_t func);
+        void call_program(program_t* program);
+        void jmp_program(scheduler_t* scheduler, program_t* program);
+
+        void set_main(state_t* state, state_task_t* task_state, program_t* main_program);
+        void set_start(state_t* state, state_task_t* task_state, program_t* start_program);
+
+        void tick(state_t* state, state_task_t* task_state);
     }  // namespace ntask
+
+    struct state_task_t
+    {
+        u64               m_current_ms;
+        ntask::program_t* m_main_program;
+        ntask::program_t* m_current_program;
+    };
+
 }  // namespace ncore
 
 #endif  // __RDNO_CORE_TASK_H__

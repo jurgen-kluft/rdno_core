@@ -5,16 +5,19 @@
 #    pragma once
 #endif
 
-#include "rdno_core/c_task.h"
+#include "rdno_core/c_state.h"
 
 namespace ncore
 {
+    struct str_t;
+    
     namespace napp
     {
         void config_init_default(nconfig::config_t* config);
         s16  config_key_to_index(str_t const& str);
         
-        void setup(ntask::executor_t* exec, ntask::state_t* state);
+        void setup(state_t* state);
+        void tick(state_t* state);
 
     }  // namespace napp
 }  // namespace ncore

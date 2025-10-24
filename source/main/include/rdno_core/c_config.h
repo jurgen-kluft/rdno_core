@@ -29,10 +29,11 @@ namespace ncore
         {
             PARAM_ID_WIFI_SSID = 0,  // string
             PARAM_ID_WIFI_PASSWORD,  // string
+            PARAM_ID_REMOTE_MODE,    // u8 (0=TCP, 1=UDP)
             PARAM_ID_REMOTE_IP,      // u32
             PARAM_ID_REMOTE_PORT,    // u16
-            PARAM_ID_T,              // u8, Temperature
-            PARAM_ID_H,              // u8, Humidity
+            PARAM_ID_T,              // u16, Temperature
+            PARAM_ID_H,              // u16, Humidity
             PARAM_ID_P,              // u16, Pressure
             PARAM_ID_LUX,            // u16, Light
             PARAM_ID_CO2,            // u16, CO2
@@ -40,16 +41,16 @@ namespace ncore
             PARAM_ID_PM1,            // u16, PM1_0
             PARAM_ID_PM2,            // u16, PM2_5
             PARAM_ID_PMA,            // u16, PM10
-            PARAM_ID_N,              // u8, Noise
-            PARAM_ID_UV,             // u8, UV
-            PARAM_ID_CO,             // u8, CO
-            PARAM_ID_V,              // u8, Vibration
+            PARAM_ID_N,              // u16, Noise
+            PARAM_ID_UV,             // u16, UV
+            PARAM_ID_CO,             // u16, CO
+            PARAM_ID_V,              // u16, Vibration
             PARAM_ID_S,              // u16, State
-            PARAM_ID_B,              // u8, Battery
-            PARAM_ID_OC,             // u8, Open/Close
-            PARAM_ID_P1,             // u8, Presence1
-            PARAM_ID_P2,             // u8, Presence2
-            PARAM_ID_P3,             // u8, Presence3
+            PARAM_ID_B,              // u16, Battery
+            PARAM_ID_OC,             // u16, Open/Close
+            PARAM_ID_P1,             // u16, Presence1
+            PARAM_ID_P2,             // u16, Presence2
+            PARAM_ID_P3,             // u16, Presence3
             PARAM_ID_D1,             // u16, Distance1
             PARAM_ID_D2,             // u16, Distance2
             PARAM_ID_D3,             // u16, Distance3

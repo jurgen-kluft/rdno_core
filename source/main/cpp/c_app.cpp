@@ -8,9 +8,8 @@
 
 namespace ncore
 {
-    ntask::executor_t* gExec;
-    ntask::state_t     gState;
-    nconfig::config_t  gConfig;
+    state_t           gState;
+    nconfig::config_t gConfig;
 
 };  // namespace ncore
 
@@ -20,8 +19,13 @@ namespace ncore
 
 void setup()
 {
-    ncore::gState.config = &ncore::gConfig;
-    ncore::gState.app    = nullptr;
+    ncore::gState.config  = &ncore::gConfig;
+    ncore::gState.time_ms = 0;
+    ncore::gState.wifi    = nullptr;
+    ncore::gState.tcp     = nullptr;
+    ncore::gState.node    = nullptr;
+    ncore::gState.app     = nullptr;
+    ncore::gState.flags   = 0;
 
     ncore::nserial::begin();                     // Initialize serial communication at 115200 baud
     if (!ncore::nvstore::load(&ncore::gConfig))  // Load configuration from non-volatile storage
@@ -35,20 +39,15 @@ void setup()
         ncore::gState.set_config(true);
     }
 
-    ncore::gExec = ncore::ntask::init(5, 512);
-
     ncore::gState.time_ms = ncore::ntimer::millis();
-    ncore::napp::setup(ncore::gExec, &ncore::gState);
-
-    ncore::ntask::print_info(ncore::gExec);
-
+    ncore::napp::setup(&ncore::gState);
     ncore::nserial::println("Setup done...");
 }
 
 void loop()
 {
     ncore::gState.time_ms = ncore::ntimer::millis();
-    ncore::ntask::tick(ncore::gExec, &ncore::gState);
+    ncore::napp::tick(&ncore::gState);
 }
 
 #endif

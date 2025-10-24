@@ -1,5 +1,6 @@
 #include "rdno_core/c_str.h"
 #include "rdno_core/c_memory.h"
+#include "rdno_core/c_network.h"
 #include "rdno_core/c_serial.h"
 
 namespace ncore
@@ -789,20 +790,19 @@ namespace ncore
         dest.m_ascii[dest.m_end] = '\0';
     }
 
-    s16 str_append(str_t& dest, char c)
+    void str_append(str_t& dest, char c)
     {
         if (dest.m_ascii == nullptr || dest.m_end >= dest.m_eos)
-            return 0;  // destination is not mutable or no space left
+            return;  // destination is not mutable or no space left
 
         dest.m_ascii[dest.m_end++] = c;
         dest.m_ascii[dest.m_end]   = '\0';
-        return 1;
     }
 
-    s16 str_append(str_t& dest, const str_t& src)
+    void str_append(str_t& dest, const str_t& src)
     {
         if (dest.m_ascii == nullptr)
-            return 0;  // destination is not mutable
+            return;  // destination is not mutable
 
         s16 len = str_len(src);
         if (len > (s16)(dest.m_eos - dest.m_end))
@@ -815,82 +815,86 @@ namespace ncore
             dest.m_ascii[dest.m_end] = '\0';
             dest.m_const             = dest.m_ascii;
         }
-        return len;
     }
 
-    s16 str_append(str_t& dest, const char* src)
+    void str_append(str_t& dest, const char* src)
     {
         if (dest.m_ascii == nullptr)
-            return 0;  // destination is not mutable
+            return;  // destination is not mutable
 
         const char* ptr = src;
         while (*ptr != '\0' && dest.m_end < dest.m_eos)
             dest.m_ascii[dest.m_end++] = *ptr++;
         dest.m_ascii[dest.m_end] = '\0';
         dest.m_const             = dest.m_ascii;
-        return (s16)(ptr - src);
     }
 
-    s16 str_append(str_t& dest, const str_t* array, s16 count)
+    void str_append(str_t& dest, const IPAddress_t& ip)
+    {
+        if (dest.m_ascii == nullptr)
+            return;  // destination is not mutable
+        to_str(dest, ip);
+    }
+
+    void str_append(str_t& dest, const MACAddress_t& mac)
+    {
+        if (dest.m_ascii == nullptr)
+            return;  // destination is not mutable
+        to_str(dest, mac);
+    }
+
+    void str_append(str_t& dest, const str_t* array, s16 count)
     {
         if (array == nullptr || count <= 0)
-            return 0;
+            return;
 
         s16 totalLen = 0;
         for (s16 i = 0; i < count; i++)
-            totalLen += str_append(dest, array[i]);
-        return totalLen;
+            str_append(dest, array[i]);
     }
 
-    s16 str_join(str_t& dest, char sep, const str_t& src1, const str_t& src2)
+    void str_join(str_t& dest, char sep, const str_t& src1, const str_t& src2)
     {
         if (dest.m_ascii == nullptr)
-            return -1;  // destination is not mutable
+            return;  // destination is not mutable
 
-        s16 totalLen = 0;
-        totalLen += str_append(dest, src1);
-        totalLen += str_append(dest, sep);
-        totalLen += str_append(dest, src2);
-        return totalLen;
+        str_append(dest, src1);
+        str_append(dest, sep);
+        str_append(dest, src2);
     }
 
-    s16 str_join(str_t& dest, char sep, const str_t& src1, const str_t& src2, const str_t& src3)
+    void str_join(str_t& dest, char sep, const str_t& src1, const str_t& src2, const str_t& src3)
     {
         if (dest.m_ascii == nullptr)
-            return -1;  // destination is not mutable
-
-        s16 totalLen = 0;
-        totalLen += str_append(dest, src1);
-        totalLen += str_append(dest, sep);
-        totalLen += str_append(dest, src2);
-        totalLen += str_append(dest, sep);
-        totalLen += str_append(dest, src3);
-        return totalLen;
+            return;  // destination is not mutable
+        str_append(dest, src1);
+        str_append(dest, sep);
+        str_append(dest, src2);
+        str_append(dest, sep);
+        str_append(dest, src3);
     }
 
-    s16 str_join(str_t& dest, char sep, const str_t* src_array, s16 array_count)
+    void str_join(str_t& dest, char sep, const str_t* src_array, s16 array_count)
     {
         char  c[2]   = {sep, '\0'};
         str_t sepStr = str_const_n(c, 1);
-        return str_join(dest, sepStr, src_array, array_count);
+        str_join(dest, sepStr, src_array, array_count);
     }
 
-    s16 str_join(str_t& dest, const str_t& sep, const str_t* src_array, s16 array_count)
+    void str_join(str_t& dest, const str_t& sep, const str_t* src_array, s16 array_count)
     {
         if (dest.m_ascii == nullptr || src_array == nullptr || array_count <= 0)
-            return 0;  // destination is not mutable or invalid source array
+            return;  // destination is not mutable or invalid source array
 
         if (array_count > 0)
         {
-            s16 totalLen = str_append(dest, src_array[0]);
+            str_append(dest, src_array[0]);
             for (s16 i = 1; i < array_count; i++)
             {
-                totalLen += str_append(dest, sep);
-                totalLen += str_append(dest, src_array[i]);
+                str_append(dest, sep);
+                str_append(dest, src_array[i]);
             }
-            return totalLen;
         }
-        return 0;
     }
 
     str_t str_trim_left(const str_t& s)

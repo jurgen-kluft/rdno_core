@@ -7,6 +7,9 @@
 
 namespace ncore
 {
+    struct IPAddress_t;
+    struct MACAddress_t;
+    
     // -------------------------------------------------------------------------------
     // character functions
     // '0' = 0x30, '9' = 0x39, 'A' = 0x41, 'Z' = 0x5A, 'a' = 0x61, 'z' = 0x7A
@@ -116,16 +119,19 @@ namespace ncore
     void to_str(str_t& dest, f32 value, s16 num_fractional_digits = 2);
 
     // string composition ------------------------------------------------------------------
-    s16 str_append(str_t& dest, char c);          // append single character to 'dest' (note: dest must be mutable)
-    s16 str_append(str_t& dest, const str_t& s);  // append 's' to 'dest' (note: dest must be mutable)
-    s16 str_append(str_t& dest, const char* src);
-    s16 str_append(str_t& dest, const str_t* array, s16 count);
+    void str_append(str_t& dest, char c);          // append single character to 'dest' (note: dest must be mutable)
+    void str_append(str_t& dest, const str_t& s);  // append 's' to 'dest' (note: dest must be mutable)
+    void str_append(str_t& dest, const char* src);
+    void str_append(str_t& dest, const IPAddress_t& ip);
+    void str_append(str_t& dest, const MACAddress_t& mac);
+    void str_append(str_t& dest, const char* src);
+    void str_append(str_t& dest, const str_t* array, s16 count);
 
     // implementation helpers
-    s16 str_join(str_t& dest, char sep, const str_t& src1, const str_t& src2);
-    s16 str_join(str_t& dest, char sep, const str_t& src1, const str_t& src2, const str_t& src3);
-    s16 str_join(str_t& dest, char sep, const str_t* src_array, s16 array_count);
-    s16 str_join(str_t& dest, const str_t& sep, const str_t* src_array, s16 array_count);
+    void str_join(str_t& dest, char sep, const str_t& src1, const str_t& src2);
+    void str_join(str_t& dest, char sep, const str_t& src1, const str_t& src2, const str_t& src3);
+    void str_join(str_t& dest, char sep, const str_t* src_array, s16 array_count);
+    void str_join(str_t& dest, const str_t& sep, const str_t* src_array, s16 array_count);
 
     // printing to serial -------------------------------------------------------------------
     void str_print(const str_t& s);
