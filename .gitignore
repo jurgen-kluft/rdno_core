@@ -38,5 +38,5 @@ cmake-build-debug/
 !*.ini
 !*.bat
 
-#except do ignore the following files
-CMakeLists.txt
+#do ignore 'secret' files
+*.secret.*
