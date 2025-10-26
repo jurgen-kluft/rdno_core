@@ -87,29 +87,29 @@ namespace ncore
         return (partIndex == 6);
     }
 
-    void to_str(str_t& str, IPAddress_t address)
+    void to_str(str_t& str, IPAddress_t address, const char* sep)
     {
         to_str(str, (u32)address.m_address[0], 10);
-        str_append(str, ".");
+        str_append(str, sep);
         to_str(str, (u32)address.m_address[1], 10);
-        str_append(str, ".");
+        str_append(str, sep);
         to_str(str, (u32)address.m_address[2], 10);
-        str_append(str, ".");
+        str_append(str, sep);
         to_str(str, (u32)address.m_address[3], 10);
     }
 
-    void to_str(str_t& str, const MACAddress_t& address)
+    void to_str(str_t& str, const MACAddress_t& address, const char* sep)
     {
         to_str(str, address.m_address[0], 2, 16);
-        str_append(str, ":");
+        str_append(str, sep);
         to_str(str, address.m_address[1], 2, 16);
-        str_append(str, ":");
+        str_append(str, sep);
         to_str(str, address.m_address[2], 2, 16);
-        str_append(str, ":");
+        str_append(str, sep);
         to_str(str, address.m_address[3], 2, 16);
-        str_append(str, ":");
+        str_append(str, sep);
         to_str(str, address.m_address[4], 2, 16);
-        str_append(str, ":");
+        str_append(str, sep);
         to_str(str, address.m_address[5], 2, 16);
     }
 

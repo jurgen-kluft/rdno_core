@@ -23,8 +23,8 @@ namespace ncore
     bool from_string(str_t const& str, IPAddress_t& outAddr);
     bool from_string(str_t const& str, MACAddress_t& outAddr);
 
-    void to_str(str_t& str, IPAddress_t address);
-    void to_str(str_t& str, const MACAddress_t& address);
+    void to_str(str_t& str, IPAddress_t address, const char* sep = ".");
+    void to_str(str_t& str, const MACAddress_t& address, const char* sep = ":");
 
     bool is_valid_SSID(str_t const&);
     bool is_valid_password(str_t const&);

@@ -122,8 +122,8 @@ namespace ncore
     void str_append(str_t& dest, char c);          // append single character to 'dest' (note: dest must be mutable)
     void str_append(str_t& dest, const str_t& s);  // append 's' to 'dest' (note: dest must be mutable)
     void str_append(str_t& dest, const char* src);
-    void str_append(str_t& dest, const IPAddress_t& ip);
-    void str_append(str_t& dest, const MACAddress_t& mac);
+    void str_append(str_t& dest, const IPAddress_t& ip, const char* sep = ".");
+    void str_append(str_t& dest, const MACAddress_t& mac, const char* sep = ":");
     void str_append(str_t& dest, const char* src);
     void str_append(str_t& dest, const str_t* array, s16 count);
 

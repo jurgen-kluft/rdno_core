@@ -5,7 +5,6 @@
 #    pragma once
 #endif
 
-#include "rdno_core/c_config.h"
 #include "rdno_core/c_state.h"
 
 namespace ncore
@@ -43,8 +42,12 @@ namespace ncore
 
         struct scheduler_t
         {
+            scheduler_t()
+                : m_counter(0)
+                , m_state_task(nullptr)
+            {
+            }
             s32           m_counter;
-            state_t*      m_state;
             state_task_t* m_state_task;
             void          reset();
         };
@@ -67,7 +70,7 @@ namespace ncore
         void init_periodic(scheduler_t* scheduler, periodic_t& periodic);
         bool periodic(scheduler_t* scheduler, periodic_t& periodic);
         bool call(scheduler_t* scheduler, function_t func);
-        void call_program(program_t* program);
+        void call_program(scheduler_t* scheduler, program_t* program);
         void jmp_program(scheduler_t* scheduler, program_t* program);
 
         void set_main(state_t* state, state_task_t* task_state, program_t* main_program);
@@ -78,9 +81,10 @@ namespace ncore
 
     struct state_task_t
     {
-        u64               m_current_ms;
-        ntask::program_t* m_main_program;
-        ntask::program_t* m_current_program;
+        u64                m_current_ms;
+        state_t*           m_state;
+        ntask::program_t*  m_main_program;
+        ntask::program_t*  m_current_program;
     };
 
 }  // namespace ncore

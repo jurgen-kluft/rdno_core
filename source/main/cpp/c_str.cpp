@@ -829,18 +829,18 @@ namespace ncore
         dest.m_const             = dest.m_ascii;
     }
 
-    void str_append(str_t& dest, const IPAddress_t& ip)
+    void str_append(str_t& dest, const IPAddress_t& ip, const char* sep)
     {
         if (dest.m_ascii == nullptr)
             return;  // destination is not mutable
-        to_str(dest, ip);
+        to_str(dest, ip, sep);
     }
 
-    void str_append(str_t& dest, const MACAddress_t& mac)
+    void str_append(str_t& dest, const MACAddress_t& mac, const char* sep)
     {
         if (dest.m_ascii == nullptr)
             return;  // destination is not mutable
-        to_str(dest, mac);
+        to_str(dest, mac, sep);
     }
 
     void str_append(str_t& dest, const str_t* array, s16 count)

@@ -40,16 +40,20 @@ func GetPackage() *denv.Package {
 	esp32corelib.AddEnvironmentVariable("ESP32_SDK")
 	esp32corelib.AddInclude("{ESP32_SDK}", "cores/esp32", "")
 	esp32corelib.AddInclude("{ESP32_SDK}", "libraries/Wire", "src")
+	esp32corelib.AddInclude("{ESP32_SDK}", "libraries/EEPROM", "src")
 	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "cores/esp32", "", ".c", ".cpp", ".S")
 	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "libraries/Wire", "src", ".c", ".cpp")
+	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "libraries/EEPROM", "src", ".c", ".cpp")
 
 	// esp8266 core library
 	esp8266corelib := denv.SetupCppLibProjectForArduinoEsp8266(mainpkg, name+"-esp8266")
 	esp8266corelib.AddEnvironmentVariable("ESP8266_SDK")
 	esp8266corelib.AddInclude("{ESP8266_SDK}", "cores/esp8266", "")
 	esp8266corelib.AddInclude("{ESP8266_SDK}", "libraries/Wire", "")
+	esp8266corelib.AddInclude("{ESP8266_SDK}", "libraries/EEPROM", "")
 	esp8266corelib.SourceFilesFrom("{ESP8266_SDK}", "cores/esp8266", "", ".c", ".cpp", ".S")
 	esp8266corelib.SourceFilesFrom("{ESP8266_SDK}", "libraries/Wire", "", ".c", ".cpp")
+	esp8266corelib.SourceFilesFrom("{ESP8266_SDK}", "libraries/EEPROM", "", ".c", ".cpp")
 
 	// main library
 	mainlib := denv.SetupCppLibProject(mainpkg, name)

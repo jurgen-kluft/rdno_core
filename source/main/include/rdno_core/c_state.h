@@ -5,6 +5,8 @@
 #    pragma once
 #endif
 
+#include "rdno_core/c_network.secret.h"
+
 namespace ncore
 {
     namespace nconfig
@@ -19,15 +21,16 @@ namespace ncore
 
     struct state_t
     {
-        nconfig::config_t* config;
-        u64                time_ms;
-        state_wifi_t*      wifi;
-        state_tcp_t*       tcp;
-        state_node_t*      node;
-        u32                flags;
-
-        void set_config(bool valid) { flags = (flags & ~0x1) | (valid ? 1 : 0); }
-        bool has_config() const { return (flags & 0x1) != 0; }
+        const char*      WiFiSSID;
+        const char*      WiFiPassword;
+        u32              ServerIP;
+        u16              ServerTcpPort;
+        u16              ServerUdpPort;
+        u64              time_ms;
+        state_wifi_t*    wifi;
+        state_tcp_t*     tcp;
+        state_node_t*    node;
+        u32              flags;
     };
 
 }  // namespace ncore

@@ -51,18 +51,18 @@ namespace ncore
         {
             if (func != nullptr)
             {
-                return func(scheduler->m_state) == RESULT_DONE;
+                return func(scheduler->m_state_task->m_state) == RESULT_DONE;
             }
             return false;
         }
 
-        void call_program(program_t* program)
+        void call_program(scheduler_t* scheduler, program_t* program)
         {
             if (program != nullptr && program->m_program != nullptr)
             {
-                scheduler_t* scheduler = &program->m_scheduler;
-                program->m_program(scheduler, scheduler->m_state);
-                scheduler->m_counter++;
+                program->m_scheduler.m_state_task = scheduler->m_state_task;
+                program->m_program(&program->m_scheduler, program->m_scheduler.m_state_task->m_state);
+                program->m_scheduler.m_counter++;
             }
         }
 
@@ -70,23 +70,30 @@ namespace ncore
         {
             if (program != nullptr)
             {
+                program->m_scheduler.m_state_task = scheduler->m_state_task;
+                program->m_scheduler.reset();
                 scheduler->m_state_task->m_current_program = program;
-                scheduler->m_state_task->m_current_program->m_scheduler.reset();
             }
         }
 
-        void set_main(state_t* state, state_task_t* task_state, program_t* main_program) { task_state->m_main_program = main_program; }
+        void set_main(state_t* state, state_task_t* task_state, program_t* main_program) 
+        { 
+            task_state->m_main_program = main_program; 
+            task_state->m_main_program->m_scheduler.reset();
+            task_state->m_main_program->m_scheduler.m_state_task = task_state;
+        }
 
         void set_start(state_t* state, state_task_t* task_state, program_t* start_program)
         {
             task_state->m_current_program = start_program;
             task_state->m_current_program->m_scheduler.reset();
+            task_state->m_current_program->m_scheduler.m_state_task = task_state;
         }
 
         void tick(state_t* state, state_task_t* task_state) 
         { 
             task_state->m_current_ms = ntimer::millis();
-            call_program(task_state->m_current_program); 
+            call_program(&task_state->m_current_program->m_scheduler, task_state->m_current_program); 
         }
 
     }  // namespace ntask
