@@ -31,7 +31,6 @@ void setup()
     ncore::nserial::begin();  // Initialize serial communication at 115200 baud
 
     ncore::gState.time_ms = ncore::ntimer::millis();
-
     ncore::napp::setup(&ncore::gState);
 
     ncore::nserial::println("Setup done...");

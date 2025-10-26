@@ -16,6 +16,7 @@ namespace ncore
 
     struct state_wifi_t;
     struct state_tcp_t;
+    struct state_udp_t;
     struct state_node_t;
     struct state_app_t;
 
@@ -29,6 +30,7 @@ namespace ncore
         u64              time_ms;
         state_wifi_t*    wifi;
         state_tcp_t*     tcp;
+        state_udp_t*     udp;
         state_node_t*    node;
         u32              flags;
     };

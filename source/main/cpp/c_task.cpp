@@ -92,6 +92,7 @@ namespace ncore
 
         void tick(state_t* state, state_task_t* task_state) 
         { 
+            task_state->m_state = state;
             task_state->m_current_ms = ntimer::millis();
             call_program(&task_state->m_current_program->m_scheduler, task_state->m_current_program); 
         }
