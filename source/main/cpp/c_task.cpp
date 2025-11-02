@@ -23,7 +23,7 @@ namespace ncore
         bool timeout(scheduler_t* scheduler, timeout_t& timeout)
         {
             const u64 current_time = scheduler->m_state_task->m_current_ms;
-            return (current_time - timeout.m_start_time_ms) >= timeout.m_timeout_ms;
+            return (u32)(current_time - timeout.m_start_time_ms) >= timeout.m_timeout_ms;
         }
 
         void init_periodic(scheduler_t* scheduler, periodic_t& periodic)

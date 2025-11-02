@@ -16,6 +16,7 @@ namespace ncore
         void config_init_default(nconfig::config_t* config);
         s16  config_key_to_index(str_t const& str);
         
+        void presetup();
         void setup(state_t* state);
         void tick(state_t* state);
 

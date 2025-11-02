@@ -71,6 +71,9 @@ namespace ncore
                 ID_PY          = 24,  // Y
                 ID_PZ          = 25,  // Z
                 ID_RSSI        = 26,  // RSSI
+                ID_PERF1        = 26,  // Performance Metric 1
+                ID_PERF2        = 27,  // Performance Metric 2
+                ID_PERF3        = 28,  // Performance Metric 3
             };
         };  // namespace nsensorid
 

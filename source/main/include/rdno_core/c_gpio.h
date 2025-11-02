@@ -11,12 +11,6 @@ namespace ncore
 {
     namespace ngpio
     {
-        const s8 High       = 1;
-        const s8 Low        = 0;
-        const s8 ModeInput  = 0;
-        const s8 ModeOutput = 1;
-        const s8 PinsMax    = 48;
-
         enum
         {
             PinTX = 1,
@@ -62,12 +56,10 @@ namespace ncore
             PinDAC2 = 26,
         };
 
-        // Is this pin valid ?
-        inline bool is_valid(s8 pin) { return pin <= PinsMax && pin > 0; }
-
         // PinMode configures the specified pin to behave either as an input or an output.
         // @see: https://docs.arduino.cc/language-reference/en/functions/digital-io/pinMode
-        void set_pinmode(s8 pin, s8 mode);
+        void set_pin_as_output(s8 pin);
+        void set_pin_as_input(s8 pin);
 
         // Read reads the value from a specified digital pin, either HIGH or LOW.
         // @see: https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalread/
@@ -78,7 +70,7 @@ namespace ncore
         
         // Write sets a HIGH or a LOW value to a digital pin.
         // @see: https://docs.arduino.cc/reference/en/language/functions/digital-io/digitalwrite/
-        void write_digital(s8 pin, s8 value);
+        void write_digital(s8 pin, bool value);
 
         // Wakeup pin can be used to wake up the device from deep sleep mode.
         // The pin can be configured to trigger on a HIGH or LOW signal.

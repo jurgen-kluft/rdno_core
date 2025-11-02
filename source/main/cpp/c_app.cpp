@@ -17,6 +17,8 @@ namespace ncore
 
 void setup()
 {
+    ncore::napp::presetup();
+
     ncore::gState.time_ms = 0;
     ncore::gState.wifi    = nullptr;
     ncore::gState.node    = nullptr;

@@ -3,13 +3,8 @@
 
 namespace ncore
 {
-    void IPAddress_t::from(u32 ip)
-    {
-        m_address[0] = (byte)((ip >> 24) & 0xFF);
-        m_address[1] = (byte)((ip >> 16) & 0xFF);
-        m_address[2] = (byte)((ip >> 8) & 0xFF);
-        m_address[3] = (byte)(ip & 0xFF);
-    }
+    void IPAddress_t::from(u32 ip) { m_address = ip; }
+    void IPAddress_t::from(u8 a, u8 b, u8 c, u8 d) { m_address = (byte)((d >> 24) & 0xFF) | (byte)((c >> 16) & 0xFF) | (byte)((b >> 8) & 0xFF) | (byte)(a & 0xFF); }
 
     // examples of valid IP string addresses:
     // "10.0.0.1"
@@ -22,10 +17,11 @@ namespace ncore
     bool from_string(str_t const& str, IPAddress_t& outAddr)
     {
         s32 partIndex = 0;
-        s32 partValue = 0;
+        u32 partValue = 0;
         s32 partChars = 0;
 
         str_t iter = str;
+        u32   ip   = outAddr.m_address;
         while (iter.m_str <= iter.m_end)
         {
             const char ch = iter.m_str < iter.m_end ? iter.m_const[iter.m_str] : '.';
@@ -35,9 +31,10 @@ namespace ncore
                     return false;  // Invalid format or too many parts
                 if ((partValue <= 9 && partChars != 1) || (partValue > 9 && partValue <= 99 && partChars != 2))
                     return false;  // Leading zero is not allowed
-                outAddr.m_address[partIndex++] = (byte)partValue;
-                partValue                      = 0;
-                partChars                      = 0;
+                ip        = ip | (partValue << ((3 - partIndex) * 8));
+                partValue = 0;
+                partChars = 0;
+                partIndex++;
             }
             else
             {
@@ -89,13 +86,13 @@ namespace ncore
 
     void to_str(str_t& str, IPAddress_t address, const char* sep)
     {
-        to_str(str, (u32)address.m_address[0], 10);
+        to_str(str, (u32)address.m_address & 0xFF, 10);
         str_append(str, sep);
-        to_str(str, (u32)address.m_address[1], 10);
+        to_str(str, (u32)(address.m_address >> 8) & 0xFF, 10);
         str_append(str, sep);
-        to_str(str, (u32)address.m_address[2], 10);
+        to_str(str, (u32)(address.m_address >> 16) & 0xFF, 10);
         str_append(str, sep);
-        to_str(str, (u32)address.m_address[3], 10);
+        to_str(str, (u32)(address.m_address >> 24) & 0xFF, 10);
     }
 
     void to_str(str_t& str, const MACAddress_t& address, const char* sep)

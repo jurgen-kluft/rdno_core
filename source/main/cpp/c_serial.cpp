@@ -32,7 +32,7 @@ namespace ncore
         void print(const IPAddress_t& address)
         {
             char strBuffer[32];
-            snprintf(strBuffer, sizeof(strBuffer), "%u.%u.%u.%u", va_t(address.m_address[0]), va_t(address.m_address[1]), va_t(address.m_address[2]), va_t(address.m_address[3]));
+            snprintf(strBuffer, sizeof(strBuffer), "%u.%u.%u.%u", va_t(address.at(0)), va_t(address.at(1)), va_t(address.at(2)), va_t(address.at(3)));
             Serial.print(strBuffer);
         }
 

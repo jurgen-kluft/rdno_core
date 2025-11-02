@@ -11,8 +11,10 @@ namespace ncore
 
     struct IPAddress_t
     {
-        byte m_address[4];
+        u32  m_address;
         void from(u32 ip);
+        void from(u8 a, u8 b, u8 c, u8 d);
+        byte at(s32 index) const { return (m_address >> (index * 8)) & 0xFF; }
     };
 
     struct MACAddress_t

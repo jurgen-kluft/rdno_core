@@ -24,20 +24,22 @@ namespace ncore
         {
             timeout_t(u32 timeout_ms)
                 : m_timeout_ms(timeout_ms)
+                , m_start_time_ms(0)
             {
             }
             u32 m_timeout_ms;
-            u64 m_start_time_ms = 0;
+            u64 m_start_time_ms;
         };
 
         struct periodic_t
         {
             periodic_t(u32 period_ms)
                 : m_period_ms(period_ms)
+                , m_start_time_ms(0)
             {
             }
             u32 m_period_ms;
-            u64 m_start_time_ms = 0;
+            u64 m_start_time_ms;
         };
 
         struct scheduler_t
