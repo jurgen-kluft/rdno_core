@@ -40,9 +40,11 @@ func GetPackage() *denv.Package {
 	esp32corelib.AddEnvironmentVariable("ESP32_SDK")
 	esp32corelib.AddInclude("{ESP32_SDK}", "cores/esp32", "")
 	esp32corelib.AddInclude("{ESP32_SDK}", "libraries/Wire", "src")
+	esp32corelib.AddInclude("{ESP32_SDK}", "libraries/SPI", "src")
 	esp32corelib.AddInclude("{ESP32_SDK}", "libraries/EEPROM", "src")
 	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "cores/esp32", "", ".c", ".cpp", ".S")
 	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "libraries/Wire", "src", ".c", ".cpp")
+	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "libraries/SPI", "src", ".c", ".cpp")
 	esp32corelib.SourceFilesFrom("{ESP32_SDK}", "libraries/EEPROM", "src", ".c", ".cpp")
 
 	// esp8266 core library
