@@ -12,8 +12,8 @@ namespace ncore
         void set_pin_as_output(s8 pin) { ::pinMode(pin, OUTPUT); }
         void set_pin_as_input(s8 pin) { ::pinMode(pin, INPUT); }
 
-        s8 read_digital(s8 pin) { return ::digitalRead(pin); }
-        s32 read_analog(s8 pin) { return ::analogRead(pin); }
+        bool read_digital(s8 pin) { return ::digitalRead(pin) == HIGH; }
+        s32  read_analog(s8 pin) { return ::analogRead(pin); }
 
         void write_digital(s8 pin, bool value) { ::digitalWrite(pin, (value) ? HIGH : LOW); }
 
@@ -26,7 +26,7 @@ namespace ncore
             // }
         }
 
-        s8 read_digital_debounced(s8 pin, u16 debounce_low_high_ms, u16 debounce_high_low_ms)
+        bool read_digital_debounced(s8 pin, u16 debounce_low_high_ms, u16 debounce_high_low_ms)
         {
             ndebounce::filter_t filter;
             filter.m_low_to_high_debounce_interval_ms = debounce_low_high_ms;
@@ -34,13 +34,13 @@ namespace ncore
             ndebounce::value_t value;
 
             filter.init(value);
-            s8 poll = read_digital(pin);
+            s8 poll = read_digital(pin) ? 1 : 0;
             while (filter.update(value, poll) == false)
             {
-                poll = read_digital(pin);
+                poll = read_digital(pin) ? 1 : 0;
                 ntimer::delay(5);
             }
-            return poll;
+            return poll == 1 ? true : false;
         }
 
     }  // namespace ngpio
@@ -56,16 +56,16 @@ namespace ncore
         static u8  GPIOModes[PinsMax]  = {0};
         static s32 GPIOValues[PinsMax] = {0};
 
-        void set_pin_as_output(s8 pin) { }
-        void set_pin_as_input(s8 pin) { }
+        void set_pin_as_output(s8 pin) {}
+        void set_pin_as_input(s8 pin) {}
 
-        s8 read_digital(s8 pin)
+        bool read_digital(s8 pin)
         {
             if (is_valid(pin))
             {
                 return GPIOValues[pin];
             }
-            return 0;
+            return false;
         }
 
         s32 read_analog(s8 pin)

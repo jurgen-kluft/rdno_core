@@ -9,11 +9,6 @@
 
 namespace ncore
 {
-    namespace nconfig
-    {
-        struct config_t;
-    }  // namespace nconfig
-
     struct state_wifi_t;
     struct state_tcp_t;
     struct state_udp_t;

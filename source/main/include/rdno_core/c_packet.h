@@ -44,36 +44,41 @@ namespace ncore
             typedef u8 value_t;
             enum
             {
-                ID_UNKNOWN     = 0x00,
+                ID_UNKNOWN     = 0,   // Unknown
                 ID_TEMPERATURE = 1,   // Temperature
                 ID_HUMIDITY    = 2,   // Humidity
                 ID_PRESSURE    = 3,   // Pressure
                 ID_LIGHT       = 4,   // Light
-                ID_CO2         = 5,   // CO2
-                ID_VOC         = 6,   // VOC
-                ID_PM1_0       = 7,   // PM1_0
-                ID_PM2_5       = 8,   // PM2_5
-                ID_PM10        = 9,   // PM10
-                ID_NOISE       = 10,   // Noise
-                ID_UV          = 11,  // UV
-                ID_CO          = 12,  // CO
-                ID_VIBRATION   = 13,  // Vibration
-                ID_STATE       = 14,  // State
-                ID_BATTERY     = 15,  // Battery
-                ID_SWITCH      = 16,  // On/Off, Open/Close
-                ID_PRESENCE1   = 17,  // Presence1
-                ID_PRESENCE2   = 18,  // Presence2
-                ID_PRESENCE3   = 19,  // Presence3
-                ID_DISTANCE1   = 20,  // Distance1
-                ID_DISTANCE2   = 21,  // Distance2
-                ID_DISTANCE3   = 22,  // Distance3
-                ID_PX          = 23,  // X
-                ID_PY          = 24,  // Y
-                ID_PZ          = 25,  // Z
-                ID_RSSI        = 26,  // RSSI
-                ID_PERF1        = 26,  // Performance Metric 1
-                ID_PERF2        = 27,  // Performance Metric 2
-                ID_PERF3        = 28,  // Performance Metric 3
+                ID_UV          = 5,   // UV
+                ID_CO          = 6,   // Carbon Monoxide
+                ID_CO2         = 7,   // Carbon Dioxide
+                ID_HCHO        = 8,   // Formaldehyde
+                ID_VOC         = 9,   // Volatile Organic Compounds
+                ID_NOX         = 10,  // Nitrogen Oxides
+                ID_PM005       = 11,  // Particulate Matter 0.5
+                ID_PM010       = 12,  // Particulate Matter 1.0
+                ID_PM025       = 13,  // Particulate Matter 2.5
+                ID_PM040       = 14,  // Particulate Matter 4.0
+                ID_PM100       = 15,  // Particulate Matter 10.0
+                ID_NOISE       = 16,  // Noise
+                ID_VIBRATION   = 17,  // Vibration
+                ID_STATE       = 18,  // State
+                ID_BATTERY     = 19,  // Battery
+                ID_SWITCH      = 20,  // On/Off, Open/Close
+                ID_PRESENCE1   = 21,  // Presence1
+                ID_PRESENCE2   = 22,  // Presence2
+                ID_PRESENCE3   = 23,  // Presence3
+                ID_DISTANCE1   = 24,  // Distance1
+                ID_DISTANCE2   = 25,  // Distance2
+                ID_DISTANCE3   = 26,  // Distance3
+                ID_PX          = 27,  // X
+                ID_PY          = 28,  // Y
+                ID_PZ          = 29,  // Z
+                ID_RSSI        = 30,  // RSSI
+                ID_PERF1       = 31,  // Performance Metric 1
+                ID_PERF2       = 32,  // Performance Metric 2
+                ID_PERF3       = 33,  // Performance Metric 3
+                ID_SENSORCOUNT = 34,  // The maximum number of sensor types (highest index + 1)
             };
         };  // namespace nsensorid
 
