@@ -14,6 +14,8 @@ On my machine the Esp32 SDK is located in `~/sdk/Arduino/esp32` but you can plac
 sure that you have a environment variable named `ESP_SDK` that points to the location of the SDK. 
 
 - `git clone https://github.com/espressif/arduino-esp32.git YourLocation`
+- `cd YourLocation`
+- `git submodule update --init --recursive`
 
 # ESP32 SDK Version
 
