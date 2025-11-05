@@ -16,6 +16,8 @@ sure that you have a environment variable named `ESP_SDK` that points to the loc
 - `git clone https://github.com/espressif/arduino-esp32.git YourLocation`
 - `cd YourLocation`
 - `git submodule update --init --recursive`
+- `cd esp32/tools`
+- `python get.py`
 
 # ESP32 SDK Version
 
