@@ -17,15 +17,15 @@ sure that you have a environment variable named `ESP_SDK` that points to the loc
 
 # ESP32 SDK Version
 
-URL: https://github.com/espressif/arduino-esp32
-Local Directory: `~/sdk/Arduino/esp32`
-Commit `6f92b604f62568eced0e519b01d17af00b80ebe4` (May 13, 2025).
+URL: https://github.com/espressif/arduino-esp32  
+Local Directory: `~/sdk/Arduino/esp32`  
+Commit `6f92b604f62568eced0e519b01d17af00b80ebe4` (May 13, 2025)  
 
 # ESP8266 SDK Version
 
-URL: https://github.com/esp8266/Arduino
-Local Directory: `~/sdk/Arduino/esp8266`
-Commit `1297133cd27986a5153d47ef60f1fe6ec66d1006` (Sep 9, 2025).
+URL: https://github.com/esp8266/Arduino  
+Local Directory: `~/sdk/Arduino/esp8266`  
+Commit `1297133cd27986a5153d47ef60f1fe6ec66d1006` (Sep 9, 2025)  
 
 
 # Environment Variables
