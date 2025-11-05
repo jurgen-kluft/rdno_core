@@ -11,7 +11,7 @@ Certain things need to be installed on your system to get this to work, mainly t
 Also you do have to have `git`, and `go` installed on your system.
 
 On my machine the Esp32 SDK is located in `~/sdk/Arduino/esp32` but you can place it anywhere you like. You do have to make
-sure that you have a environment variable named `ESP_SDK` that points to the location of the SDK. 
+sure that you have a environment variable named `ESP32_SDK` that points to the location of the SDK. 
 
 - `git clone https://github.com/espressif/arduino-esp32.git YourLocation`
 - `cd YourLocation`
