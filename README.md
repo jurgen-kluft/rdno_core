@@ -19,6 +19,15 @@ sure that you have a environment variable named `ESP32_SDK` that points to the l
 - `cd esp32/tools`
 - `python get.py`
 
+On my machine the Esp8266 SDK is located in `~/sdk/Arduino/esp8266` but you can place it anywhere you like. You do have to make
+sure that you have a environment variable named `ESP8266_SDK` that points to the location of the SDK. 
+
+- `git clone https://github.com/esp8266/Arduino.git YourLocation`
+- `cd YourLocation`
+- `git submodule update --init --recursive`
+- `cd tools`
+- `python get.py`
+
 # ESP32 SDK Version
 
 URL: https://github.com/espressif/arduino-esp32  
