@@ -5,8 +5,6 @@
 #    pragma once
 #endif
 
-#include "rdno_core/c_debug.h"
-
 namespace ncore
 {
     namespace nwire

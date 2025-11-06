@@ -1,11 +1,11 @@
 #include "rdno_core/c_target.h"
 #include "rdno_core/c_malloc.h"
-#include "rdno_core/c_memory.h"
 #include "rdno_core/c_serial.h"
 #include "rdno_core/c_system.h"
 #include "rdno_core/c_task.h"
 #include "rdno_core/c_timer.h"
-#include "rdno_core/c_allocator.h"
+
+#include "ccore/c_memory.h"
 
 namespace ncore
 {

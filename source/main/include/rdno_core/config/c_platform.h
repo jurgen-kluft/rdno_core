@@ -32,7 +32,8 @@ namespace ncore
     // #define CC_PLATFORM_NAME = <string>
     // #define CC_PLATFORM_DESCRIPTION = <string>
     // #define CC_PROCESSOR_XXX
-    // #define CC_SYSTEM_LITTLE_ENDIAN | CC_SYSTEM_BIG_ENDIAN 1
+    // #define CC_MISALIGNED_SUPPORT_LEVEL=0|1|2
+    // #define CC_SYSTEM_LITTLE_ENDIAN | CC_SYSTEM_BIG_ENDIAN
     // #define CC_ASM_STYLE_ATT | CC_ASM_STYLE_INTEL | CC_ASM_STYLE_MOTOROLA
     // #define CC_PLATFORM_PTR_SIZE = <integer size in bytes>
     // #define CC_PLATFORM_WORD_SIZE = <integer size in bytes>
@@ -83,11 +84,15 @@ namespace ncore
 #    define CC_PLATFORM_NAME        "Larrabee"
 #    define CC_PLATFORM_DESCRIPTION "Larrabee on LRB1"
 #    define CC_PROCESSOR_X86_64     1
-#    define CC_SYSTEM_BIG_ENDIAN    1 1
-#    define CC_PROCESSOR_LRB        1
-#    define CC_PROCESSOR_LRB1       1  // Larrabee version 1
-#    define CC_ASM_STYLE_ATT        1  // Both types of asm style
-#    define CC_ASM_STYLE_INTEL      1  // are supported.
+#    if defined(BYTE_ORDER) && (BYTE_ORDER == 4321)
+#        define CC_SYSTEM_BIG_ENDIAN 1
+#    else
+#        define CC_SYSTEM_LITTLE_ENDIAN 1
+#    endif
+#    define CC_PROCESSOR_LRB   1
+#    define CC_PROCESSOR_LRB1  1  // Larrabee version 1
+#    define CC_ASM_STYLE_ATT   1  // Both types of asm style
+#    define CC_ASM_STYLE_INTEL 1  // are supported.
 #elif defined(CC_PLATFORM_ANDROID) || defined(__ANDROID__)
 
 #    undef CC_PLATFORM_ANDROID
@@ -279,7 +284,7 @@ namespace ncore
 #    define CC_PLATFORM_BSD         0
 #    define CC_PLATFORM_UNIX        0
 #    define CC_PLATFORM_POSIX       0
-#    define CC_PLATFORM_NAME        "riscv"  
+#    define CC_PLATFORM_NAME        "riscv"
 #    define CC_PLATFORM_DESCRIPTION "riscv"
 #    if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #        define CC_SYSTEM_LITTLE_ENDIAN 1
@@ -324,7 +329,7 @@ namespace ncore
 #    define CC_PLATFORM_BSD         0
 #    define CC_PLATFORM_UNIX        0
 #    define CC_PLATFORM_POSIX       0
-#    define CC_PLATFORM_NAME        "xtensa"  
+#    define CC_PLATFORM_NAME        "xtensa"
 #    define CC_PLATFORM_DESCRIPTION "xtensa (esp32 or esp8266)"
 #    if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #        define CC_SYSTEM_LITTLE_ENDIAN 1

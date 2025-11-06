@@ -1,6 +1,6 @@
 #include "rdno_core/c_eeprom.h"
-#include "rdno_core/c_memory.h"
 #include "rdno_core/c_serial.h"
+#include "ccore/c_memory.h"
 
 #ifdef TARGET_ARDUINO
 

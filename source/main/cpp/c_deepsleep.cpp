@@ -1,7 +1,5 @@
 #include "rdno_core/c_str.h"
-#include "rdno_core/c_memory.h"
 #include "rdno_core/c_deepsleep.h"
-#include "rdno_core/c_malloc.h"
 
 #ifdef TARGET_ESP32
 #    include "Arduino.h"

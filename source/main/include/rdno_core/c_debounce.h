@@ -5,7 +5,7 @@
 #    pragma once
 #endif
 
-#include "rdno_core/c_debug.h"
+#include "ccore/c_debug.h"
 
 namespace ncore
 {

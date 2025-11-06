@@ -1,7 +1,7 @@
 #include "rdno_core/c_str.h"
-#include "rdno_core/c_memory.h"
 #include "rdno_core/c_system.h"
 #include "rdno_core/c_malloc.h"
+#include "ccore/c_memory.h"
 
 #ifdef TARGET_ARDUINO
 #    include "Arduino.h"

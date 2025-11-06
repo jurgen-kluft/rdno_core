@@ -2,11 +2,12 @@ package rdno_core
 
 import (
 	denv "github.com/jurgen-kluft/ccode/denv"
-	csdk "github.com/jurgen-kluft/csdk/package"
+	ccore "github.com/jurgen-kluft/ccore/package"
 	cunittest "github.com/jurgen-kluft/cunittest/package"
 )
 
 // Core package for Arduino projects, both for ESP32 and ESP8266.
+// This package depends on the fundamental ccore package.
 //
 // It can compile for Desktop (Windows, Mac, Linux) but it mocks many of the
 // systems that are available on the Arduino platform.
@@ -27,16 +28,17 @@ func GetPackage() *denv.Package {
 	name := repo_name
 
 	// dependencies
-	csdkpkg := csdk.GetPackage()
+	ccorepkg := ccore.GetPackage()
 	cunittestpkg := cunittest.GetPackage()
 
 	// main package
 	mainpkg := denv.NewPackage(repo_path, repo_name)
-	mainpkg.AddPackage(csdkpkg)
+	mainpkg.AddPackage(ccorepkg)
 	mainpkg.AddPackage(cunittestpkg)
 
 	// esp32 core library
 	esp32corelib := denv.SetupCppLibProjectForArduinoEsp32(mainpkg, name+"-esp32")
+	esp32corelib.AddDependencies(ccorepkg.GetMainLib())
 	esp32corelib.AddEnvironmentVariable("ESP32_SDK")
 	esp32corelib.AddInclude("{ESP32_SDK}", "cores/esp32", "")
 	esp32corelib.AddInclude("{ESP32_SDK}", "libraries/Wire", "src")
@@ -49,6 +51,7 @@ func GetPackage() *denv.Package {
 
 	// esp8266 core library
 	esp8266corelib := denv.SetupCppLibProjectForArduinoEsp8266(mainpkg, name+"-esp8266")
+	esp8266corelib.AddDependencies(ccorepkg.GetMainLib())
 	esp8266corelib.AddEnvironmentVariable("ESP8266_SDK")
 	esp8266corelib.AddInclude("{ESP8266_SDK}", "cores/esp8266", "")
 	esp8266corelib.AddInclude("{ESP8266_SDK}", "libraries/Wire", "")
@@ -64,6 +67,7 @@ func GetPackage() *denv.Package {
 
 	// test library
 	testlib := denv.SetupCppTestLibProject(mainpkg, name)
+	testlib.AddDependencies(ccorepkg.GetTestLib())
 
 	// unittest project
 	maintest := denv.SetupCppTestProject(mainpkg, name)

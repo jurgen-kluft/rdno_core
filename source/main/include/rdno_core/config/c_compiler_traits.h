@@ -66,7 +66,7 @@ namespace ncore
     //    CC_EXTERN_TEMPLATE
     //    CC_NOEXCEPT
     //    CC_NORETURN
-    //    C >=C_CARRIES_DEPENDENCY
+    //    CC_CARRIES_DEPENDENCY
     //    CC_NON_COPYABLE / struct EANonCopyable
     //    CC_OPTIMIZE_OFF / CC_OPTIMIZE_ON
     //    CC_SIGNED_RIGHT_SHIFT_IS_UNSIGNED
