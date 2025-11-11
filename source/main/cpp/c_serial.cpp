@@ -11,7 +11,7 @@ namespace ncore
 {
     namespace nserial
     {
-#    ifdef TARGET_DEBUG
+#    ifndef TARGET_FINAL
         // Begin sets the data rate in bits per second (baud) for serial data transmission.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
         void begin(nbaud::Enum baud)
@@ -426,7 +426,7 @@ namespace ncore
             }
 
             outData[0] = hmmdTestBufferPtr[hmmdTestBufferCursor++];
-            if (hmmdTestBufferCursor >= sizeof(hmmdTestBuffer1))
+            if (hmmdTestBufferCursor >= (s32)sizeof(hmmdTestBuffer1))
             {
                 hmmdTestBufferCursor = -1;
             }

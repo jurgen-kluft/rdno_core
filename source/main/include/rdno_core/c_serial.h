@@ -5,11 +5,24 @@
 #    pragma once
 #endif
 
-#include "rdno_core/c_network.h"
 #include "ccore/c_printf.h"
+
+#ifndef TARGET_ARDUINO
+class Stream
+{
+public:
+    virtual ~Stream() {}
+    virtual ncore::s32 available()                                     = 0;
+    virtual ncore::s32 read()                                          = 0;
+    virtual ncore::s32 readBytes(ncore::u8* buffer, ncore::s32 length) = 0;
+};
+#endif
 
 namespace ncore
 {
+    struct IPAddress_t;
+    struct MACAddress_t;
+
     namespace nbaud
     {
         enum Enum
@@ -25,8 +38,9 @@ namespace ncore
             Rate28800  = 28800,
             Rate38400  = 38400,
             Rate57600  = 57600,
+            Rate74880  = 74880,
             Rate115200 = 115200,
-            Rate256000  = 256000,
+            Rate256000 = 256000,
         };
     }
     namespace nconfig
@@ -45,23 +59,23 @@ namespace ncore
         void print(const MACAddress_t& address);
         void println(const char* val);
 
-        template<typename... Args>
+        template <typename... Args>
         void printf(const char* format, Args... args)
         {
-            char buffer[256];
+            char       buffer[256];
             const va_t argv[] = {args...};
             const s32  argc   = sizeof(argv) / sizeof(argv[0]);
-            snprintf_(buffer, sizeof(buffer)-1, format, argv, argc);
+            snprintf_(buffer, sizeof(buffer) - 1, format, argv, argc);
             print(buffer);
         }
 
-        template<typename... Args>
+        template <typename... Args>
         void printfln(const char* format, Args... args)
         {
-            char buffer[256];
+            char       buffer[256];
             const va_t argv[] = {args...};
             const s32  argc   = sizeof(argv) / sizeof(argv[0]);
-            snprintf_(buffer, sizeof(buffer)-1, format, argv, argc);
+            snprintf_(buffer, sizeof(buffer) - 1, format, argv, argc);
             println(buffer);
         }
     }  // namespace nserial

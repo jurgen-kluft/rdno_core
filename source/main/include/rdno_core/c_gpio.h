@@ -5,6 +5,8 @@
 #    pragma once
 #endif
 
+#include "rdno_core/c_debounce.h"
+
 namespace ncore
 {
     namespace ngpio
@@ -54,25 +56,47 @@ namespace ncore
             PinDAC2 = 26,
         };
 
-        // PinMode configures the specified pin to behave either as an input or an output.
-        // @see: https://docs.arduino.cc/language-reference/en/functions/digital-io/pinMode
-        void set_pin_as_output(s8 pin);
-        void set_pin_as_input(s8 pin);
+        struct output_pin_t
+        {
+            output_pin_t(s8 pin);
+            void setup();
+            void set_high();
+            void set_low();
 
-        // Read reads the value from a specified digital pin, either HIGH or LOW.
-        // @see: https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalread/
-        bool read_digital(s8 pin);  // true = HIGH, false = LOW
-        bool read_digital_debounced(s8 pin, u16 debounce_low_high_ms = 25, u16 debounce_high_low_ms = 25);
+        private:
+            u16 mPin;
+        };
 
-        s32 read_analog(s8 pin);
+        struct input_pin_t
+        {
+            input_pin_t(s8 pin);
+            void setup();
+            bool is_high();
 
-        // Write sets a HIGH or a LOW value to a digital pin.
-        // @see: https://docs.arduino.cc/reference/en/language/functions/digital-io/digitalwrite/
-        void write_digital(s8 pin, bool value);
+        private:
+            u16 mPin;
+        };
 
-        // Wakeup pin can be used to wake up the device from deep sleep mode.
-        // The pin can be configured to trigger on a HIGH or LOW signal.
-        void set_wakeup_pin(s8 pin, s8 trigger);
+        struct input_debounce_pin_t
+        {
+            input_debounce_pin_t(s8 pin, u16 debounce_low_high_ms = 25, u16 debounce_high_low_ms = 25);
+            void setup();
+            bool is_high();
+
+        private:
+            ndebounce::filter_t mFilter;
+            u16                 mPin;
+        };
+
+        struct analog_pin_t
+        {
+            analog_pin_t(s8 pin);
+            void setup();
+            s32  read();
+
+        private:
+            u16 mPin;
+        };
 
     }  // namespace ngpio
 }  // namespace ncore

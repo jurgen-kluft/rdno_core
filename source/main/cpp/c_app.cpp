@@ -30,7 +30,11 @@ void setup()
     ncore::gState.ServerTcpPort = ncore::SERVER_TCPPORT();
     ncore::gState.ServerUdpPort = ncore::SERVER_UDPPORT();
 
-    ncore::nserial::begin();  // Initialize serial communication at 115200 baud
+#    ifdef TARGET_ESP8266
+    ncore::nserial::begin(ncore::nbaud::Rate74880); // Initialize serial communication at 74880 baud
+#    else
+    ncore::nserial::begin(ncore::nbaud::Rate115200);  // Initialize serial communication at 115200 baud
+#    endif
 
     ncore::gState.time_ms = ncore::ntimer::millis();
     ncore::napp::setup(&ncore::gState);

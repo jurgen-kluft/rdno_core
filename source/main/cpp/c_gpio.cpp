@@ -9,39 +9,74 @@ namespace ncore
 {
     namespace ngpio
     {
-        void set_pin_as_output(s8 pin) { ::pinMode(pin, OUTPUT); }
-        void set_pin_as_input(s8 pin) { ::pinMode(pin, INPUT); }
-
-        bool read_digital(s8 pin) { return ::digitalRead(pin) == HIGH; }
-        s32  read_analog(s8 pin) { return ::analogRead(pin); }
-
-        void write_digital(s8 pin, bool value) { ::digitalWrite(pin, (value) ? HIGH : LOW); }
-
-        void set_wakeup_pin(s8 pin, s8 trigger)
+        output_pin_t::output_pin_t(s8 pin) { mPin = (pin & 0x00FF); }
+        void output_pin_t::setup()
         {
-            // switch (trigger)
-            // {
-            //     case High : ::esp_deep_sleep_enable_gpio_wakeup((gpio_num_t)pin, ESP_GPIO_WAKEUP_GPIO_HIGH);
-            //     case Low : ::esp_deep_sleep_enable_gpio_wakeup((gpio_num_t)pin, ESP_GPIO_WAKEUP_GPIO_LOW);
-            // }
+            ::pinMode(mPin & 0x00FF, OUTPUT);
+            mPin |= 0x8000;
+        }
+        void output_pin_t::set_high()
+        {
+            if ((mPin & 0x8000) == 0)
+                setup();
+            ::digitalWrite(mPin & 0x007F, HIGH);
+        }
+        void output_pin_t::set_low()
+        {
+            if ((mPin & 0x8000) == 0)
+                setup();
+            ::digitalWrite(mPin & 0x007F, LOW);
         }
 
-        bool read_digital_debounced(s8 pin, u16 debounce_low_high_ms, u16 debounce_high_low_ms)
+        input_pin_t::input_pin_t(s8 pin) { mPin = (pin & 0x00FF); }
+        void input_pin_t::setup()
         {
-            ndebounce::filter_t filter;
-            filter.m_low_to_high_debounce_interval_ms = debounce_low_high_ms;
-            filter.m_high_to_low_debounce_interval_ms = debounce_high_low_ms;
-            ndebounce::value_t value;
+            ::pinMode(mPin & 0x00FF, INPUT);
+            mPin |= 0x8000;
+        }
+        bool input_pin_t::is_high()
+        {
+            if ((mPin & 0x8000) == 0)
+                setup();
+            return ::digitalRead(mPin & 0x007F) == HIGH;
+        }
 
-            filter.init(value);
-            s8 poll = read_digital(pin) ? 1 : 0;
-            while (filter.update(value, poll) == false)
+        input_debounce_pin_t::input_debounce_pin_t(s8 pin, u16 debounce_low_high_ms, u16 debounce_high_low_ms)
+        {
+            mPin                                       = (pin & 0x00FF);
+            mFilter.m_low_to_high_debounce_interval_ms = debounce_low_high_ms;
+            mFilter.m_high_to_low_debounce_interval_ms = debounce_high_low_ms;
+        }
+
+        void input_debounce_pin_t::setup()
+        {
+            ::pinMode(mPin & 0x00FF, INPUT);
+            mPin |= 0x8000;
+        }
+
+        bool input_debounce_pin_t::is_high()
+        {
+            if ((mPin & 0x8000) == 0)
+                setup();
+
+            ndebounce::value_t value;
+            mFilter.init(value);
+            s8 poll = ::digitalRead(mPin & 0x007F) == HIGH ? 1 : 0;
+            while (mFilter.update(value, poll) == false)
             {
-                poll = read_digital(pin) ? 1 : 0;
+                poll = ::digitalRead(mPin & 0x007F) == HIGH ? 1 : 0;
                 ntimer::delay(5);
             }
             return poll == 1 ? true : false;
         }
+
+        analog_pin_t::analog_pin_t(s8 pin) { mPin = (pin & 0x00FF) | 0x8000; }
+        void analog_pin_t::setup()
+        {
+            // Analog pins on Arduino do not need pinMode setup
+        }
+
+        s32 analog_pin_t::read() { return ::analogRead(mPin & 0x007F); }
 
     }  // namespace ngpio
 }  // namespace ncore
@@ -52,42 +87,29 @@ namespace ncore
 {
     namespace ngpio
     {
-        // GPIO simulation
-        static u8  GPIOModes[PinsMax]  = {0};
-        static s32 GPIOValues[PinsMax] = {0};
-
-        void set_pin_as_output(s8 pin) {}
-        void set_pin_as_input(s8 pin) {}
-
-        bool read_digital(s8 pin)
+        output_pin_t::output_pin_t(s8 pin) { mPin = (pin & 0x00FF); }
+        void output_pin_t::setup()
         {
-            if (is_valid(pin))
+            if ((mPin & 0x8000) == 0)
             {
-                return GPIOValues[pin];
-            }
-            return false;
-        }
-
-        s32 read_analog(s8 pin)
-        {
-            if (is_valid(pin))
-            {
-                return GPIOValues[pin];
-            }
-            return 0;
-        }
-
-        void write_pin(s8 pin, s8 value)
-        {
-            if (is_valid(pin))
-            {
-                GPIOValues[pin] = value;
+                mPin |= 0x8000;
             }
         }
+        void output_pin_t::set_high() { setup(); }
+        void output_pin_t::set_low() { setup(); }
 
-        void set_wakeup_pin(s8 pin, s8 mode)
+        input_pin_t::input_pin_t(s8 pin) { mPin = (pin & 0x00FF); }
+        void input_pin_t::setup()
         {
-            // Not supported in simulation
+            if ((mPin & 0x8000) == 0)
+            {
+                mPin |= 0x8000;
+            }
+        }
+        bool input_pin_t::is_high()
+        {
+            setup();
+            return true;
         }
 
     }  // namespace ngpio
