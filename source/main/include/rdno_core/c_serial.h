@@ -17,6 +17,8 @@ public:
     virtual ncore::s32 readBytes(ncore::u8* buffer, ncore::s32 length)   = 0;
     virtual ncore::s32 write(const ncore::u8* buffer, ncore::s32 length) = 0;
 };
+#else
+class Stream;
 #endif
 
 namespace ncore
@@ -54,11 +56,12 @@ namespace ncore
 
     namespace nserial
     {
-        void begin(nbaud::Enum baud = nbaud::Rate115200);
-        void print(const char* val);
-        void print(const IPAddress_t& address);
-        void print(const MACAddress_t& address);
-        void println(const char* val);
+        void    begin(nbaud::Enum baud = nbaud::Rate115200);
+        Stream* getStream();
+        void    print(const char* val);
+        void    print(const IPAddress_t& address);
+        void    print(const MACAddress_t& address);
+        void    println(const char* val);
 
         template <typename... Args>
         void printf(const char* format, Args... args)
@@ -83,24 +86,26 @@ namespace ncore
 
     namespace nserial1
     {
-        void begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin);
-        s32  available();
-        void print(const char* val);
-        void println(const char* val);
-        void write(const byte* data, s32 length);
-        s32  read_until(char terminator, char* outString, s32 outMaxLength);
-        s32  read_bytes(byte* outData, s32 outMaxLength);
+        void    begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin);
+        Stream* getStream();
+        s32     available();
+        void    print(const char* val);
+        void    println(const char* val);
+        void    write(const byte* data, s32 length);
+        s32     read_until(char terminator, char* outString, s32 outMaxLength);
+        s32     read_bytes(byte* outData, s32 outMaxLength);
     }  // namespace nserial1
 
     namespace nserial2
     {
-        void begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin);
-        s32  available();
-        void print(const char* val);
-        void println(const char* val);
-        void write(const byte* data, s32 length);
-        s32  read_until(char terminator, char* outString, s32 outMaxLength);
-        s32  read_bytes(byte* outData, s32 outMaxLength);
+        void    begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin);
+        Stream* getStream();
+        s32     available();
+        void    print(const char* val);
+        void    println(const char* val);
+        void    write(const byte* data, s32 length);
+        s32     read_until(char terminator, char* outString, s32 outMaxLength);
+        s32     read_bytes(byte* outData, s32 outMaxLength);
     }  // namespace nserial2
 
 }  // namespace ncore

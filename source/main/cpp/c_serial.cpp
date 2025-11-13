@@ -25,6 +25,11 @@ namespace ncore
             }
         }
 
+        Stream* getStream()
+        {
+            return &Serial;
+        }
+
         // Print prints data to the serial port as human-readable ASCII text.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
         void print(const char* val) { Serial.print(val); }
@@ -79,6 +84,11 @@ namespace ncore
 #    else
             nlog::error("nserial1::begin: Serial1 not available on this platform.");
 #    endif
+        }
+
+        Stream* getStream()
+        {
+            return &Serial1;
         }
 
         s32 available()
@@ -171,6 +181,15 @@ namespace ncore
 #    endif
         }
 
+        Stream* getStream()
+        {
+#    if SOC_UART_HP_NUM > 2
+            return &Serial2;
+#    else
+            return nullptr;
+#    endif
+        }
+
         s32 available()
         {
 #    if SOC_UART_HP_NUM > 2
@@ -254,6 +273,11 @@ namespace ncore
         {
             // No operation in simulation
             (void)baud;
+        }
+
+        Stream* getStream()
+        {
+            return nullptr;
         }
 
         // Print prints data to the serial port as human-readable ASCII text.
