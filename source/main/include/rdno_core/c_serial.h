@@ -12,9 +12,10 @@ class Stream
 {
 public:
     virtual ~Stream() {}
-    virtual ncore::s32 available()                                     = 0;
-    virtual ncore::s32 read()                                          = 0;
-    virtual ncore::s32 readBytes(ncore::u8* buffer, ncore::s32 length) = 0;
+    virtual ncore::s32 available()                                       = 0;
+    virtual ncore::s32 read()                                            = 0;
+    virtual ncore::s32 readBytes(ncore::u8* buffer, ncore::s32 length)   = 0;
+    virtual ncore::s32 write(const ncore::u8* buffer, ncore::s32 length) = 0;
 };
 #endif
 

@@ -848,7 +848,6 @@ namespace ncore
         if (array == nullptr || count <= 0)
             return;
 
-        s16 totalLen = 0;
         for (s16 i = 0; i < count; i++)
             str_append(dest, array[i]);
     }
