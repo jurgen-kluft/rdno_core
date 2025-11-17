@@ -31,9 +31,16 @@ void setup()
     ncore::gState.ServerUdpPort = ncore::SERVER_UDPPORT();
 
 #    ifdef TARGET_ESP8266
-    ncore::nserial::begin(ncore::nbaud::Rate74880); // Initialize serial communication at 74880 baud
+    ncore::nserial::begin(ncore::nbaud::Rate74880);  // Initialize serial communication at 74880 baud
 #    else
     ncore::nserial::begin(ncore::nbaud::Rate115200);  // Initialize serial communication at 115200 baud
+#    endif
+
+#    ifdef TARGET_ESP32S3
+    if (psramInit())
+    {
+        ncore::nserial::println("PSRAM initialized successfully.");
+    }
 #    endif
 
     ncore::gState.time_ms = ncore::ntimer::millis();
