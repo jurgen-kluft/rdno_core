@@ -101,7 +101,7 @@ namespace ncore
 
             void begin(MACAddress_t const& mac);
             void write_sensor(nsensorid::value_t id, u16 value);
-            s32  num_sensors() const { return Count; }
+            s32  count() const { return Count; }
             void finalize();  // returns the number of sensor values written
         };
 
