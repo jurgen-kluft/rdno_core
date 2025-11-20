@@ -85,8 +85,9 @@ namespace ncore
         struct packet_t
         {
             byte Data[64];
-            s32  Size;
-            s32  Capacity;
+            s16  Count;
+            s16  Size;
+            s16  Capacity;
 
             enum
             {
@@ -100,7 +101,8 @@ namespace ncore
 
             void begin(MACAddress_t const& mac);
             void write_sensor(nsensorid::value_t id, u16 value);
-            s32  finalize();  // returns the number of sensor values written
+            s32  num_sensors() const { return Count; }
+            void finalize();  // returns the number of sensor values written
         };
 
     }  // namespace npacket
