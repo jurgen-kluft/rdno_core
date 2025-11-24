@@ -43,7 +43,7 @@ namespace ncore
 
     namespace nserialx
     {
-        typedef void* serial_t;
+        typedef s8 serial_t;
     }
 
     namespace nserial
