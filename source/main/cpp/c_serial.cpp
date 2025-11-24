@@ -71,7 +71,7 @@ namespace ncore
             {
             }
 
-            virtual s64 v_read(u8* data, s64 len) override
+            virtual s64 v_read(u8* data, s64 len) final override
             {
                 s32 availableBytes = m_serial->available();
                 if (availableBytes <= 0)
@@ -85,15 +85,13 @@ namespace ncore
         class nil_serial_reader_t : public reader_t
         {
         public:
-            virtual s64 v_read(u8* data, s64 len) override
+            virtual s64 v_read(u8* data, s64 len) final override
             {
                 CC_UNUSED(data);
                 CC_UNUSED(len);
                 return 0;
             }
         };
-
-        nil_serial_reader_t NIL_SERIAL_READER;
 
         HardwareSerial* HwSerial[4] = {&Serial0,
 #    if SOC_UART_HP_NUM > 1
@@ -113,39 +111,14 @@ namespace ncore
 #    endif
         };
 
-        serial_t        SERIAL0 = 0;
-        serial_reader_t SERIAL0_READER(&Serial0);
-
-#    if SOC_UART_HP_NUM > 1
-        serial_t        SERIAL1 = 1;
-        serial_reader_t SERIAL1_READER(&Serial1);
-#    else
-        serial_t            SERIAL1 = -1;
-        nil_serial_reader_t SERIAL1_READER;
-#    endif
-#    if SOC_UART_HP_NUM > 2
-        serial_t        SERIAL2 = 2;
-        serial_reader_t SERIAL2_READER(&Serial2);
-#    else
-        serial_t            SERIAL2 = -1;
-        nil_serial_reader_t SERIAL2_READER;
-#    endif
-#    if SOC_UART_HP_NUM > 3
-        serial_t        SERIAL3 = 3;
-        serial_reader_t SERIAL3_READER(&Serial3);
-#    else
-        serial_t            SERIAL3 = -1;
-        nil_serial_reader_t SERIAL3_READER;
-#    endif
-
         // Begin sets the data rate in bits per second (baud) for serial data transmission.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
         void begin(serial_t x, nbaud::Enum baud, nconfig::Enum config, s8 rxPin, s8 txPin)
         {
-            if (x < 0)
+            if (x > 3 || HwSerial[x] == nullptr)
                 return;
 
-            uint32_t configValue = SERIAL_8N1;
+            u32 configValue = SERIAL_8N1;
             switch (config)
             {
                 case nconfig::MODE_8N1: configValue = SERIAL_8N1; break;
@@ -157,22 +130,24 @@ namespace ncore
             }
         }
 
+        serial_reader_t SERIAL_READERS[] = {
+          serial_reader_t(0),
+          serial_reader_t(1),
+          serial_reader_t(2),
+          serial_reader_t(3),
+        };
+        nil_serial_reader_t NIL_SERIAL_READER;
+
         reader_t* reader(serial_t x)
         {
-            if (x == SERIAL0)
-                return &SERIAL0_READER;
-            else if (x == SERIAL1 && SERIAL1 != nullptr)
-                return &SERIAL1_READER;
-            else if (x == SERIAL2 && SERIAL2 != nullptr)
-                return &SERIAL2_READER;
-            else if (x == SERIAL3 && SERIAL3 != nullptr)
-                return &SERIAL3_READER;
-            return &NIL_SERIAL_READER;
+            if (x > 3 || HwSerial[x] == nullptr)
+                return &NIL_SERIAL_READER;
+            return &SERIAL_READERS[x];
         }
 
         s32 available(serial_t x)
         {
-            if (x < 0)
+            if (x > 3 || HwSerial[x] == nullptr)
                 return 0;
             HardwareSerial* serial = HwSerial[x];
             return serial->available();
@@ -182,7 +157,7 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
         void print(serial_t x, const char* val)
         {
-            if (x < 0)
+            if (x > 3 || HwSerial[x] == nullptr)
                 return;
             HardwareSerial* serial = HwSerial[x];
             serial->print(val);
@@ -193,7 +168,7 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
         void println(serial_t x, const char* val)
         {
-            if (x < 0)
+            if (x > 3 || HwSerial[x] == nullptr)
                 return;
             HardwareSerial* serial = HwSerial[x];
             serial->println(val);
@@ -203,7 +178,7 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication
         void write(serial_t x, const byte* data, s32 length)
         {
-            if (x < 0)
+            if (x > 3 || HwSerial[x] == nullptr)
                 return;
             HardwareSerial* serial = HwSerial[x];
             serial->write(data, length);
@@ -211,8 +186,8 @@ namespace ncore
 
         s32 read_until(serial_t x, char terminator, char* outString, s32 outMaxLength)
         {
-            if (x < 0)
-                return;
+            if (x > 3 || HwSerial[x] == nullptr)
+                return 0;
             HardwareSerial* serial = HwSerial[x];
             // Read data from the specified serial port until the terminator character is found or the maximum length is reached
             s32 n = 0;
@@ -222,8 +197,8 @@ namespace ncore
 
         s32 read_bytes(serial_t x, byte* outData, s32 outMaxLength)
         {
-            if (x < 0)
-                return;
+            if (x > 3 || HwSerial[x] == nullptr)
+                return 0;
             HardwareSerial* serial = HwSerial[x];
             s32             n      = 0;
             n                      = (s32)serial->readBytes(outData, outMaxLength);

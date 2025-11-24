@@ -10,6 +10,7 @@
 namespace ncore
 {
     class reader_t;
+    
     struct IPAddress_t;
     struct MACAddress_t;
 
@@ -43,7 +44,12 @@ namespace ncore
 
     namespace nserialx
     {
-        typedef s8 serial_t;
+        typedef u8 serial_t;
+
+        const serial_t SERIAL0 = 0;
+        const serial_t SERIAL1 = 1;
+        const serial_t SERIAL2 = 2;
+        const serial_t SERIAL3 = 3;
     }
 
     namespace nserial
@@ -77,13 +83,6 @@ namespace ncore
 
     namespace nserialx
     {
-        typedef void*   serial_t;
-        extern serial_t SERIAL0;
-        extern serial_t SERIAL1;
-        extern serial_t SERIAL2;
-        extern serial_t SERIAL3;
-        extern serial_t SERIAL4;
-
         void      begin(serial_t x, nbaud::Enum baud, nconfig::Enum config, s8 rxPin, s8 txPin);
         reader_t* reader(serial_t x);
         s32       available(serial_t x);
