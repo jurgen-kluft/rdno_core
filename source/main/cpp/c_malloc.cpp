@@ -22,6 +22,20 @@ namespace ncore
             }
         }
 
+        byte* malloc_psram(u32 size)
+        {
+            byte* mem = (byte*)heap_caps_malloc(size, MALLOC_CAP_SPIRAM);
+            return mem;
+        }
+
+        void  free_psram(byte* ptr)
+        {
+            if (ptr != nullptr)
+            {
+                heap_caps_free(ptr);
+            }
+        }
+
     }  // namespace nsystem
 };  // namespace ncore
 

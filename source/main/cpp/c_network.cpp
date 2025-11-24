@@ -3,8 +3,18 @@
 
 namespace ncore
 {
-    void IPAddress_t::from(u32 ip) { m_address = ip; }
-    void IPAddress_t::from(u8 a, u8 b, u8 c, u8 d) { m_address = (byte)((d >> 24) & 0xFF) | (byte)((c >> 16) & 0xFF) | (byte)((b >> 8) & 0xFF) | (byte)(a & 0xFF); }
+    IPAddress_t IPAddress_t::from(u32 _ip)
+    {
+        IPAddress_t ip;
+        ip.m_address = _ip;
+        return ip;
+    }
+
+    IPAddress_t IPAddress_t::from(u8 a, u8 b, u8 c, u8 d)
+    {
+        const u32 address = ((u32)d << 24) | ((u32)c << 16) | ((u32)b << 8) | ((u32)a);
+        return IPAddress_t { address };
+    }
 
     // examples of valid IP string addresses:
     // "10.0.0.1"

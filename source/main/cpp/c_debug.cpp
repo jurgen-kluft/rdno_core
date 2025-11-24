@@ -13,17 +13,30 @@ namespace ncore
     debug_manager_t  gDebugManagerInstance;
     debug_manager_t* gDebugManager = &gDebugManagerInstance;
 
-    void setTagLevel(debug_manager_t* tm, debug_tag_t& tag, s32 level) { tag.level = level; }
-    void setTagToDefaultLevel(debug_manager_t* tm, debug_tag_t& tag) { tag.level = tm->m_default_level; }
-#    ifdef TARGET_ESP32
+    void setTagLevel(debug_manager_t* tm, debug_tag_t& tag, s32 level)
+    {
+#    if NCORE_DEBUG_LEVEL > DEBUG_LEVEL_NONE
+        tag.level = level;
+#    endif
+    }
+    void setTagToDefaultLevel(debug_manager_t* tm, debug_tag_t& tag)
+    {
+#    if NCORE_DEBUG_LEVEL > DEBUG_LEVEL_NONE
+        tag.level = tm->m_default_level;
+#    endif
+    }
+
+#    if NCORE_DEBUG_LEVEL > DEBUG_LEVEL_NONE
+#        ifdef TARGET_ESP32
     u32         getFreeHeap(debug_manager_t* tm) { return ESP.getFreeHeap(); }
     u32         getStackHighWaterMark(debug_manager_t* tm) { return uxTaskGetStackHighWaterMark(NULL); }
     const char* getTaskGetName(debug_manager_t* tm) { return pcTaskGetName(NULL); }
-    #else
+
+#        else
     u32         getFreeHeap(debug_manager_t* tm) { return 0; }
     u32         getStackHighWaterMark(debug_manager_t* tm) { return 0; }
     const char* getTaskGetName(debug_manager_t* tm) { return "UNKNOWN"; }
-#    endif
+#        endif
 
     const char* gTagLevelStr[] = {"NONE", "ERROR", "WARN", "INFO", "DBG", "VERBOSE", "UNKNOWN", "UNKNOWN"};
     const char* getTagLevelStr(debug_manager_t* tm, debug_tag_t const& tag)
@@ -31,6 +44,8 @@ namespace ncore
         const char* tagLevelStr = gTagLevelStr[getTagLevel(tm, tag) & 0x07];
         return tagLevelStr;
     }
+
+#    endif
 
 #    ifdef TARGET_ESP8266
 

@@ -84,7 +84,31 @@ namespace ncore
 
         struct packet_t
         {
-            byte Data[64];
+            byte Data[256 - 4];
+            s16  Size;
+            s16  Capacity;
+
+            enum
+            {
+                // Packet header
+                HeaderSize    = 1 + 1 + 6,  // length, version, mac
+                LengthOffset  = 0,
+                VersionOffset = 1,
+                MacOffset     = 2,
+                BodyOffset    = 8,
+            };
+
+            void begin();                         // User has to fill in MAC address manually
+            void begin(MACAddress_t const& mac);  // User provides MAC address
+            void write(u8 const* data, u8 len);  // Write an block of data (max 255 bytes)
+            void write(u16 value);                // Write a 16 bit value
+            void write(u32 value);                // Write a 32 bit value
+            void finalize();                      // returns the number of sensor values written
+        };
+
+        struct sensorpacket_t
+        {
+            byte Data[64 - 6];
             s16  Count;
             s16  Size;
             s16  Capacity;
@@ -92,17 +116,18 @@ namespace ncore
             enum
             {
                 // Packet header
-                HeaderSize       = 1 + 1 + 6,  // length, version
-                LengthOffset     = 0,
-                VersionOffset    = 1,
-                MacOffset        = 2,
-                SensorDataOffset = 8,
+                HeaderSize    = 1 + 1 + 6,  // length, version
+                LengthOffset  = 0,
+                VersionOffset = 1,
+                MacOffset     = 2,
+                DataOffset    = 8,
             };
 
-            void begin(MACAddress_t const& mac);
-            void write_sensor(nsensorid::value_t id, u16 value);
-            s32  count() const { return Count; }
-            void finalize();  // returns the number of sensor values written
+            void begin();                                  // User has to fill in MAC address manually
+            void begin(MACAddress_t const& mac);           // User provides MAC address
+            void write(nsensorid::value_t id, u16 value);  // Write a sensor value
+            s32  count() const { return Count; }           // returns the number of sensor values written
+            void finalize();                               // returns the number of sensor values written
         };
 
     }  // namespace npacket

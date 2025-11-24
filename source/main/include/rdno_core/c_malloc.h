@@ -12,6 +12,9 @@ namespace ncore
         byte* malloc(u32 size);
         void  free(byte* ptr);
 
+        byte* malloc_psram(u32 size);
+        void  free_psram(byte* ptr);
+
         template <typename T, typename... Args>
         T* construct(Args... args)
         {

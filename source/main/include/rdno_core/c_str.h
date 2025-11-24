@@ -9,7 +9,7 @@ namespace ncore
 {
     struct IPAddress_t;
     struct MACAddress_t;
-    
+
     // -------------------------------------------------------------------------------
     // character functions
     // '0' = 0x30, '9' = 0x39, 'A' = 0x41, 'Z' = 0x5A, 'a' = 0x61, 'z' = 0x7A
@@ -136,6 +136,11 @@ namespace ncore
     // printing to serial -------------------------------------------------------------------
     void str_print(const str_t& s);
     void str_println(const str_t& s);
+
+#define STR_T(name, len, cstr)                                           \
+    char         name##_buffer[len + 1];                                    \
+    ncore::str_t name = ncore::str_mutable(name##_buffer, sizeof(len + 1)); \
+    ncore::str_append(name, cstr);
 
 }  // namespace ncore
 

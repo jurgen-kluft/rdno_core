@@ -7,22 +7,9 @@
 
 #include "ccore/c_printf.h"
 
-#ifndef TARGET_ARDUINO
-class Stream
-{
-public:
-    virtual ~Stream() {}
-    virtual ncore::s32 available()                                       = 0;
-    virtual ncore::s32 read()                                            = 0;
-    virtual ncore::s32 readBytes(ncore::u8* buffer, ncore::s32 length)   = 0;
-    virtual ncore::s32 write(const ncore::u8* buffer, ncore::s32 length) = 0;
-};
-#else
-class Stream;
-#endif
-
 namespace ncore
 {
+    class reader_t;
     struct IPAddress_t;
     struct MACAddress_t;
 
@@ -54,14 +41,18 @@ namespace ncore
         };
     }
 
+    namespace nserialx
+    {
+        typedef void* serial_t;
+    }
+
     namespace nserial
     {
-        void    begin(nbaud::Enum baud = nbaud::Rate115200);
-        Stream* getStream();
-        void    print(const char* val);
-        void    print(const IPAddress_t& address);
-        void    print(const MACAddress_t& address);
-        void    println(const char* val);
+        void begin(nbaud::Enum baud = nbaud::Rate115200);
+        void print(const char* val);
+        void print(const IPAddress_t& address);
+        void print(const MACAddress_t& address);
+        void println(const char* val);
 
         template <typename... Args>
         void printf(const char* format, Args... args)
@@ -84,29 +75,24 @@ namespace ncore
         }
     }  // namespace nserial
 
-    namespace nserial1
+    namespace nserialx
     {
-        void    begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin);
-        Stream* getStream();
-        s32     available();
-        void    print(const char* val);
-        void    println(const char* val);
-        void    write(const byte* data, s32 length);
-        s32     read_until(char terminator, char* outString, s32 outMaxLength);
-        s32     read_bytes(byte* outData, s32 outMaxLength);
-    }  // namespace nserial1
+        typedef void*   serial_t;
+        extern serial_t SERIAL0;
+        extern serial_t SERIAL1;
+        extern serial_t SERIAL2;
+        extern serial_t SERIAL3;
+        extern serial_t SERIAL4;
 
-    namespace nserial2
-    {
-        void    begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin);
-        Stream* getStream();
-        s32     available();
-        void    print(const char* val);
-        void    println(const char* val);
-        void    write(const byte* data, s32 length);
-        s32     read_until(char terminator, char* outString, s32 outMaxLength);
-        s32     read_bytes(byte* outData, s32 outMaxLength);
-    }  // namespace nserial2
+        void      begin(serial_t x, nbaud::Enum baud, nconfig::Enum config, s8 rxPin, s8 txPin);
+        reader_t* reader(serial_t x);
+        s32       available(serial_t x);
+        void      print(serial_t x, const char* val);
+        void      println(serial_t x, const char* val);
+        void      write(serial_t x, const byte* data, s32 length);
+        s32       read_until(serial_t x, char terminator, char* outString, s32 outMaxLength);
+        s32       read_bytes(serial_t x, byte* outData, s32 outMaxLength);
+    }  // namespace nserialx
 
 }  // namespace ncore
 

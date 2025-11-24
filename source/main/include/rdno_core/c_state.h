@@ -17,17 +17,23 @@ namespace ncore
 
     struct state_t
     {
-        const char*      WiFiSSID;
-        const char*      WiFiPassword;
-        u32              ServerIP;
-        u16              ServerTcpPort;
-        u16              ServerUdpPort;
-        u64              time_ms;
-        state_wifi_t*    wifi;
-        state_tcp_t*     tcp;
-        state_udp_t*     udp;
-        state_node_t*    node;
-        u32              flags;
+        enum
+        {
+            FLAG_PSRAM = 0x00000001,
+        };
+        inline bool has_psram() const { return (flags & FLAG_PSRAM) != 0; }
+
+        const char*   WiFiSSID;
+        const char*   WiFiPassword;
+        u32           ServerIP;
+        u16           ServerTcpPort;
+        u16           ServerUdpPort;
+        u64           time_ms;
+        state_wifi_t* wifi;
+        state_tcp_t*  tcp;
+        state_udp_t*  udp;
+        state_node_t* node;
+        u32           flags;
     };
 
 }  // namespace ncore

@@ -3,6 +3,8 @@
 #include "rdno_core/c_timer.h"
 #include "rdno_core/c_str.h"
 
+#include "ccore/c_stream.h"
+
 #ifdef TARGET_ARDUINO
 
 #    include "Arduino.h"
@@ -14,30 +16,29 @@ namespace ncore
 #    ifndef TARGET_FINAL
         // Begin sets the data rate in bits per second (baud) for serial data transmission.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
-        void begin(nbaud::Enum baud)
-        {
+        void begin(nbaud::Enum baud) 
+        { 
             Serial.begin(baud);
-
-            const u64 startAttemptTime = ntimer::millis();
-            while (!Serial && (ntimer::millis() - startAttemptTime) < 5000)
+            const u64 startTime = ntimer::millis();
+            while (!Serial)
             {
-                ntimer::delay(100);
+                if (ntimer::millis() - startTime > 3000)
+                    break;
+                ntimer::delay(10);
             }
-        }
-
-        Stream* getStream()
-        {
-            return &Serial;
         }
 
         // Print prints data to the serial port as human-readable ASCII text.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void print(const char* val) { Serial.print(val); }
+        void print(const char* val) 
+        { 
+            Serial.print(val); 
+        }
 
         void print(const IPAddress_t& address)
         {
             char strBuffer[32];
-            snprintf(strBuffer, sizeof(strBuffer), "%u.%u.%u.%u", va_t(address.at(0)), va_t(address.at(1)), va_t(address.at(2)), va_t(address.at(3)));
+            snprintf(strBuffer, sizeof(strBuffer), "%u.%u.%u.%u", va_t(address[0]), va_t(address[1]), va_t(address[2]), va_t(address[3]));
             Serial.print(strBuffer);
         }
 
@@ -51,11 +52,7 @@ namespace ncore
         // Println prints data to the serial port as human-readable ASCII text followed by a
         // carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void println(const char* val)
-        {
-            // Prints the string followed by a newline
-            Serial.println(val);
-        }
+        void println(const char* val) { Serial.println(val); }
 #    else
         void begin(nbaud::Enum baud) { CC_UNUSED(baud); }
         void print(const char* val) { CC_UNUSED(val); }
@@ -65,13 +62,74 @@ namespace ncore
 #    endif
     }  // namespace nserial
 
-    namespace nserial1
+    namespace nserialx
     {
+        class serial_reader_t : public reader_t
+        {
+            serial_t m_serial;
+
+        public:
+            inline serial_reader_t(serial_t serial)
+                : m_serial(serial)
+            {
+            }
+
+            virtual s64 v_read(u8* data, s64 len) override
+            {
+                s32 availableBytes = nserialx::available(m_serial);
+                if (availableBytes <= 0)
+                    return 0;
+                if (len > availableBytes)
+                    len = availableBytes;
+                return nserialx::read_bytes(m_serial, data, len);
+            }
+        };
+
+        class nil_serial_reader_t : public reader_t
+        {
+        public:
+            virtual s64 v_read(u8* data, s64 len) override
+            {
+                CC_UNUSED(data);
+                CC_UNUSED(len);
+                return 0;
+            }
+        };
+
+        nil_serial_reader_t NIL_SERIAL_READER;
+
+        serial_t        SERIAL0 = (void*)&Serial;
+        serial_reader_t SERIAL0_READER(SERIAL0);
+
+#    if SOC_UART_HP_NUM > 1
+        serial_t        SERIAL1 = (void*)&Serial1;
+        serial_reader_t SERIAL1_READER(SERIAL1);
+#    else
+        serial_t            SERIAL1 = nullptr;
+        nil_serial_reader_t SERIAL1_READER;
+#    endif
+#    if SOC_UART_HP_NUM > 2
+        serial_t        SERIAL2 = (void*)&Serial2;
+        serial_reader_t SERIAL2_READER(SERIAL2);
+#    else
+        serial_t            SERIAL2 = nullptr;
+        nil_serial_reader_t SERIAL2_READER;
+#    endif
+#    if SOC_UART_HP_NUM > 3
+        serial_t        SERIAL3 = (void*)&Serial3;
+        serial_reader_t SERIAL3_READER(SERIAL3);
+#    else
+        serial_t            SERIAL3 = nullptr;
+        nil_serial_reader_t SERIAL3_READER;
+#    endif
+
         // Begin sets the data rate in bits per second (baud) for serial data transmission.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
-        void begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
+        void begin(serial_t x, nbaud::Enum baud, nconfig::Enum config, s8 rxPin, s8 txPin)
         {
-#    if SOC_UART_HP_NUM > 1
+            if (x == nullptr)
+                return;
+
             uint32_t configValue = SERIAL_8N1;
             switch (config)
             {
@@ -79,185 +137,85 @@ namespace ncore
             }
             if (configValue != 0)
             {
-                Serial1.begin(baud, configValue, rxPin, txPin);
+                HardwareSerial* serial = (HardwareSerial*)x;
+                serial->begin(baud, configValue, rxPin, txPin);
             }
-#    else
-            nlog::error("nserial1::begin: Serial1 not available on this platform.");
-#    endif
         }
 
-        Stream* getStream()
+        reader_t* reader(serial_t x)
         {
-            return &Serial1;
+            if (x == SERIAL0)
+                return &SERIAL0_READER;
+            else if (x == SERIAL1 && SERIAL1 != nullptr)
+                return &SERIAL1_READER;
+            else if (x == SERIAL2 && SERIAL2 != nullptr)
+                return &SERIAL2_READER;
+            else if (x == SERIAL3 && SERIAL3 != nullptr)
+                return &SERIAL3_READER;
+            return &NIL_SERIAL_READER;
         }
 
-        s32 available()
+        s32 available(serial_t x)
         {
-#    if SOC_UART_HP_NUM > 1
-            return Serial1.available();
-#    else
-            nlog::error("nserial1::available: Serial1 not available on this platform.");
-            return 0;  // Invalid port
-#    endif
+            if (x == nullptr)
+                return 0;
+            HardwareSerial* serial = (HardwareSerial*)x;
+            return serial->available();
         }
 
         // Print prints data to the serial port as human-readable ASCII text.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void print(const char* val)
+        void print(serial_t x, const char* val)
         {
-#    if SOC_UART_HP_NUM > 1
-            Serial1.print(val);
-#    else
-            nlog::error("nserial1::print: Serial1 not available on this platform.");
-#    endif
+            if (x == nullptr)
+                return;
+            HardwareSerial* serial = (HardwareSerial*)x;
+            serial->print(val);
         }
 
         // Println prints data to the serial port as human-readable ASCII text followed by a
         // carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void println(const char* val)
+        void println(serial_t x, const char* val)
         {
-#    if SOC_UART_HP_NUM > 1
-            Serial1.println(val);
-#    else
-            nlog::error("nserial1::println: Serial1 not available on this platform.");
-#    endif
+            if (x == nullptr)
+                return;
+            HardwareSerial* serial = (HardwareSerial*)x;
+            serial->println(val);
         }
 
         // Write writes data to the serial port.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication
-        void write(const byte* data, s32 length)
+        void write(serial_t x, const byte* data, s32 length)
         {
-#    if SOC_UART_HP_NUM > 1
-            Serial1.write(data, length);
-#    else
-            nlog::error("nserial1::write: Serial1 not available on this platform.");
-#    endif
+            if (x == nullptr)
+                return;
+            HardwareSerial* serial = (HardwareSerial*)x;
+            serial->write(data, length);
         }
 
-        s32 read_until(char terminator, char* outString, s32 outMaxLength)
+        s32 read_until(serial_t x, char terminator, char* outString, s32 outMaxLength)
         {
+            HardwareSerial* serial = (HardwareSerial*)x;
+            if (serial == nullptr)
+                return 0;
             // Read data from the specified serial port until the terminator character is found or the maximum length is reached
             s32 n = 0;
-#    if SOC_UART_HP_NUM > 1
-            n = Serial1.readBytesUntil(terminator, outString, outMaxLength);
-#    else
-            nlog::error("nserial1::read_until: Serial1 not available on this platform.");
-#    endif
+            n     = serial->readBytesUntil(terminator, outString, outMaxLength);
             return n;
         }
 
-        s32 read_bytes(byte* outData, s32 outMaxLength)
+        s32 read_bytes(serial_t x, byte* outData, s32 outMaxLength)
         {
+            HardwareSerial* serial = (HardwareSerial*)x;
+            if (serial == nullptr)
+                return 0;
             s32 n = 0;
-#    if SOC_UART_HP_NUM > 1
-            n = (s32)Serial1.readBytes(outData, outMaxLength);
-#    else
-            nlog::error("nserial1::read_bytes: Serial1 not available on this platform.");
-#    endif
+            n     = (s32)serial->readBytes(outData, outMaxLength);
             return n;
         }
 
-    }  // namespace nserial1
-
-    namespace nserial2
-    {
-        // Begin sets the data rate in bits per second (baud) for serial data transmission.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
-        void begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
-        {
-#    if SOC_UART_HP_NUM > 2
-            uint32_t configValue = SERIAL_8N1;
-            switch (config)
-            {
-                case nconfig::MODE_8N1: configValue = SERIAL_8N1; break;
-            }
-            if (configValue != 0)
-            {
-                Serial2.begin(baud, configValue, rxPin, txPin);
-            }
-#    else
-            nlog::error("nserial2::begin: Serial2 not available on this platform.");
-#    endif
-        }
-
-        Stream* getStream()
-        {
-#    if SOC_UART_HP_NUM > 2
-            return &Serial2;
-#    else
-            return nullptr;
-#    endif
-        }
-
-        s32 available()
-        {
-#    if SOC_UART_HP_NUM > 2
-            return Serial2.available();
-#    else
-            nlog::error("nserial2::available: Serial2 not available on this platform.");
-            return 0;
-#    endif
-        }
-
-        // Print prints data to the serial port as human-readable ASCII text.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void print(const char* val)
-        {
-#    if SOC_UART_HP_NUM > 2
-            Serial2.print(val);
-#    else
-            nlog::error("nserial2::print: Serial2 not available on this platform.");
-#    endif
-        }
-
-        // Println prints data to the serial port as human-readable ASCII text followed by a
-        // carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void println(const char* val)
-        {
-#    if SOC_UART_HP_NUM > 2
-            Serial2.println(val);
-#    else
-            nlog::error("nserial2::println: Serial2 not available on this platform.");
-#    endif
-        }
-
-        // Write writes data to the serial port.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication
-        void write(const byte* data, s32 length)
-        {
-#    if SOC_UART_HP_NUM > 2
-            Serial2.write(data, length);
-#    else
-            nlog::error("nserial2::write: Serial2 not available on this platform.");
-#    endif
-        }
-
-        s32 read_until(char terminator, char* outString, s32 outMaxLength)
-        {
-            // Read data from the specified serial port until the terminator character is found or the maximum length is reached
-#    if SOC_UART_HP_NUM > 2
-            return Serial2.readBytesUntil(terminator, outString, outMaxLength);
-#    else
-            nlog::error("nserial2::read_until: Serial2 not available on this platform.");
-            return 0;
-#    endif
-        }
-
-        s32 read_bytes(byte* outData, s32 outMaxLength)
-        {
-            s32 n = 0;
-#    if SOC_UART_HP_NUM > 2
-            n = (s32)Serial2.readBytes(outData, outMaxLength);
-#    else
-            nlog::error("nserial2::read_bytes: Serial2 not available on this platform.");
-#    endif
-            return n;
-        }
-
-    }  // namespace nserial2
-
+    }  // namespace nserialx
 }  // namespace ncore
 
 #else
@@ -266,197 +224,65 @@ namespace ncore
 {
     namespace nserial
     {
-        // Begin sets the data rate in bits per second (baud) for serial data transmission.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
-        // func Begin(baud int)
-        void begin(nbaud::Enum baud)
-        {
-            // No operation in simulation
-            (void)baud;
-        }
-
-        Stream* getStream()
-        {
-            return nullptr;
-        }
-
-        // Print prints data to the serial port as human-readable ASCII text.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void print(const char* val)
-        {
-            // No operation in simulation
-            (void)val;
-        }
-
-        // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void println(const char* val)
-        {
-            // No operation in simulation
-            (void)val;
-        }
-
-        // Write writes data to the serial port.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication
-        void write(const byte* data, s32 length)
-        {
-            // No operation in simulation
-            (void)data;
-            (void)length;
-        }
-
-        s32 read_until(char terminator, char* outString, s32 outMaxLength)
-        {
-            // No operation in simulation
-            (void)terminator;
-            (void)outString;
-            (void)outMaxLength;
-            return 0;  // Return 0 bytes read
-        }
+        void begin(nbaud::Enum baud) { CC_UNUSED(baud); }
+        void print(const char* val) { CC_UNUSED(val); }
+        void print(const IPAddress_t& address) { CC_UNUSED(address); }
+        void print(const MACAddress_t& mac) { CC_UNUSED(mac); }
+        void println(const char* val) { CC_UNUSED(val); }
     }  // namespace nserial
 
-    namespace nserial1
+    namespace nserialx
     {
-        // Begin sets the data rate in bits per second (baud) for serial data transmission.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
+        serial_t SERIAL1 = (void*)1;
+        serial_t SERIAL2 = (void*)2;
+        serial_t SERIAL3 = (void*)3;
+        serial_t SERIAL4 = (void*)4;
 
-        void begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
+        void begin(serial_t x, nbaud::Enum baud, nconfig::Enum config, s8 rxPin, s8 txPin)
         {
-            (void)baud;
-            (void)config;
-            (void)rxPin;
-            (void)txPin;
+            CC_UNUSED(x);
+            CC_UNUSED(baud);
+            CC_UNUSED(config);
+            CC_UNUSED(rxPin);
+            CC_UNUSED(txPin);
         }
-
-        s32 available() { return 0; }
-
-        // Print prints data to the serial port as human-readable ASCII text.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void print(const char* val)
+        s32 available(serial_t x)
         {
-            // No operation in simulation
-            (void)val;
+            CC_UNUSED(x);
+            return 0;
         }
-
-        // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void println(const char* val)
+        void print(serial_t x, const char* val)
         {
-            // No operation in simulation
-            (void)val;
+            CC_UNUSED(x);
+            CC_UNUSED(val);
         }
-
-        // Write writes data to the serial port.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication
-        void write(const byte* data, s32 length)
+        void println(serial_t x, const char* val)
         {
-            // No operation in simulation
-            (void)data;
-            (void)length;
+            CC_UNUSED(x);
+            CC_UNUSED(val);
         }
-
-        s32 read_until(char terminator, char* outString, s32 outMaxLength)
+        void write(serial_t x, const byte* data, s32 length)
         {
-            // No operation in simulation
-            (void)terminator;
-            (void)outString;
-            (void)outMaxLength;
-            return 0;  // Return 0 bytes read
+            CC_UNUSED(x);
+            CC_UNUSED(data);
+            CC_UNUSED(length);
         }
-    }  // namespace nserial1
-
-    namespace nserial2
-    {
-        // Begin sets the data rate in bits per second (baud) for serial data transmission.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
-
-        void begin(nbaud::Enum baud, nconfig::Enum config, u8 rxPin, u8 txPin)
+        s32 read_until(serial_t x, char terminator, char* outString, s32 outMaxLength)
         {
-            (void)baud;
-            (void)config;
-            (void)rxPin;
-            (void)txPin;
+            CC_UNUSED(x);
+            CC_UNUSED(terminator);
+            CC_UNUSED(outString);
+            CC_UNUSED(outMaxLength);
+            return 0;
         }
-
-        // Frame Header    Length   Detection Result   Target Distance   The energy values for each distance gate    Frame Tail
-        // 4 bytes,        2 bytes, 1 byte,            2 bytes,          32 bytes,                                   4 bytes
-        //
-        //   Frame Header (F4 F3 F2 F1)
-        //   Detection Result (00 absent, 01 present)
-        //   Length, total number of bytes for detection result, target distance, and energy values for each distance gate
-        //   Target Distance, indicating the distance of the target phase from the radar in the scene
-        //   Energy values, 16 (total number of distance gates) * 2 bytes, size of energy value for each distance gate from 0 to 15
-        //   Frame Tail (F8 F7 F6 F5)
-
-        const byte hmmdTestBuffer1[] = {0xF4, 0xF3, 0xF2, 0xF1, 0x2B, 0x00, 0x01, 0x3C, 0x00, 0x10, 0x00, 0x20, 0x00, 0x30, 0x00, 0x40, 0x00, 0x50, 0x00, 0x60, 0x00, 0x70, 0x00,
-                                        0x80, 0x00, 0x90, 0x00, 0xA0, 0x00, 0xB0, 0x00, 0xC0, 0x00, 0xD0, 0x00, 0xE0, 0x00, 0xF0, 0x00, 0x00, 0x00, 0xF8, 0xF7, 0xF6, 0xF5};
-        const byte hmmdTestBuffer2[] = {0xF4, 0xF3, 0xF2, 0xF1, 0x2B, 0x00, 0x00, 0x4B, 0x00, 0x10, 0x00, 0x20, 0x00, 0x30, 0x00, 0x40, 0x00, 0x50, 0x00, 0x60, 0x00, 0x70, 0x00,
-                                        0x80, 0x00, 0x90, 0x00, 0xA0, 0x00, 0xB0, 0x00, 0xC0, 0x00, 0xD0, 0x00, 0xE0, 0x00, 0xF0, 0x00, 0x00, 0x00, 0xF8, 0xF7, 0xF6, 0xF5};
-
-        const byte* hmmdTestBufferPtr    = hmmdTestBuffer1;
-        s32         hmmdTestBufferCursor = 0;
-
-        s32 available()
+        s32 read_bytes(serial_t x, byte* outData, s32 outMaxLength)
         {
-            if (hmmdTestBufferCursor == -1)
-            {
-                hmmdTestBufferPtr    = hmmdTestBufferPtr == hmmdTestBuffer1 ? hmmdTestBuffer2 : hmmdTestBuffer1;
-                hmmdTestBufferCursor = 0;
-                return 0;
-            }
-
-            return hmmdTestBufferCursor >= 0 ? 1 : 0;
+            CC_UNUSED(x);
+            CC_UNUSED(outData);
+            CC_UNUSED(outMaxLength);
+            return 0;
         }
-
-        // Print prints data to the serial port as human-readable ASCII text.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
-        void print(const char* val)
-        {
-            // No operation in simulation
-            (void)val;
-        }
-
-        // Println prints data to the serial port as human-readable ASCII text followed by a carriage return character (ASCII 13, or '\r') and a newline character (ASCII 10, or '\n').
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
-        void println(const char* val)
-        {
-            // No operation in simulation
-            (void)val;
-        }
-
-        // Write writes data to the serial port.
-        // @see: https://www.arduino.cc/reference/en/language/functions/communication
-        void write(const byte* data, s32 length)
-        {
-            // No operation in simulation
-            (void)data;
-            (void)length;
-        }
-
-        s32 read_until(char terminator, char* outString, s32 outMaxLength)
-        {
-            // No operation in simulation
-            (void)terminator;
-            (void)outString;
-            (void)outMaxLength;
-            return 0;  // Return 0 bytes read
-        }
-
-        s32 read_bytes(byte* outData, s32 outMaxLength)
-        {
-            if (hmmdTestBufferCursor == -1)
-            {
-                return 0;
-            }
-
-            outData[0] = hmmdTestBufferPtr[hmmdTestBufferCursor++];
-            if (hmmdTestBufferCursor >= (s32)sizeof(hmmdTestBuffer1))
-            {
-                hmmdTestBufferCursor = -1;
-            }
-            return 1;
-        }
-    }  // namespace nserial2
+    }  // namespace nserialx
 
 }  // namespace ncore
 

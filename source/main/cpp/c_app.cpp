@@ -8,7 +8,7 @@
 
 namespace ncore
 {
-    state_t gState;
+    static state_t gState = {0};
 };  // namespace ncore
 
 #ifdef TARGET_ARDUINO
@@ -17,12 +17,7 @@ namespace ncore
 
 void setup()
 {
-    ncore::napp::presetup();
-
-    ncore::gState.time_ms = 0;
-    ncore::gState.wifi    = nullptr;
-    ncore::gState.node    = nullptr;
-    ncore::gState.flags   = 0;
+    ncore::napp::presetup(&ncore::gState);
 
     ncore::gState.WiFiSSID      = ncore::WIFI_SSID();
     ncore::gState.WiFiPassword  = ncore::WIFI_PASSWORD();
@@ -36,12 +31,22 @@ void setup()
     ncore::nserial::begin(ncore::nbaud::Rate115200);  // Initialize serial communication at 115200 baud
 #    endif
 
-#    ifdef TARGET_ESP32S3
+#    ifndef TARGET_ESP8266
     if (psramInit())
     {
-        ncore::nserial::println("PSRAM initialized successfully.");
+        ncore::gState.flags |= ncore::state_t::FLAG_PSRAM;
+        const ncore::u32 psram_size       = ESP.getPsramSize();
+        const ncore::u32 free_psram       = ESP.getFreePsram();
+        ncore::nserial::printf("PSRAM Size: %u Kbytes with %u Kbytes free.\n", ncore::va_t(psram_size >> 10), ncore::va_t(free_psram >> 10));
+    }
+    else
+    {
+        ncore::nserial::println("PSRAM initialization failed.");
     }
 #    endif
+
+    const ncore::u32 free_memory = ESP.getFreeHeap();
+    ncore::nserial::printf("Free heap memory: %u Kbytes\n", ncore::va_t(free_memory >> 10));
 
     ncore::gState.time_ms = ncore::ntimer::millis();
     ncore::napp::setup(&ncore::gState);

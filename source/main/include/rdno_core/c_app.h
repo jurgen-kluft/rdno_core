@@ -9,14 +9,11 @@
 
 namespace ncore
 {
-    struct str_t;
-    
     namespace napp
     {
-        void presetup();
+        void presetup(state_t* state);
         void setup(state_t* state);
         void tick(state_t* state);
-
     }  // namespace napp
 }  // namespace ncore
 
