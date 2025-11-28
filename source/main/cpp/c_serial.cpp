@@ -61,13 +61,32 @@ namespace ncore
 
     namespace nserialx
     {
+
+        HardwareSerial* HwSerial[4] = {&Serial,
+#    if SOC_UART_HP_NUM > 1
+                                       &Serial1,
+#    else
+                                       nullptr,
+#    endif
+#    if SOC_UART_HP_NUM > 2
+                                       &Serial2,
+#    else
+                                       nullptr,
+#    endif
+#    if SOC_UART_HP_NUM > 3
+                                       &Serial3
+#    else
+                                       nullptr
+#    endif
+        };
+
         class serial_reader_t : public reader_t
         {
             HardwareSerial* m_serial;
 
         public:
-            inline serial_reader_t(HardwareSerial* serial)
-                : m_serial(serial)
+            inline serial_reader_t(serial_t serial)
+                : m_serial(HwSerial[serial])
             {
             }
 
@@ -93,24 +112,6 @@ namespace ncore
             }
         };
 
-        HardwareSerial* HwSerial[4] = {&Serial0,
-#    if SOC_UART_HP_NUM > 1
-                                       &Serial1,
-#    else
-                                       nullptr,
-#    endif
-#    if SOC_UART_HP_NUM > 2
-                                       &Serial2,
-#    else
-                                       nullptr,
-#    endif
-#    if SOC_UART_HP_NUM > 3
-                                       &Serial3
-#    else
-                                       nullptr
-#    endif
-        };
-
         // Begin sets the data rate in bits per second (baud) for serial data transmission.
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
         void begin(serial_t x, nbaud::Enum baud, nconfig::Enum config, s8 rxPin, s8 txPin)
@@ -118,7 +119,8 @@ namespace ncore
             if (x > 3 || HwSerial[x] == nullptr)
                 return;
 
-            u32 configValue = SERIAL_8N1;
+#    ifdef TARGET_ESP8266
+            SerialConfig configValue = SERIAL_8N1;
             switch (config)
             {
                 case nconfig::MODE_8N1: configValue = SERIAL_8N1; break;
@@ -126,8 +128,17 @@ namespace ncore
             if (configValue != 0)
             {
                 HardwareSerial* serial = HwSerial[x];
-                serial->begin(baud, configValue, rxPin, txPin);
+                serial->begin(baud, configValue, SERIAL_FULL, rxPin, txPin);
             }
+#    else  // TARGET_ESP32
+            u32 configValue = SERIAL_8N1;
+            switch (config)
+            {
+                case nconfig::MODE_8N1: configValue = SERIAL_8N1; break;
+            }
+            HardwareSerial* serial = HwSerial[x];
+            serial->begin(baud, configValue, rxPin, txPin);
+#    endif
         }
 
         serial_reader_t SERIAL_READERS[] = {
@@ -223,10 +234,10 @@ namespace ncore
 
     namespace nserialx
     {
-        serial_t SERIAL1 = (void*)1;
-        serial_t SERIAL2 = (void*)2;
-        serial_t SERIAL3 = (void*)3;
-        serial_t SERIAL4 = (void*)4;
+        serial_t SERIAL1 = 1;
+        serial_t SERIAL2 = 2;
+        serial_t SERIAL3 = 3;
+        serial_t SERIAL4 = 4;
 
         void begin(serial_t x, nbaud::Enum baud, nconfig::Enum config, s8 rxPin, s8 txPin)
         {
