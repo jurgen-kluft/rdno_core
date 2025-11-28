@@ -15,11 +15,11 @@ namespace ncore
             Size         = HeaderSize;        // Set size to header size, user has to fill in MAC address manually
         }
 
-        void packet_t::begin(MACAddress_t const& mac)
+        void packet_t::begin(u8 const* mac)
         {
             begin();
             for (s32 i = 0; i < 6; i++)
-                Data[MacOffset + i] = mac.m_address[i];  // MAC address
+                Data[MacOffset + i] = mac[i];  // MAC address
         }
 
         void packet_t::write(u8 const* data, u8 len)
@@ -65,11 +65,11 @@ namespace ncore
             Size         = HeaderSize;        // Set size to header size, user has to fill in MAC address manually
         }
 
-        void sensorpacket_t::begin(MACAddress_t const& mac)
+        void sensorpacket_t::begin(const u8* mac)
         {
             begin();
             for (s32 i = 0; i < 6; i++)
-                Data[MacOffset + i] = mac.m_address[i];  // MAC address
+                Data[MacOffset + i] = mac[i];  // MAC address
         }
 
         void sensorpacket_t::finalize()

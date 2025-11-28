@@ -5,8 +5,6 @@
 #    pragma once
 #endif
 
-#include "rdno_core/c_network.h"
-
 namespace ncore
 {
     namespace nlog

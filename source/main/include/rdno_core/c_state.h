@@ -25,6 +25,7 @@ namespace ncore
 
         const char*   WiFiSSID;
         const char*   WiFiPassword;
+        u8            MACAddress[6];
         u32           ServerIP;
         u16           ServerTcpPort;
         u16           ServerUdpPort;

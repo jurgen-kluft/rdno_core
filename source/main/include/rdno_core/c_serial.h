@@ -11,9 +11,6 @@ namespace ncore
 {
     class reader_t;
     
-    struct IPAddress_t;
-    struct MACAddress_t;
-
     namespace nbaud
     {
         enum Enum
@@ -56,8 +53,8 @@ namespace ncore
     {
         void begin(nbaud::Enum baud = nbaud::Rate115200);
         void print(const char* val);
-        void print(const IPAddress_t& address);
-        void print(const MACAddress_t& address);
+        void print(u8 a, u8 b, u8 c, u8 d, char separator = '.');
+        void print(u8 a, u8 b, u8 c, u8 d, u8 e, u8 f, char separator = ':');
         void println(const char* val);
 
         template <typename... Args>

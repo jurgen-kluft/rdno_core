@@ -5,8 +5,6 @@
 #    pragma once
 #endif
 
-#include "rdno_core/c_network.h"
-
 namespace ncore
 {
     namespace npacket
@@ -98,12 +96,12 @@ namespace ncore
                 BodyOffset    = 8,
             };
 
-            void begin();                         // User has to fill in MAC address manually
-            void begin(MACAddress_t const& mac);  // User provides MAC address
+            void begin();                        // User has to fill in MAC address manually
+            void begin(u8 const* mac);           // User provides MAC address
             void write(u8 const* data, u8 len);  // Write an block of data (max 255 bytes)
-            void write(u16 value);                // Write a 16 bit value
-            void write(u32 value);                // Write a 32 bit value
-            void finalize();                      // returns the number of sensor values written
+            void write(u16 value);               // Write a 16 bit value
+            void write(u32 value);               // Write a 32 bit value
+            void finalize();                     // returns the number of sensor values written
         };
 
         struct sensorpacket_t
@@ -124,7 +122,7 @@ namespace ncore
             };
 
             void begin();                                  // User has to fill in MAC address manually
-            void begin(MACAddress_t const& mac);           // User provides MAC address
+            void begin(u8 const* mac);                     // User provides MAC address
             void write(nsensorid::value_t id, u16 value);  // Write a sensor value
             s32  count() const { return Count; }           // returns the number of sensor values written
             void finalize();                               // returns the number of sensor values written

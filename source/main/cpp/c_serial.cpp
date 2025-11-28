@@ -2,12 +2,15 @@
 #include "rdno_core/c_serial.h"
 #include "rdno_core/c_timer.h"
 #include "rdno_core/c_str.h"
-
 #include "ccore/c_stream.h"
 
 #ifdef TARGET_ARDUINO
-
 #    include "Arduino.h"
+#endif
+
+#include "rdno_core/c_network.h"
+
+#ifdef TARGET_ARDUINO
 
 namespace ncore
 {
@@ -32,17 +35,17 @@ namespace ncore
         // @see: https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
         void print(const char* val) { Serial.print(val); }
 
-        void print(const IPAddress_t& address)
+        void print(u8 a, u8 b, u8 c, u8 d, char s)
         {
             char strBuffer[32];
-            snprintf(strBuffer, sizeof(strBuffer), "%u.%u.%u.%u", va_t(address[0]), va_t(address[1]), va_t(address[2]), va_t(address[3]));
+            snprintf(strBuffer, sizeof(strBuffer), "%u%c%u%c%u%c%u", va_t(a), va_t(s), va_t(b), va_t(s), va_t(c), va_t(s), va_t(d));
             Serial.print(strBuffer);
         }
 
-        void print(const MACAddress_t& mac)
+        void print(u8 a, u8 b, u8 c, u8 d, u8 e, u8 f, char s)
         {
             char strBuffer[32];
-            snprintf(strBuffer, sizeof(strBuffer), "%02X:%02X:%02X:%02X:%02X:%02X", va_t(mac.m_address[0]), va_t(mac.m_address[1]), va_t(mac.m_address[2]), va_t(mac.m_address[3]), va_t(mac.m_address[4]), va_t(mac.m_address[5]));
+            snprintf(strBuffer, sizeof(strBuffer), "%02X%c%02X%c%02X%c%02X%c%02X%c%02X", va_t(a), va_t(s), va_t(b), va_t(s), va_t(c), va_t(s), va_t(d), va_t(s), va_t(e), va_t(s), va_t(f));
             Serial.print(strBuffer);
         }
 
@@ -227,18 +230,29 @@ namespace ncore
     {
         void begin(nbaud::Enum baud) { CC_UNUSED(baud); }
         void print(const char* val) { CC_UNUSED(val); }
-        void print(const IPAddress_t& address) { CC_UNUSED(address); }
-        void print(const MACAddress_t& mac) { CC_UNUSED(mac); }
+        void print(u8 a, u8 b, u8 c, u8 d, char separator = '.')
+        {
+            CC_UNUSED(a);
+            CC_UNUSED(b);
+            CC_UNUSED(c);
+            CC_UNUSED(d);
+            CC_UNUSED(separator);
+        }
+        void print(u8 a, u8 b, u8 c, u8 d, u8 e, u8 f, char separator = ':')
+        {
+            CC_UNUSED(a);
+            CC_UNUSED(b);
+            CC_UNUSED(c);
+            CC_UNUSED(d);
+            CC_UNUSED(e);
+            CC_UNUSED(f);
+            CC_UNUSED(separator);
+        }
         void println(const char* val) { CC_UNUSED(val); }
     }  // namespace nserial
 
     namespace nserialx
     {
-        serial_t SERIAL1 = 1;
-        serial_t SERIAL2 = 2;
-        serial_t SERIAL3 = 3;
-        serial_t SERIAL4 = 4;
-
         void begin(serial_t x, nbaud::Enum baud, nconfig::Enum config, s8 rxPin, s8 txPin)
         {
             CC_UNUSED(x);

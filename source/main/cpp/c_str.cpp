@@ -1,5 +1,4 @@
 #include "rdno_core/c_str.h"
-#include "rdno_core/c_network.h"
 #include "rdno_core/c_serial.h"
 #include "ccore/c_memory.h"
 
@@ -827,20 +826,6 @@ namespace ncore
             dest.m_ascii[dest.m_end++] = *ptr++;
         dest.m_ascii[dest.m_end] = '\0';
         dest.m_const             = dest.m_ascii;
-    }
-
-    void str_append(str_t& dest, const IPAddress_t& ip, const char* sep)
-    {
-        if (dest.m_ascii == nullptr)
-            return;  // destination is not mutable
-        to_str(dest, ip, sep);
-    }
-
-    void str_append(str_t& dest, const MACAddress_t& mac, const char* sep)
-    {
-        if (dest.m_ascii == nullptr)
-            return;  // destination is not mutable
-        to_str(dest, mac, sep);
     }
 
     void str_append(str_t& dest, const str_t* array, s16 count)
