@@ -1,9 +1,9 @@
-# rdno_core, Arduino core library for ESP32 and ESP8266
+# rcore, Arduino core library for ESP32 and ESP8266
 
 For my own home development, automation, sensors, etc.. I have setup C++ libraries that build with Arduino libraries. 
 
 Note: This uses ccode to pull in any dependencies, this also means that any used sensors and their libraries need to wrapped 
-into a `rdno_{name}` libraries/packages. There are currently 2 examples of this in the `rdno_wifi` and `rdno_sensors` library.
+into a `r{name}` libraries/packages. There are currently 2 examples of this in the `rwifi` and `rsensors` library.
 
 # Arduino and ESP32/ESP8266 SDK
 

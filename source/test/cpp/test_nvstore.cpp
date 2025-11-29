@@ -1,8 +1,7 @@
-#include "rdno_core/c_target.h"
-#include "rdno_core/c_allocator.h"
-#include "rdno_core/c_str.h"
-#include "rdno_core/c_nvstore.h"
-#include "rdno_core/c_memory.h"
+#include "rcore/c_target.h"
+#include "ccore/c_allocator.h"
+#include "rcore/c_str.h"
+#include "ccore/c_memory.h"
 
 #include "cunittest/cunittest.h"
 

@@ -1,6 +1,6 @@
-#include "rdno_core/c_log.h"
-#include "rdno_core/c_timer.h"
-#include "rdno_core/c_str.h"
+#include "rcore/c_log.h"
+#include "rcore/c_timer.h"
+#include "rcore/c_str.h"
 
 #ifdef TARGET_ARDUINO
 

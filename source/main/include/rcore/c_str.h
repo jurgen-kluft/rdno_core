@@ -1,6 +1,6 @@
-#ifndef __RDNO_CORE_STR_H__
-#define __RDNO_CORE_STR_H__
-#include "rdno_core/c_target.h"
+#ifndef __RCORE_STR_H__
+#define __RCORE_STR_H__
+#include "rcore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
 #endif
@@ -139,4 +139,4 @@ namespace ncore
 
 }  // namespace ncore
 
-#endif  // __RDNO_CORE_STR_H__
+#endif  // __RCORE_STR_H__

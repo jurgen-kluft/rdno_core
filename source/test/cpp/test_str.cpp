@@ -1,6 +1,6 @@
-#include "rdno_core/c_target.h"
-#include "rdno_core/c_allocator.h"
-#include "rdno_core/c_str.h"
+#include "rcore/c_target.h"
+#include "ccore/c_allocator.h"
+#include "rcore/c_str.h"
 
 #include "cunittest/cunittest.h"
 
@@ -262,10 +262,10 @@ UNITTEST_SUITE_BEGIN(str)
 
             u32 uintValue;
             CHECK_TRUE(from_str(str6, &uintValue, 10));
-            CHECK_EQUAL(uintValue, 123);
+            CHECK_EQUAL(uintValue, (u32)123);
             CHECK_FALSE(from_str(str7, &uintValue, 10));  // negative number cannot be converted to unsigned
             CHECK_TRUE(from_str(str8, &uintValue, 16));
-            CHECK_EQUAL(uintValue, 127);
+            CHECK_EQUAL(uintValue, (u32)127);
             CHECK_FALSE(from_str(str9, &uintValue, 10));
         }
 
@@ -402,28 +402,24 @@ UNITTEST_SUITE_BEGIN(str)
             str_t str2 = str_const("hello ");
             str_t str3 = str_const("world");
 
-            s16 len1 = str_append(str1, str2);
-            CHECK_EQUAL(len1, str_len(str2));
+            str_append(str1, str2);
             CHECK_EQUAL(str_len(str1), str_len(str2));
             CHECK_EQUAL(str_at(str1, 0), 'h');
             CHECK_EQUAL(str_at(str1, 5), ' ');
 
-            s16 len2 = str_append(str1, str3);
-            CHECK_EQUAL(len2, str_len(str3));
+            str_append(str1, str3);
             CHECK_EQUAL(str_len(str1), str_len(str2) + str_len(str3));
             CHECK_EQUAL(str_at(str1, 6), 'w');
             CHECK_EQUAL(str_at(str1, 10), 'd');
 
-            s16 len3 = str_append(str1, "!!!");
-            CHECK_EQUAL(len3, 3);
+            str_append(str1, "!!!");
             CHECK_EQUAL(str_len(str1), 14);
             CHECK_EQUAL(str_at(str1, 11), '!');
             CHECK_EQUAL(str_at(str1, 13), '!');
 
             str_clear(str1);
             str_t array[3] = {str_const("one "), str_const("two "), str_const("three")};
-            s16   len4     = str_append(str1, array, 3);
-            CHECK_EQUAL(len4, 13);
+            str_append(str1, array, 3);
             CHECK_EQUAL(str_len(str1), 13);
             CHECK_EQUAL(str_at(str1, 0), 'o');
             CHECK_EQUAL(str_at(str1, 12), 'e');
@@ -434,20 +430,17 @@ UNITTEST_SUITE_BEGIN(str)
             char  buffer[30];
             str_t str1 = str_mutable(buffer, sizeof(buffer));
 
-            s16 len1 = str_append(str1, "hello ");
-            CHECK_EQUAL(len1, 6);
+            str_append(str1, "hello ");
             CHECK_EQUAL(str_len(str1), 6);
             CHECK_EQUAL(str_at(str1, 0), 'h');
             CHECK_EQUAL(str_at(str1, 5), ' ');
 
-            s16 len2 = str_append(str1, "world");
-            CHECK_EQUAL(len2, 5);
+            str_append(str1, "world");
             CHECK_EQUAL(str_len(str1), 11);
             CHECK_EQUAL(str_at(str1, 6), 'w');
             CHECK_EQUAL(str_at(str1, 10), 'd');
 
-            s16 len3 = str_append(str1, "!!!");
-            CHECK_EQUAL(len3, 3);
+            str_append(str1, "!!!");
             CHECK_EQUAL(str_len(str1), 14);
             CHECK_EQUAL(str_at(str1, 11), '!');
             CHECK_EQUAL(str_at(str1, 13), '!');
@@ -461,8 +454,7 @@ UNITTEST_SUITE_BEGIN(str)
             str_t str1     = str_mutable(buffer, sizeof(buffer));
             str_t array[3] = {str_const("one "), str_const("two "), str_const("three")};
 
-            s16 len1 = str_append(str1, array, 3);
-            CHECK_EQUAL(len1, 13);
+            str_append(str1, array, 3);
             CHECK_EQUAL(str_len(str1), 13);
             CHECK_EQUAL(str_at(str1, 0), 'o');
             CHECK_EQUAL(str_at(str1, 1), 'n');
@@ -485,8 +477,7 @@ UNITTEST_SUITE_BEGIN(str)
             str_t str2 = str_const("hello");
             str_t str3 = str_const("world");
 
-            s16 len1 = str_join(str1, ' ', str2, str3);
-            CHECK_EQUAL(len1, str_len(str2) + str_len(str3) + 1);
+            str_join(str1, ' ', str2, str3);
             CHECK_EQUAL(str_len(str1), str_len(str2) + str_len(str3) + 1);
             CHECK_EQUAL(str_at(str1, 0), 'h');
             CHECK_EQUAL(str_at(str1, 5), ' ');

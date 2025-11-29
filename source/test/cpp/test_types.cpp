@@ -1,5 +1,5 @@
-#include "rdno_core/c_target.h"
-#include "rdno_core/c_allocator.h"
+#include "rcore/c_target.h"
+#include "ccore/c_allocator.h"
 
 #include "cunittest/cunittest.h"
 

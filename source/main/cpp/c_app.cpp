@@ -1,22 +1,23 @@
-#include "rdno_core/c_target.h"
-#include "rdno_core/c_malloc.h"
-#include "rdno_core/c_eeprom.h"
-#include "rdno_core/c_serial.h"
-#include "rdno_core/c_task.h"
-#include "rdno_core/c_timer.h"
-#include "rdno_core/c_app.h"
+#include "rcore/c_target.h"
+#include "rcore/c_malloc.h"
+#include "rcore/c_eeprom.h"
+#include "rcore/c_serial.h"
+#include "rcore/c_task.h"
+#include "rcore/c_timer.h"
+#include "rcore/c_app.h"
+
+#ifdef TARGET_ARDUINO
 
 namespace ncore
 {
-    static state_t gState = {0};
+    static state_t gState;
 };  // namespace ncore
-
-#ifdef TARGET_ARDUINO
 
 #    include "Arduino.h"
 
 void setup()
 {
+    ncore::gState.reset();
     ncore::napp::presetup(&ncore::gState);
 
     ncore::gState.WiFiSSID      = ncore::WIFI_SSID();

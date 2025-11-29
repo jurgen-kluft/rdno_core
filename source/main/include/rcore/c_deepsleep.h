@@ -1,6 +1,6 @@
-#ifndef __RDNO_CORE_SYSTEM_DEEPSLEEP_H__
-#define __RDNO_CORE_SYSTEM_DEEPSLEEP_H__
-#include "rdno_core/c_target.h"
+#ifndef __rCORE_SYSTEM_DEEPSLEEP_H__
+#define __rCORE_SYSTEM_DEEPSLEEP_H__
+#include "rcore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
 #endif
@@ -48,4 +48,4 @@ namespace ncore
     }  // namespace nsystem
 }  // namespace ncore
 
-#endif  // __RDNO_CORE_SYSTEM_DEEPSLEEP_H__
+#endif  // __rCORE_SYSTEM_DEEPSLEEP_H__

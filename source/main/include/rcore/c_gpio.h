@@ -1,11 +1,11 @@
-#ifndef __RDNO_CORE_GPIO_H__
-#define __RDNO_CORE_GPIO_H__
-#include "rdno_core/c_target.h"
+#ifndef __rCORE_GPIO_H__
+#define __rCORE_GPIO_H__
+#include "rcore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
 #endif
 
-#include "rdno_core/c_debounce.h"
+#include "rcore/c_debounce.h"
 
 namespace ncore
 {
@@ -101,4 +101,4 @@ namespace ncore
     }  // namespace ngpio
 }  // namespace ncore
 
-#endif  // __RDNO_CORE_GPIO_H__
+#endif  // __rCORE_GPIO_H__

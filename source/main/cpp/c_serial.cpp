@@ -1,14 +1,14 @@
-#include "rdno_core/c_log.h"
-#include "rdno_core/c_serial.h"
-#include "rdno_core/c_timer.h"
-#include "rdno_core/c_str.h"
+#include "rcore/c_log.h"
+#include "rcore/c_serial.h"
+#include "rcore/c_timer.h"
+#include "rcore/c_str.h"
 #include "ccore/c_stream.h"
 
 #ifdef TARGET_ARDUINO
 #    include "Arduino.h"
 #endif
 
-#include "rdno_core/c_network.h"
+#include "rcore/c_network.h"
 
 #ifdef TARGET_ARDUINO
 
@@ -230,7 +230,7 @@ namespace ncore
     {
         void begin(nbaud::Enum baud) { CC_UNUSED(baud); }
         void print(const char* val) { CC_UNUSED(val); }
-        void print(u8 a, u8 b, u8 c, u8 d, char separator = '.')
+        void print(u8 a, u8 b, u8 c, u8 d, char separator )
         {
             CC_UNUSED(a);
             CC_UNUSED(b);
@@ -238,7 +238,7 @@ namespace ncore
             CC_UNUSED(d);
             CC_UNUSED(separator);
         }
-        void print(u8 a, u8 b, u8 c, u8 d, u8 e, u8 f, char separator = ':')
+        void print(u8 a, u8 b, u8 c, u8 d, u8 e, u8 f, char separator)
         {
             CC_UNUSED(a);
             CC_UNUSED(b);

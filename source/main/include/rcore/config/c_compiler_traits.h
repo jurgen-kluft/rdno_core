@@ -1,5 +1,5 @@
-#ifndef __RDNO_CORE_TARGET_COMPILER_TRAITS_V2_H__
-#define __RDNO_CORE_TARGET_COMPILER_TRAITS_V2_H__
+#ifndef __rCORE_TARGET_COMPILER_TRAITS_V2_H__
+#define __rCORE_TARGET_COMPILER_TRAITS_V2_H__
 #pragma once
 
 namespace ncore

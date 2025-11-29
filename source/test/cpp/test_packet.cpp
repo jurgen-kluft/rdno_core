@@ -1,6 +1,6 @@
-#include "rdno_core/c_target.h"
-#include "rdno_core/c_allocator.h"
-#include "rdno_core/c_packet.h"
+#include "rcore/c_target.h"
+#include "ccore/c_allocator.h"
+#include "rcore/c_packet.h"
 
 #include "cunittest/cunittest.h"
 
@@ -16,15 +16,15 @@ UNITTEST_SUITE_BEGIN(packet)
 
         UNITTEST_TEST(test)
         {
-            packet_t packet;
-            packet.begin(1, true);
+            sensorpacket_t packet;
+            packet.begin();
 
             // Write sensor values
-            packet.write_value(ntype::Temperature, 25);
-            packet.write_value(ntype::Humidity, 60);
+            packet.write(nsensorid::ID_TEMPERATURE, 25);
+            packet.write(nsensorid::ID_HUMIDITY, 60);
 
             // Finalize the packet
-            CHECK_EQUAL(2, packet.finalize());
+            CHECK_EQUAL(2, packet.count());
 
             // Check the size of the packet
             CHECK_EQUAL((packet_t::HeaderSize + 2 + 2), packet.Size);

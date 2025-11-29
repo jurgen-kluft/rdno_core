@@ -1,7 +1,8 @@
-#include "rdno_core/c_target.h"
-#include "rdno_core/c_allocator.h"
-#include "rdno_core/c_network.h"
-#include "rdno_core/c_str.h"
+#include "rcore/c_target.h"
+#include "rcore/c_network.h"
+#include "rcore/c_str.h"
+
+#include "ccore/c_allocator.h"
 
 #include "cunittest/cunittest.h"
 

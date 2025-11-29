@@ -1,6 +1,6 @@
-#include "rdno_core/c_target.h"
-#include "rdno_core/c_str.h"
-#include "rdno_core/c_system.h"
+#include "rcore/c_target.h"
+#include "rcore/c_str.h"
+#include "rcore/c_system.h"
 
 #include "cunittest/cunittest.h"
 

@@ -1,9 +1,9 @@
-#include "rdno_core/c_target.h"
-#include "rdno_core/c_malloc.h"
-#include "rdno_core/c_serial.h"
-#include "rdno_core/c_system.h"
-#include "rdno_core/c_task.h"
-#include "rdno_core/c_timer.h"
+#include "rcore/c_target.h"
+#include "rcore/c_malloc.h"
+#include "rcore/c_serial.h"
+#include "rcore/c_system.h"
+#include "rcore/c_task.h"
+#include "rcore/c_timer.h"
 
 #include "ccore/c_memory.h"
 

@@ -1,6 +1,6 @@
-#ifndef __RDNO_CORE_LOG_H__
-#define __RDNO_CORE_LOG_H__
-#include "rdno_core/c_target.h"
+#ifndef __rCORE_LOG_H__
+#define __rCORE_LOG_H__
+#include "rcore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
 #endif
@@ -37,4 +37,4 @@ namespace ncore
 
 }  // namespace ncore
 
-#endif  // __RDNO_CORE_LOG_H__
+#endif  // __rCORE_LOG_H__

@@ -1,6 +1,6 @@
-#include "rdno_core/c_gpio.h"
-#include "rdno_core/c_timer.h"
-#include "rdno_core/c_debounce.h"
+#include "rcore/c_gpio.h"
+#include "rcore/c_timer.h"
+#include "rcore/c_debounce.h"
 
 #ifdef TARGET_ARDUINO
 #    include "Arduino.h"

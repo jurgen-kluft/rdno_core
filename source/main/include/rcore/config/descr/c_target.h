@@ -2,7 +2,7 @@
 #define __CCORE_TARGET_TARGET_DESCRIPTION_V2_H__
 #pragma once
 
-#include "rdno_core/config/c_platform.h"
+#include "rcore/config/c_platform.h"
 
 namespace ncore
 {

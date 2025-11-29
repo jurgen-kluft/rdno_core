@@ -1,4 +1,4 @@
-#include "rdno_core/c_wire.h"
+#include "rcore/c_wire.h"
 
 #ifdef TARGET_ARDUINO
 #    include "Arduino.h"

@@ -1,6 +1,6 @@
-#ifndef __RDNO_CORE_TIMER_H__
-#define __RDNO_CORE_TIMER_H__
-#include "rdno_core/c_target.h"
+#ifndef __rCORE_TIMER_H__
+#define __rCORE_TIMER_H__
+#include "rcore/c_target.h"
 #ifdef USE_PRAGMA_ONCE
 #    pragma once
 #endif
@@ -19,4 +19,4 @@ namespace ncore
     }  // namespace ntimer
 }  // namespace ncore
 
-#endif  // __RDNO_CORE_TIMER_H__
+#endif  // __rCORE_TIMER_H__

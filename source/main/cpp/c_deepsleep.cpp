@@ -1,5 +1,5 @@
-#include "rdno_core/c_str.h"
-#include "rdno_core/c_deepsleep.h"
+#include "rcore/c_str.h"
+#include "rcore/c_deepsleep.h"
 
 #ifdef TARGET_ESP32
 #    include "Arduino.h"

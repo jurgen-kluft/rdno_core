@@ -1,5 +1,5 @@
-#ifndef __RDNO_CORE_TARGET_PLATFORM_V2_H__
-#define __RDNO_CORE_TARGET_PLATFORM_V2_H__
+#ifndef __rCORE_TARGET_PLATFORM_V2_H__
+#define __rCORE_TARGET_PLATFORM_V2_H__
 #pragma once
 
 namespace ncore
@@ -669,4 +669,4 @@ namespace ncore
 #endif
 };  // namespace ncore
 
-#endif  // __RDNO_CORE_TARGET_PLATFORM_V2_H__
+#endif  // __rCORE_TARGET_PLATFORM_V2_H__

@@ -1,5 +1,5 @@
-#include "rdno_core/c_str.h"
-#include "rdno_core/c_serial.h"
+#include "rcore/c_str.h"
+#include "rcore/c_serial.h"
 #include "ccore/c_memory.h"
 
 namespace ncore

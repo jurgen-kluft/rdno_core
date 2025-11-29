@@ -1,5 +1,5 @@
-#include "rdno_core/c_timer.h"
-#include "rdno_core/c_debounce.h"
+#include "rcore/c_timer.h"
+#include "rcore/c_debounce.h"
 
 namespace ncore
 {
