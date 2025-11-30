@@ -103,16 +103,16 @@ namespace ncore
 
     // from and to conversions ----------------------------------------------------------------
     bool from_str(const str_t& s, bool* outValue);
-    bool from_str(const str_t& s, s32* outValue, s16 base = 10);
-    bool from_str(const str_t& s, u32* outValue, s16 base = 10);
-    bool from_str(const str_t& s, s64* outValue, s16 base = 10);
-    bool from_str(const str_t& s, u64* outValue, s16 base = 10);
+    bool from_str(const str_t& s, s32* outValue, s8 base = 10);
+    bool from_str(const str_t& s, u32* outValue, s8 base = 10);
+    bool from_str(const str_t& s, s64* outValue, s8 base = 10);
+    bool from_str(const str_t& s, u64* outValue, s8 base = 10);
     bool from_str(const str_t& s, f32* outValue);
 
     void to_str(str_t& dest, bool value);
-    void to_str(str_t& dest, byte value, s8 chars = 0, s16 base = 10);
-    void to_str(str_t& dest, s32 value, s16 base = 10);
-    void to_str(str_t& dest, u32 value, s16 base = 10);
+    void to_str(str_t& dest, byte value, s8 chars = 0, s8 base = 10);
+    void to_str(str_t& dest, s32 value, s8 base = 10);
+    void to_str(str_t& dest, u32 value, s8 base = 10);
     void to_str(str_t& dest, f32 value, s16 num_fractional_digits = 2);
 
     // string composition ------------------------------------------------------------------
@@ -131,6 +131,13 @@ namespace ncore
     // printing to serial -------------------------------------------------------------------
     void str_print(const str_t& s);
     void str_println(const str_t& s);
+
+    // helper functions  -------------------------------------------------------------------
+    inline void to_str_and_append(str_t& dest, byte value, s8 base = 10, char c = ' ')
+    {
+        to_str(dest, value, base);
+        str_append(dest, c);
+    }
 
 #define STR_T(name, len, cstr)                                           \
     char         name##_buffer[len + 1];                                    \

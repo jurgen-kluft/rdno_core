@@ -1,6 +1,7 @@
 #include "rcore/c_target.h"
 #include "rcore/c_malloc.h"
 #include "rcore/c_eeprom.h"
+#include "rcore/c_log.h"
 #include "rcore/c_serial.h"
 #include "rcore/c_task.h"
 #include "rcore/c_timer.h"
@@ -38,21 +39,21 @@ void setup()
         ncore::gState.flags |= ncore::state_t::FLAG_PSRAM;
         const ncore::u32 psram_size       = ESP.getPsramSize();
         const ncore::u32 free_psram       = ESP.getFreePsram();
-        ncore::nserial::printf("PSRAM Size: %u Kbytes with %u Kbytes free.\n", ncore::va_t(psram_size >> 10), ncore::va_t(free_psram >> 10));
+        ncore::nlog::printf("PSRAM Size: %u Kbytes with %u Kbytes free.\n", ncore::va_t(psram_size >> 10), ncore::va_t(free_psram >> 10));
     }
     else
     {
-        ncore::nserial::println("PSRAM initialization failed.");
+        ncore::nlog::println("PSRAM initialization failed.");
     }
 #    endif
 
     const ncore::u32 free_memory = ESP.getFreeHeap();
-    ncore::nserial::printf("Free heap memory: %u Kbytes\n", ncore::va_t(free_memory >> 10));
+    ncore::nlog::printf("Free heap memory: %u Kbytes\n", ncore::va_t(free_memory >> 10));
 
     ncore::gState.time_ms = ncore::ntimer::millis();
     ncore::napp::setup(&ncore::gState);
 
-    ncore::nserial::println("Setup done...");
+    ncore::nlog::println("Setup done...");
 }
 
 void loop()

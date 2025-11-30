@@ -162,13 +162,9 @@ namespace ncore
 
 #ifdef TARGET_ARDUINO
         const IPAddress& ip  = *(IPAddress const*)bytes;
-        const char*      sep = ".";
-        to_str(str, (byte)ip[0], 0, 10);
-        str_append(str, sep);
-        to_str(str, (byte)(ip[1]) & 0xFF, 0, 10);
-        str_append(str, sep);
-        to_str(str, (byte)(ip[2]) & 0xFF, 0, 10);
-        str_append(str, sep);
+        to_str_and_append(str, (byte)(ip[0]) & 0xFF, 10, '.');
+        to_str_and_append(str, (byte)(ip[1]) & 0xFF, 10, '.');
+        to_str_and_append(str, (byte)(ip[2]) & 0xFF, 10, '.');
         to_str(str, (byte)(ip[3]) & 0xFF, 0, 10);
 #endif
     }

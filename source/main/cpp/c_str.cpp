@@ -411,7 +411,7 @@ namespace ncore
         return false;
     }
 
-    bool str_to_int32(const char* str, const char* end, s16 base, s32* outValue)
+    bool str_to_int32(const char* str, const char* end, s8 base, s32* outValue)
     {
         *outValue = 0;
 
@@ -458,7 +458,7 @@ namespace ncore
         return false;
     }
 
-    bool str_to_int64(const char* str, const char* end, s16 base, s64* outValue)
+    bool str_to_int64(const char* str, const char* end, s8 base, s64* outValue)
     {
         *outValue = 0;
 
@@ -570,7 +570,7 @@ namespace ncore
         return false;
     }
 
-    bool from_str(const str_t& s, s32* outValue, s16 base)
+    bool from_str(const str_t& s, s32* outValue, s8 base)
     {
         if (outValue == nullptr)
             return false;
@@ -584,7 +584,7 @@ namespace ncore
         return str_to_int32(start, end, base, outValue);
     }
 
-    bool from_str(const str_t& s, u32* outValue, s16 base)
+    bool from_str(const str_t& s, u32* outValue, s8 base)
     {
         if (outValue == nullptr)
             return false;
@@ -599,7 +599,7 @@ namespace ncore
         return false;
     }
 
-    bool from_str(const str_t& s, s64* outValue, s16 base)
+    bool from_str(const str_t& s, s64* outValue, s8 base)
     {
         if (outValue == nullptr)
             return false;
@@ -613,7 +613,7 @@ namespace ncore
         return str_to_int64(start, end, base, outValue);
     }
 
-    bool from_str(const str_t& s, u64* outValue, s16 base)
+    bool from_str(const str_t& s, u64* outValue, s8 base)
     {
         if (outValue == nullptr)
             return false;
@@ -659,7 +659,7 @@ namespace ncore
         dest.m_const             = dest.m_ascii;
     }
 
-    void to_str(str_t& dest, byte value, s8 chars, s16 base)
+    void to_str(str_t& dest, byte value, s8 chars, s8 base)
     {
         if (dest.m_ascii == nullptr || base < 2 || base > 36)
             return;  // destination is not mutable or invalid base
@@ -711,7 +711,7 @@ namespace ncore
         dest.m_ascii[dest.m_end] = '\0';
     }
 
-    void to_str(str_t& dest, s32 value, s16 base)
+    void to_str(str_t& dest, s32 value, s8 base)
     {
         if (dest.m_ascii == nullptr || base < 2 || base > 36)
             return;  // destination is not mutable or invalid base
@@ -720,7 +720,7 @@ namespace ncore
         to_str(dest, (u32)((value < 0) ? -value : value), base);
     }
 
-    void to_str(str_t& dest, u32 value, s16 base)
+    void to_str(str_t& dest, u32 value, s8 base)
     {
         if (dest.m_ascii == nullptr || dest.m_end == dest.m_eos || base < 2 || base > 36)
             return;  // destination is not mutable or invalid base
